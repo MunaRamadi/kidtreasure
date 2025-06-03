@@ -74,6 +74,7 @@
 
         .logo-bounce {
             animation: bounce 1s ease-in-out;
+           
         }
 
         @keyframes bounce {
@@ -97,18 +98,15 @@
             <div class="flex items-center justify-between h-20">
 
                 <!-- Logo Section -->
-    <div class="flex items-center space-x-4 ltr:space-x-reverse">
-    <a href="/" class="flex items-center space-x-3 ltr:space-x-reverse group">
-        <div class="relative">
-            <!-- الشعار مع الصورة -->
-            <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-500 overflow-hidden border-2 border-white">
-                <!-- استبدل src بمسار صورتك -->
-                <img src="../../../public/d3ab5ee8-a0e5-49d1-8faa-eb7bb1e90bff">
-                <div class="absolute inset-0 rounded-full border-2 border-white/30 animate-spin-slow" style="animation-duration: 8s;"></div>
-            </div>
-            
-        </div>
-       
+ <div class="flex items-center space-x-4 ltr:space-x-reverse">
+     <a href="/" class="flex items-center space-x-3 ltr:space-x-reverse group">
+         <div class="relative">
+             <div class="w-20 h-17 rounded-full flex items-center justify-center shadow-lg transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-500 overflow-hidden border-2 border-white">
+                 <img src="{{ asset('images/824bf781-4537-4798-8606-8d9660988496.jfif') }}" alt="Children's Treasures Logo" class="w-full h-full object-cover"  width="50px" >
+                 <div class="absolute inset-0 rounded-full border-2 border-white/30 animate-spin-slow" style="animation-duration: 8s;"></div>
+             </div>
+             
+         </div>
     </a>
 </div>
 
