@@ -150,6 +150,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::delete('/{post}', 'destroy')->name('destroy');
         Route::patch('/{post}/toggle-status', 'toggleStatus')->name('toggle-status');
     });
+      Route::controller(AdminController::class)->prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', 'settingsIndex')->name('index'); // أو أي دالة عرض للإعدادات
+    });
 });
 
 require __DIR__.'/auth.php';
