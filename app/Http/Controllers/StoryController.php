@@ -12,20 +12,20 @@ class StoryController extends Controller
 
     public function index()
     {
-        // مثال: جلب القصص المعتمدة للنشر
+        // جلب القصص المعتمدة للنشر
         $stories = Story::where('status', 'approved')->orderByDesc('submission_date')->paginate(10); 
-        return view('pages.stories.index', compact('stories'));    
+        return view('stories.index', compact('stories'));    
     }
 
  
     public function create()
     {
-        return view('pages.stories.create');
+        return view('stories.create');
     }
 
     public function store(Request $request)
     {
-        // مثال: التحقق من صحة بيانات النموذج
+        // التحقق من صحة بيانات النموذج
         $request->validate([
             'child_name' => 'required|string|max:255',
             'child_age' => 'nullable|integer|min:1|max:18',
@@ -39,7 +39,7 @@ class StoryController extends Controller
             'video' => 'nullable|mimetypes:video/avi,video/mpeg,video/quicktime,video/mp4|max:10240', // Max 10MB
         ]);
 
-        // مثال: رفع الصورة والفيديو
+        // رفع الصورة والفيديو
         $imageUrl = null;
         if ($request->hasFile('image')) {
             $imageUrl = $request->file('image')->store('stories/images', 'public'); 
@@ -50,8 +50,7 @@ class StoryController extends Controller
             $videoUrl = $request->file('video')->store('stories/videos', 'public'); 
         }
 
-
-        // مثال: حفظ بيانات القصة في قاعدة البيانات
+        // حفظ بيانات القصة في قاعدة البيانات
         $story = Story::create([
             'user_id' => Auth::id(), // يسجل ID المستخدم الحالي إذا كان مسجلاً، وإلا سيكون null
             'child_name' => $request->child_name,
@@ -64,15 +63,11 @@ class StoryController extends Controller
             'content_en' => $request->content_en,
             'submission_date' => now(),
             'status' => 'pending', // تبدأ القصة كـ 'pending' للمراجعة
-            'image_url' => $imageUrl ? Storage::url($imageUrl) : null, // استخدام Storage::url لعرض الملفات
+            'image_url' => $imageUrl ? Storage::url($imageUrl) : null,
             'video_url' => $videoUrl ? Storage::url($videoUrl) : null,
         ]);
 
         // إعادة التوجيه بعد النجاح
         return redirect()->route('stories.index')->with('success', 'شكراً لمساهمتك! ستتم مراجعة قصتك قريباً.');
-
-      
-       
     }
-
 }

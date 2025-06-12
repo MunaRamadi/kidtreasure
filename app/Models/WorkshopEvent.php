@@ -12,6 +12,13 @@ class WorkshopEvent extends Model
     use HasFactory;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'workshop_events'; // Change this to your actual table name
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
