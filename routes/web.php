@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\ProductsController;
 use App\Http\Controllers\Admin\OrdersController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\StoriesController;
+use App\Http\Controllers\Admin\WorkshopManagementController;
 use App\Http\Controllers\Admin\WorkshopsController;
 use App\Http\Controllers\Admin\ContactMessagesController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
@@ -27,6 +28,7 @@ Route::get('/about', [AboutController::class, 'index'])->name('about');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index'); 
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show'); 
 Route::get('/workshops', [WorkshopController::class, 'index'])->name('workshops.index'); 
+Route::get('/workshops/static', [WorkshopController::class, 'staticWorkshops'])->name('workshops.static'); 
 Route::get('/workshops/{event}/register', [WorkshopController::class, 'showRegistrationForm'])->name('workshops.register.form'); 
 Route::post('/workshops/{event}/register', [WorkshopController::class, 'register'])->name('workshops.register'); 
 Route::post('/workshops/register-interest', [WorkshopController::class, 'registerInterest'])->name('workshops.register.interest');
@@ -117,7 +119,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     });
     
     // إدارة الورش
-    Route::controller(WorkshopsController::class)->prefix('workshops')->name('workshops.')->group(function () {
+    Route::controller(WorkshopManagementController::class)->prefix('workshops')->name('workshops.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{workshop}', 'show')->name('show');
+        Route::get('/{workshop}/edit', 'edit')->name('edit');
+        Route::put('/{workshop}', 'update')->name('update');
+        Route::delete('/{workshop}', 'destroy')->name('destroy');
+        Route::get('/{workshop}/registrations', 'registrations')->name('registrations');
+    });
+    
+    // إدارة فعاليات الورش (WorkshopEvents)
+    Route::controller(WorkshopsController::class)->prefix('workshop-events')->name('workshop-events.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');

@@ -335,7 +335,7 @@
             <div class="fade-in-left">
                 <div class="relative">
                     <div class="absolute -inset-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl blur opacity-75"></div>
-                    <img src="{{ asset('images/ArtRecycle.jpg') }}" alt="Children creating art from recycled materials" class="rounded-3xl relative z-10 w-full h-auto shadow-lg">
+                    <img src="{{ asset('images/WorkshopImg4.png') }}" alt="Children creating art from recycled materials" class="rounded-3xl relative z-10 w-full h-auto shadow-lg">
                 </div>
             </div>
             
@@ -408,134 +408,255 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            @forelse($upcomingEvents ?? [] as $event)
-                <div class="workshop-card glass-card card-hover-effect p-0 fade-in-up" style="animation-delay: {{ $loop->index * 0.2 }}s;">
-                    <div class="workshop-image">
-                        <img src="{{ $event->image_url ?? asset('images/workshops/default-workshop.jpg') }}" alt="{{ $event->title }}">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="bg-purple-500 bg-opacity-30 text-white px-3 py-1 rounded-full text-sm">{{ $event->category }}</span>
-                            <span class="text-white text-opacity-80 text-sm">{{ $event->duration }} mins</span>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-2">{{ $event->title }}</h3>
-                        <p class="text-white text-opacity-80 mb-4">{{ Str::limit($event->description, 100) }}</p>
-                        
-                        <div class="flex justify-between items-center mb-4">
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white text-opacity-80 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <span class="text-white text-opacity-80">{{ $event->event_date->format('M d, Y') }}</span>
-                            </div>
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white text-opacity-80 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span class="text-white text-opacity-80">{{ $event->start_time }}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-between items-center">
-                            <span class="text-white font-bold text-xl">{{ $event->price_jod > 0 ? $event->price_jod . ' JOD' : 'Free' }}</span>
-                            <a href="{{ route('workshops.register.form', $event) }}" class="btn-professional bg-white text-purple-700 px-4 py-2 rounded-full font-bold text-sm hover:bg-opacity-90">
-                                Register Now
-                            </a>
-                        </div>
-                    </div>
+            @forelse($workshops as $workshop)
+            <div class="workshop-card glass-card card-hover-effect p-0 fade-in-up">
+                <div class="workshop-image">
+                    <img src="{{ asset('images/workshopImg' . ($loop->iteration % 3 + 1) . '.png') }}" alt="{{ $workshop->name_en }}">
                 </div>
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="bg-purple-500 bg-opacity-30 text-white px-3 py-1 rounded-full text-sm">{{ $workshop->target_age_group }}</span>
+                        <span class="text-white text-opacity-80 text-sm">
+                            @if($workshop->events->isNotEmpty())
+                                {{ $workshop->events->first()->event_time }}
+                            @else
+                                Available Soon
+                            @endif
+                        </span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">{{ $workshop->name_en }}</h3>
+                    <p class="text-white text-opacity-80 mb-4">{{ \Illuminate\Support\Str::limit($workshop->description_en, 120) }}</p>
+                    
+                    @if($workshop->events->isNotEmpty())
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white text-opacity-80 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span class="text-white text-opacity-80">{{ \Carbon\Carbon::parse($workshop->events->first()->event_date)->format('M d, Y') }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white text-opacity-80 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-white text-opacity-80">{{ \Carbon\Carbon::parse($workshop->events->first()->event_time)->format('g:i A') }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-white font-bold text-xl">{{ $workshop->events->first()->price_jod }} JOD</span>
+                        <button type="button" class="btn-professional bg-white text-purple-700 px-4 py-2 rounded-full font-bold text-sm hover:bg-opacity-90" 
+                            onclick="openRegistrationModal('{{ $workshop->events->first()->id }}', '{{ $workshop->name_en }}')">
+                            Register Now
+                        </button>
+                    </div>
+                    @else
+                    <div class="flex justify-between items-center">
+                        <span class="text-white text-opacity-80">No events scheduled</span>
+                        <button type="button" class="btn-professional bg-white bg-opacity-50 text-purple-700 px-4 py-2 rounded-full font-bold text-sm cursor-not-allowed">
+                            Coming Soon
+                        </button>
+                    </div>
+                    @endif
+                </div>
+            </div>
             @empty
-                <div class="col-span-1 md:col-span-3 glass-card text-center p-12 fade-in-up">
-                    <h3 class="text-2xl font-bold mb-4">No Upcoming Workshops</h3>
-                    <p class="mb-6">We're preparing new and exciting workshops for you. Check back soon!</p>
-                    <a href="#register-interest" class="btn-professional bg-white text-purple-700 px-6 py-3 rounded-full font-bold">
-                        Register Interest
-                    </a>
+            <!-- Static Workshop 1 -->
+            <div class="workshop-card glass-card card-hover-effect p-0 fade-in-up" style="animation-delay: 0s;">
+                <div class="workshop-image">
+                    <img src="{{ asset('images/workshopImg1.png') }}" alt="Recycled Art Masterpieces">
                 </div>
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="bg-purple-500 bg-opacity-30 text-white px-3 py-1 rounded-full text-sm">Art & Craft</span>
+                        <span class="text-white text-opacity-80 text-sm">120 mins</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Recycled Art Masterpieces</h3>
+                    <p class="text-white text-opacity-80 mb-4">Children will learn to create beautiful art pieces from recycled materials, fostering creativity and environmental awareness.</p>
+                    
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white text-opacity-80 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span class="text-white text-opacity-80">{{ now()->addDays(7)->format('M d, Y') }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white text-opacity-80 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-white text-opacity-80">10:00 AM</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-white font-bold text-xl">25 JOD</span>
+                        <button type="button" class="btn-professional bg-white text-purple-700 px-4 py-2 rounded-full font-bold text-sm hover:bg-opacity-90" 
+                            onclick="openRegistrationModal('WS-2025-001', 'Recycled Art Masterpieces')">
+                            Register Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Static Workshop 2 -->
+            <div class="workshop-card glass-card card-hover-effect p-0 fade-in-up" style="animation-delay: 0.2s;">
+                <div class="workshop-image">
+                    <img src="{{ asset('images/workshopImg2.png') }}" alt="Storytelling & Imagination">
+                </div>
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="bg-purple-500 bg-opacity-30 text-white px-3 py-1 rounded-full text-sm">Storytelling</span>
+                        <span class="text-white text-opacity-80 text-sm">90 mins</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Storytelling & Imagination</h3>
+                    <p class="text-white text-opacity-80 mb-4">A workshop that encourages children to create and tell their own stories, developing language skills and imagination.</p>
+                    
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white text-opacity-80 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span class="text-white text-opacity-80">{{ now()->addDays(14)->format('M d, Y') }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white text-opacity-80 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-white text-opacity-80">2:00 PM</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-white font-bold text-xl">15 JOD</span>
+                        <button type="button" class="btn-professional bg-white text-purple-700 px-4 py-2 rounded-full font-bold text-sm hover:bg-opacity-90" 
+                            onclick="openRegistrationModal('WS-2025-002', 'Storytelling & Imagination')">
+                            Register Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Static Workshop 3 -->
+            <div class="workshop-card glass-card card-hover-effect p-0 fade-in-up" style="animation-delay: 0.4s;">
+                <div class="workshop-image">
+                    <img src="{{ asset('images/workshopImg3.png') }}" alt="Nature Explorers">
+                </div>
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="bg-purple-500 bg-opacity-30 text-white px-3 py-1 rounded-full text-sm">Nature & Science</span>
+                        <span class="text-white text-opacity-80 text-sm">150 mins</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Nature Explorers</h3>
+                    <p class="text-white text-opacity-80 mb-4">An outdoor workshop where children connect with nature through exploration, observation, and nature-inspired art activities.</p>
+                    
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white text-opacity-80 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span class="text-white text-opacity-80">{{ now()->addDays(21)->format('M d, Y') }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white text-opacity-80 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-white text-opacity-80">9:30 AM</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-white font-bold text-xl">30 JOD</span>
+                        <button type="button" class="btn-professional bg-white text-purple-700 px-4 py-2 rounded-full font-bold text-sm hover:bg-opacity-90" 
+                            onclick="openRegistrationModal('WS-2025-003', 'Nature Explorers')">
+                            Register Now
+                        </button>
+                    </div>
+                </div>
+            </div>
             @endforelse
         </div>
     </div>
 </section>
 
-<!-- Registration Form Section -->
-<section id="register-interest" class="py-24 section-bg-pattern bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 relative overflow-hidden">
-    <div class="container mx-auto px-6 relative z-10">
-        <div class="max-w-4xl mx-auto">
-            <div class="text-center mb-16 fade-in-up">
-                <h2 class="text-5xl md:text-6xl font-black mb-8">
-                    <span class="text-gradient-advanced">Register</span> Your Interest
-                </h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Interested in our workshops? Fill out the form below and we'll notify you about upcoming events.
-                </p>
+<!-- Registration Modal -->
+<div id="registrationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full mx-4 md:mx-auto max-h-[90vh] overflow-y-auto">
+        <div class="p-6 md:p-10">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-3xl font-bold text-gray-800" id="modalWorkshopTitle">Register Interest</h3>
+                <button type="button" onclick="closeRegistrationModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
             
-            <div class="glass-card bg-white bg-opacity-10 p-8 md:p-12 rounded-3xl shadow-2xl fade-in-up">
-                <form action="{{ route('workshops.register.interest') }}" method="POST" class="space-y-6">
-                    @csrf
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="form-input-group">
-                            <input type="text" name="parent_name" class="form-input" placeholder="Parent's Name *" required>
-                        </div>
-                        
-                        <div class="form-input-group">
-                            <input type="email" name="parent_email" class="form-input" placeholder="Parent's Email *" required>
-                        </div>
-                        
-                        <div class="form-input-group">
-                            <input type="tel" name="parent_phone" class="form-input" placeholder="Parent's Phone *" required>
-                        </div>
-                        
-                        <div class="form-input-group">
-                            <input type="text" name="child_name" class="form-input" placeholder="Child's Name *" required>
-                        </div>
-                        
-                        <div class="form-input-group">
-                            <input type="number" name="child_age" class="form-input" placeholder="Child's Age *" min="3" max="18" required>
-                        </div>
-                        
-                        <div class="form-input-group">
-                            <select name="preferred_day" class="form-input" required>
-                                <option value="" disabled selected>Preferred Day *</option>
-                                <option value="monday">Monday</option>
-                                <option value="tuesday">Tuesday</option>
-                                <option value="wednesday">Wednesday</option>
-                                <option value="thursday">Thursday</option>
-                                <option value="friday">Friday</option>
-                                <option value="saturday">Saturday</option>
-                                <option value="sunday">Sunday</option>
-                            </select>
-                        </div>
+            <form action="{{ route('workshops.register.interest') }}" method="POST" class="space-y-6">
+                @csrf
+                <input type="hidden" name="workshop_id" id="modalWorkshopId">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-input-group">
+                        <input type="text" name="parent_name" class="form-input" placeholder="Parent's Name *" required>
                     </div>
                     
                     <div class="form-input-group">
-                        <textarea name="special_requirements" class="form-input" placeholder="Any special requirements or interests?" rows="4"></textarea>
+                        <input type="email" name="parent_email" class="form-input" placeholder="Parent's Email *" required>
                     </div>
                     
                     <div class="form-input-group">
-                        <div class="flex items-start">
-                            <div class="flex items-center h-5">
-                                <input type="checkbox" name="privacy_policy" id="privacy_policy" class="h-5 w-5 rounded" required>
-                            </div>
-                            <div class="ml-3 text-sm">
-                                <label for="privacy_policy" class="text-white">
-                                    I agree to the <a href="#" class="text-blue-300 hover:text-blue-200 underline">Privacy Policy</a> and consent to be contacted about workshops.
-                                </label>
-                            </div>
-                        </div>
+                        <input type="tel" name="parent_phone" class="form-input" placeholder="Parent's Phone *" required>
                     </div>
                     
-                    <div class="mt-8">
-                        <button type="submit" class="register-btn btn-professional">
-                            Register Interest
-                        </button>
+                    <div class="form-input-group">
+                        <input type="text" name="child_name" class="form-input" placeholder="Child's Name *" required>
                     </div>
-                </form>
-            </div>
+                    
+                    <div class="form-input-group">
+                        <input type="number" name="child_age" class="form-input" placeholder="Child's Age *" min="3" max="18" required>
+                    </div>
+                    
+                    <div class="form-input-group">
+                        <select name="preferred_day" class="form-input" required>
+                            <option value="" disabled selected>Preferred Day *</option>
+                            <option value="monday">Monday</option>
+                            <option value="tuesday">Tuesday</option>
+                            <option value="wednesday">Wednesday</option>
+                            <option value="thursday">Thursday</option>
+                            <option value="friday">Friday</option>
+                            <option value="saturday">Saturday</option>
+                            <option value="sunday">Sunday</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-input-group">
+                    <textarea name="special_requirements" class="form-input" placeholder="Any special requirements or interests?" rows="4"></textarea>
+                </div>
+                
+                <div class="form-input-group">
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input type="checkbox" name="privacy_policy" id="privacy_policy" class="h-5 w-5 rounded" required>
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="privacy_policy" class="text-gray-700">
+                                I agree to the <a href="#" class="text-blue-600 hover:text-blue-800 underline">Privacy Policy</a> and consent to be contacted about workshops.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <button type="submit" class="register-btn btn-professional">
+                        Register Interest
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-</section>
+</div>
 
 <!-- Workshop FAQs Section -->
 <section class="py-24 bg-white">
@@ -607,6 +728,28 @@
                 }
             });
         });
+    });
+    
+    function openRegistrationModal(workshopId, workshopTitle) {
+        document.getElementById('modalWorkshopId').value = workshopId;
+        document.getElementById('modalWorkshopTitle').textContent = 'Register for: ' + workshopTitle;
+        document.getElementById('registrationModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+    }
+    
+    function closeRegistrationModal() {
+        document.getElementById('registrationModal').classList.add('hidden');
+        document.body.style.overflow = ''; // Re-enable scrolling
+    }
+    
+    // Close modal when clicking outside of it
+    document.addEventListener('click', function(event) {
+        const modal = document.getElementById('registrationModal');
+        const modalContent = modal.querySelector('div');
+        
+        if (event.target === modal) {
+            closeRegistrationModal();
+        }
     });
 </script>
 

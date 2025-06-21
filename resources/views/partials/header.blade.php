@@ -162,20 +162,61 @@
                 </nav>
 
                 <div class="hidden lg:flex items-center space-x-4 ltr:space-x-reverse">
-                    <div id="desktop-language-switcher" class="language-switcher flex items-center space-x-1 ltr:space-x-reverse text-gray-600 hover:text-indigo-600 cursor-pointer">
-                        <i class="fas fa-language text-lg"></i>
-                        <span class="text-sm font-medium" data-translate="switch_lang_desktop">Arabic</span>
-                    </div>
+                 
                     
+                    @guest
                     <a href="/login" class="flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-white font-medium px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 text-sm" data-translate="login_button">
                         <i class="fas fa-user"></i>
                         <span>Login</span>
                     </a>
+                    <a href="/register" class="flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-white font-medium px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 text-sm" data-translate="register_button">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Register</span>
+                    </a>
+                    @else
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-4 ltr:space-x-reverse text-indigo-600 hover:text-white font-medium px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 text-sm">
+                            <i class="fas fa-user-circle"></i>
+                            <span>{{ Auth::user()->name }}</span>
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-200" 
+                             x-transition:enter-start="opacity-0 scale-95" 
+                             x-transition:enter-end="opacity-100 scale-100" 
+                             x-transition:leave="transition ease-in duration-150" 
+                             x-transition:leave-start="opacity-100 scale-100" 
+                             x-transition:leave-end="opacity-0 scale-95" 
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50"
+                             style="display: none;">
+                            <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="profile_option">
+                                <i class="fas fa-user-circle mr-2"></i> Profile
+                            </a>
+                            <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="settings_option">
+                                <i class="fas fa-cog mr-2"></i> Settings
+                            </a>
+                            <a href="/orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="orders_option">
+                                <i class="fas fa-shopping-bag mr-2"></i> Orders
+                            </a>
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" data-translate="logout_option">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                     <a href="/cart" class="relative flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-white font-medium px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 text-sm" data-translate="cart_button">
                         <i class="fas fa-shopping-cart"></i>
                         <span>Cart</span>
                         <span class="cart-badge absolute -top-2 -right-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg">3</span>
                     </a>
+                    @endguest
+                       <div id="desktop-language-switcher" class="language-switcher flex items-center space-x-1 ltr:space-x-reverse text-gray-600 hover:text-indigo-600 cursor-pointer">
+                        <i class="fas fa-language text-lg"></i>
+                        <span class="text-sm font-medium" data-translate="switch_lang_desktop">Arabic</span>
+                    </div>
                 </div>
 
                 <div class="lg:hidden">
@@ -242,16 +283,51 @@
                             <span class="font-medium text-sm" data-translate="switch_lang_mobile">Switch to Arabic</span>
                         </div>
                     </div>
+                    @auth
+                    <div class="flex items-center justify-center mb-3">
+                        <div class="text-gray-700 font-medium text-sm px-3 py-2 bg-gray-100 rounded-lg w-full text-center">
+                            Hi, {{ Auth::user()->name }}
+                        </div>
+                    </div>
+                    @endauth
                     <div class="flex items-center justify-center space-x-3 ltr:space-x-reverse">
+                        @guest
                         <a href="/login" class="flex items-center space-x-2 ltr:space-x-reverse bg-indigo-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 flex-1 justify-center text-sm" data-translate="login_button">
                             <i class="fas fa-user"></i>
                             <span>Login</span>
                         </a>
+                        <a href="/register" class="flex items-center space-x-2 ltr:space-x-reverse bg-purple-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors duration-300 flex-1 justify-center text-sm" data-translate="register_button">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Register</span>
+                        </a>
+                        @else
+                        <div class="grid grid-cols-2 gap-2 w-full">
+                            <a href="/profile" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="profile_option">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Profile</span>
+                            </a>
+                            <a href="/settings" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="settings_option">
+                                <i class="fas fa-cog"></i>
+                                <span>Settings</span>
+                            </a>
+                            <a href="/orders" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="orders_option">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span>Orders</span>
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}" class="flex-1">
+                                @csrf
+                                <button type="submit" class="w-full flex items-center space-x-1 ltr:space-x-reverse bg-red-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors duration-300 justify-center text-sm" data-translate="logout_option">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Logout</span>
+                                </button>
+                            </form>
+                        </div>
                         <a href="/cart" class="relative flex items-center space-x-2 ltr:space-x-reverse bg-purple-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors duration-300 flex-1 justify-center text-sm" data-translate="cart_button">
                             <i class="fas fa-shopping-cart"></i>
                             <span>Cart</span>
                             <span class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">3</span>
                         </a>
+                        @endguest
                     </div>
                 </div>
             </div>
@@ -274,6 +350,12 @@
             'nav_about': "About Us",
             'nav_contact': "Contact Us",
             'login_button': "Login",
+            'register_button': "Register",
+            'profile_button': "Profile",
+            'profile_option': "Profile",
+            'settings_option': "Settings",
+            'orders_option': "Orders",
+            'logout_option': "Logout",
             'cart_button': "Cart",
             'switch_lang_desktop': "العربية", // Text shown for switching to Arabic
             'switch_lang_mobile': "Switch to Arabic" // Text shown for switching to Arabic in mobile
@@ -290,6 +372,12 @@
             'nav_about': "من نحن",
             'nav_contact': "اتصل بنا",
             'login_button': "تسجيل الدخول",
+            'register_button': "إنشاء حساب",
+            'profile_button': "الملف الشخصي",
+            'profile_option': "الملف الشخصي",
+            'settings_option': "الإعدادات",
+            'orders_option': "الطلبات",
+            'logout_option': "تسجيل الخروج",
             'cart_button': "السلة",
             'switch_lang_desktop': "English", // Text shown for switching to English
             'switch_lang_mobile': "التبديل إلى الإنجليزية" // Text shown for switching to English in mobile
@@ -396,3 +484,6 @@
 </script>
 </body>
 </html>
+
+<!-- Add Alpine.js for dropdown functionality -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
