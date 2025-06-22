@@ -120,6 +120,7 @@
             margin-left: 0.5rem; /* Adjust as needed for spacing */
         }
     </style>
+    
 </head>
 <body class="bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 min-h-screen">
     <header class="sticky top-0 z-50 glass-effect shadow-sm">
@@ -171,13 +172,11 @@
                         <i class="fas fa-user"></i>
                         <span>Login</span>
                     </a>
-                    <a href="/cart" class="relative flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-white font-medium px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 text-sm" data-translate="cart_button">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Cart</span>
-                        <span class="cart-badge absolute -top-2 -right-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg">3</span>
-                    </a>
+               <a href="/cart" class="relative flex items-center bg-purple-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors duration-300 flex-1 justify-center text-sm" ">
+               <i class="fas fa-shopping-cart"></i>
+               <span class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">3</span>
+              </a>
                 </div>
-
                 <div class="lg:hidden">
                     <button id="mobile-menu-button" class="relative p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-indigo-200">
                         <div class="w-5 h-0.5 bg-indigo-600 mb-1 transition-all duration-300" id="line1"></div>

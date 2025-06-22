@@ -340,10 +340,7 @@
                             <i class="fas fa-rocket mr-3 text-xl"></i>
                             <span>Explore Our World</span>
                         </a>
-                        <a href="/order" class="btn-professional glass-card text-white font-bold py-4 px-10 rounded-3xl text-lg border border-white/30 inline-flex items-center justify-center">
-                            <i class="fas fa-magic mr-3 text-xl"></i>
-                            <span>Start the Adventure</span>
-                        </a>
+                     
                     </div>
                 </div>
             </div>
@@ -442,13 +439,15 @@
                 <h3 class="text-3xl font-bold mb-6">Talk to Our Experts</h3>
                 <p class="text-white/90 mb-8 text-lg leading-relaxed">Get a free consultation from our specialized team to choose the best solutions for your child.</p>
                 <div class="space-y-4">
-                    <a href="tel:+962-XXX-XXXX" class="btn-professional bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600 text-white font-bold py-4 px-10 rounded-2xl text-lg inline-flex items-center w-full justify-center">
+                    <a href="tel:+962797793944" class="btn-professional bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600 text-white font-bold py-4 px-10 rounded-2xl text-lg inline-flex items-center w-full justify-center">
                         <i class="fas fa-phone mr-3"></i>
                         <span>Call Directly</span>
+                        
                     </a>
-                    <a href="https://wa.me/962XXXXXXXX" class="btn-professional bg-gradient-to-r from-green-600 via-green-700 to-emerald-800 text-white font-bold py-4 px-10 rounded-2xl text-lg inline-flex items-center w-full justify-center">
+                    <a href="https://wa.me/+962797793944" class="btn-professional bg-gradient-to-r from-green-600 via-green-700 to-emerald-800 text-white font-bold py-4 px-10 rounded-2xl text-lg inline-flex items-center w-full justify-center">
                         <i class="fab fa-whatsapp mr-3"></i>
                         <span>WhatsApp Now</span>
+                       
                     </a>
                 </div>
             </div>

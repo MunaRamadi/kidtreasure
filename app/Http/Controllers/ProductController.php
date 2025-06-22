@@ -86,32 +86,80 @@ class ProductController extends Controller
     }
 
     /**
-     * عرض صفحة تفاصيل المنتج
+     * عرض صفحة تفاصيل المنتج - مُحسَّن
      */
-    public function show(Product $product)
+    public function show($product)
     {
-        // التحقق من أن المنتج نشط
-        if (!$product->is_active) {
-            abort(404);
-        }
+        try {
+            // البحث عن المنتج بطريقة مرنة
+            if (is_numeric($product)) {
+                // إذا كان المعرف رقم
+                $product = Product::where('id', $product)
+                    ->where('is_active', true)
+                    ->first();
+            } else {
+                // إذا كان slug
+                $product = Product::where('slug', $product)
+                    ->orWhere('id', $product)
+                    ->where('is_active', true)
+                    ->first();
+            }
 
-        // منتجات مشابهة
-        $relatedProducts = Product::active()
-            ->where('id', '!=', $product->id)
-            ->where('category', $product->category)
-            ->limit(4)
-            ->get();
+            // التحقق من وجود المنتج
+            if (!$product) {
+                abort(404, 'المنتج غير موجود أو غير نشط');
+            }
 
-        // إذا لم توجد منتجات مشابهة، اختر منتجات عشوائية
-        if ($relatedProducts->isEmpty()) {
-            $relatedProducts = Product::active()
+            // تسجيل بيانات المنتج للتشخيص
+            \Log::info('Product Show - تفاصيل المنتج:', [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'detailed_description' => $product->detailed_description,
+                'difficulty_level' => $product->difficulty_level,
+                'estimated_time' => $product->estimated_time,
+                'material' => $product->material,
+                'dimensions' => $product->dimensions,
+                'features' => $product->features,
+                'components' => $product->components,
+                'skills_developed' => $product->skills_developed,
+                'educational_benefits' => $product->educational_benefits,
+                'price_jod' => $product->price_jod,
+                'stock_quantity' => $product->stock_quantity,
+                'category' => $product->category,
+                'age_group' => $product->age_group,
+                'is_active' => $product->is_active,
+                'is_featured' => $product->is_featured,
+                'image_paths' => [
+                    'main' => $product->image_path,
+                    'product' => $product->product_image_path,
+                    'featured' => $product->featured_image_path,
+                ],
+                'gallery_images' => $product->gallery_images,
+            ]);
+
+            // جلب المنتجات ذات الصلة
+            $relatedProducts = Product::where('category', $product->category)
+                ->where('is_active', true)
                 ->where('id', '!=', $product->id)
-                ->inRandomOrder()
-                ->limit(4)
+                ->limit(3)
                 ->get();
-        }
 
-        return view('pages.products.show', compact('product', 'relatedProducts'));
+            // تسجيل المنتجات ذات الصلة
+            \Log::info('Related Products Count:', ['count' => $relatedProducts->count()]);
+
+            return view('pages.products.show', compact('product', 'relatedProducts'));
+
+        } catch (\Exception $e) {
+            \Log::error('خطأ في عرض المنتج:', [
+                'product_identifier' => $product,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
+            abort(500, 'حدث خطأ في تحميل المنتج');
+        }
     }
 
     /**

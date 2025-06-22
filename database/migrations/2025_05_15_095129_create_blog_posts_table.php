@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('blog_posts', function (Blueprint $table) {
             $table->id('post_id');
+
+            // -->>  بداية التعديل <<--
+            // أضف هذا السطر لإنشاء عمود المفتاح الخارجي
+            $table->foreignId('author_id')->constrained('users')->onDelete('cascade');
+            // -->> نهاية التعديل  <<--
+
             $table->string('author_name');
             $table->string('title_ar');
             $table->string('title_en')->nullable();

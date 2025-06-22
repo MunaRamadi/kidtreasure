@@ -16,7 +16,7 @@ class ContactMessagesController extends Controller
     {
         $query = ContactMessage::query();
 
-        // البحث
+        // Search
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -27,19 +27,25 @@ class ContactMessagesController extends Controller
             });
         }
 
-        // التصفية حسب الحالة
+        // Filter by status
         if ($request->filled('status')) {
             $query->where('is_read', $request->status === 'read');
         }
 
         $messages = $query->latest('submission_date')->paginate(20)->withQueryString();
 
+        // Add debug information
+        \Log::info('Messages count: ' . $messages->count());
+        if ($messages->count() > 0) {
+            \Log::info('First message ID: ' . $messages->first()->id);
+        }
+
         return view('admin.contact-messages.index', compact('messages'));
     }
 
     public function show(ContactMessage $message)
     {
-        // تعليم الرسالة كمقروءة
+        // Mark the message as read
         if (!$message->is_read) {
             $message->update(['is_read' => true]);
         }
@@ -50,35 +56,45 @@ class ContactMessagesController extends Controller
     public function markAsRead(ContactMessage $message)
     {
         $message->update(['is_read' => true]);
-        return back()->with('success', 'تم تعليم الرسالة كمقروءة');
+        return back()->with('success', 'Message marked as read successfully.');
     }
 
     public function markAsUnread(ContactMessage $message)
     {
         $message->update(['is_read' => false]);
-        return back()->with('success', 'تم تعليم الرسالة كغير مقروءة');
+        return back()->with('success', 'Message marked as unread successfully.');
     }
 
     public function destroy(ContactMessage $message)
     {
         $message->delete();
         return redirect()->route('admin.contact-messages.index')
-            ->with('success', 'تم حذف الرسالة بنجاح');
+            ->with('success', 'Message deleted successfully.');
     }
 
     public function bulkMarkAsRead(Request $request)
     {
         $messageIds = $request->input('messages', []);
-        ContactMessage::whereIn('id', $messageIds)->update(['is_read' => true]);
         
-        return back()->with('success', 'تم تعليم الرسائل المحددة كمقروءة');
+        if (empty($messageIds)) {
+            return back()->with('error', 'No messages selected.');
+        }
+        
+        ContactMessage::whereIn('id', $messageIds)->update(['is_read' => true]);
+
+        return back()->with('success', 'Selected messages marked as read.');
     }
 
     public function bulkDelete(Request $request)
     {
         $messageIds = $request->input('messages', []);
-        ContactMessage::whereIn('id', $messageIds)->delete();
         
-        return back()->with('success', 'تم حذف الرسائل المحددة بنجاح');
+        if (empty($messageIds)) {
+            return back()->with('error', 'No messages selected.');
+        }
+        
+        ContactMessage::whereIn('id', $messageIds)->delete();
+
+        return back()->with('success', 'Selected messages deleted successfully.');
     }
 }

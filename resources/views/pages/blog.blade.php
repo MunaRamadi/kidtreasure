@@ -392,82 +392,14 @@
                 </p>
             </div>
             
-            <div class="fade-in-right">
-                <div class="flex flex-wrap justify-center gap-4 mb-12">
-                    <span class="eco-badge pulse-advanced">
-                        <i class="fas fa-recycle"></i>
-                        Recycling
-                    </span>
-                    <span class="eco-badge pulse-advanced" style="animation-delay: 0.2s;">
-                        <i class="fas fa-home"></i>
-                        Home Activities
-                    </span>
-                    <span class="eco-badge pulse-advanced" style="animation-delay: 0.4s;">
-                        <i class="fas fa-child"></i>
-                        Kids Education
-                    </span>
-                    <span class="eco-badge pulse-advanced" style="animation-delay: 0.6s;">
-                        <i class="fas fa-leaf"></i>
-                        Eco-Friendly
-                    </span>
-                </div>
+
             </div>
         </div>
     </div>
 </section>
 
 <!-- Search and Filter Section -->
-<section class="py-16 animated-bg relative overflow-hidden">
-    <div class="floating-elements">
-        <div class="floating-element"></div>
-        <div class="floating-element"></div>
-    </div>
-    
-    <div class="container mx-auto px-4 relative z-10">
-        <div class="max-w-4xl mx-auto">
-            <div class="search-box rounded-3xl p-8 mb-12 fade-in-up">
-                <div class="flex flex-col md:flex-row gap-6">
-                    <div class="flex-1">
-                        <div class="relative">
-                            <input type="text" 
-                                   placeholder="Search environmental articles..." 
-                                   class="w-full pl-14 pr-6 py-4 rounded-2xl border-0 bg-white/90 backdrop-filter backdrop-blur-10 shadow-lg focus:ring-4 focus:ring-white/30 text-lg font-medium">
-                            <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
-                        </div>
-                    </div>
-                    <button class="btn-professional px-8 py-4 bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600 text-white rounded-2xl hover:shadow-2xl font-bold text-lg">
-                        <i class="fas fa-search mr-3"></i>
-                        Search
-                    </button>
-                </div>
-            </div>
 
-            <!-- Categories -->
-            <div class="flex flex-wrap justify-center gap-4 mb-12 fade-in-left">
-                <button class="category-pill px-8 py-4 rounded-full font-medium active">
-                    <i class="fas fa-list mr-2"></i>
-                    All Articles
-                </button>
-                <button class="category-pill px-8 py-4 rounded-full font-medium">
-                    <i class="fas fa-recycle mr-2"></i>
-                    Recycling
-                </button>
-                <button class="category-pill px-8 py-4 rounded-full font-medium">
-                    <i class="fas fa-home mr-2"></i>
-                    Home Activities
-                </button>
-                <button class="category-pill px-8 py-4 rounded-full font-medium">
-                    <i class="fas fa-seedling mr-2"></i>
-                    Gardening
-                </button>
-                <button class="category-pill px-8 py-4 rounded-full font-medium">
-                    <i class="fas fa-lightbulb mr-2"></i>
-                    Creative Ideas
-                </button>
-            </div>
-        </div>
-    </div>
-</section>
 
 <!-- Blog Posts Section -->
 <section class="py-24 section-bg-pattern bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
@@ -517,23 +449,12 @@
                         </p>
                         
                         <div class="flex items-center justify-between">
-                            <a href="{{ route('blog.show', $post->id) }}" 
-                               class="btn-professional inline-flex items-center gap-3 bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 text-white px-6 py-3 rounded-2xl font-semibold hover:shadow-2xl">
-                                <span>Read More</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
+                           <a href="{{ route('blog.show', $post) }}" class="inline-flex items-center gap-2 font-semibold text-indigo-600 hover:text-indigo-800 transition-colors duration-300">
+        <span>Read More</span>
+        <i class="fas fa-arrow-right"></i>
+    </a>
                             
-                            <div class="flex items-center gap-4 text-gray-500">
-                                <button class="hover:text-red-500 transition-all duration-300 transform hover:scale-110">
-                                    <i class="far fa-heart text-lg"></i>
-                                </button>
-                                <button class="hover:text-blue-500 transition-all duration-300 transform hover:scale-110">
-                                    <i class="far fa-bookmark text-lg"></i>
-                                </button>
-                                <button class="hover:text-green-500 transition-all duration-300 transform hover:scale-110">
-                                    <i class="fas fa-share-alt text-lg"></i>
-                                </button>
-                            </div>
+                            
                         </div>
                     </div>
                 </article>
@@ -625,51 +546,9 @@
         <div class="floating-element"></div>
     </div>
     
-    <div class="container mx-auto px-4 relative z-10">
-        <div class="max-w-4xl mx-auto text-center">
-            <div class="fade-in-up">
-                <h2 class="text-5xl md:text-6xl font-black text-white mb-8 drop-shadow-2xl">
-                    Join the Eco Family 🌱
-                </h2>
-                <p class="text-xl md:text-2xl text-white/90 mb-12 leading-relaxed font-light">
-                    Get the latest environmental articles and activities directly in your inbox
-                </p>
-            </div>
+  
             
-            <div class="glass-card rounded-3xl p-8 md:p-12 fade-in-left">
-                <form class="flex flex-col md:flex-row gap-6">
-                    <div class="flex-1">
-                        <input type="email" 
-                               placeholder="Enter your email..." 
-                               class="w-full px-6 py-4 rounded-2xl border-0 bg-white/90 backdrop-filter backdrop-blur-10 shadow-lg focus:ring-4 focus:ring-white/30 text-lg font-medium"
-                               required>
-                    </div>
-                    <button type="submit" 
-                            class="btn-professional px-8 py-4 bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-700 text-white rounded-2xl hover:shadow-2xl font-bold text-lg whitespace-nowrap">
-                        <i class="fas fa-paper-plane mr-3"></i>
-                        Subscribe Now
-                    </button>
-                </form>
-                
-                <div class="mt-8 flex flex-wrap justify-center gap-4 text-white/80">
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-check-circle text-emerald-300"></i>
-                        <span>Weekly Articles</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-check-circle text-emerald-300"></i>
-                        <span>Free Activities</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-check-circle text-emerald-300"></i>
-                        <span>Environmental Tips</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
+           
 <!-- Social Media & Call to Action -->
 <section class="py-20 bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 relative overflow-hidden">
     <div class="stars">
@@ -700,14 +579,7 @@
                 <i class="fab fa-instagram text-3xl mb-2 text-pink-400"></i>
                 <div class="text-sm font-semibold">Instagram</div>
             </a>
-            <a href="#" class="glass-card btn-professional rounded-2xl p-6 text-white hover:scale-110 transition-all duration-300">
-                <i class="fab fa-youtube text-3xl mb-2 text-red-400"></i>
-                <div class="text-sm font-semibold">YouTube</div>
-            </a>
-            <a href="#" class="glass-card btn-professional rounded-2xl p-6 text-white hover:scale-110 transition-all duration-300">
-                <i class="fab fa-twitter text-3xl mb-2 text-blue-300"></i>
-                <div class="text-sm font-semibold">Twitter</div>
-            </a>
+        
         </div>
         
         <div class="text-center fade-in-right">
@@ -727,156 +599,162 @@
         </div>
     </div>
 </section>
-<section class="py-20 section-bg-pattern bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-    <div class="container mx-auto px-4">
-        <div class="text-center mb-16 fade-in-up">
-            <h2 class="text-4xl md:text-5xl font-black text-gray-800 mb-8">
-                <span class="text-gradient-advanced">Our Environmental Achievements</span> 🌟
-            </h2>
-            <div class="flex justify-center mb-8">
-                <div class="w-32 h-2 bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500 rounded-full"></div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="glass-card card-hover-effect rounded-3xl p-8 text-center shadow-2xl fade-in-left">
-                <div class="text-5xl font-black text-gradient-advanced mb-4">500+</div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Environmental Articles</h3>
-                <p class="text-gray-600">Educational articles and fun activities</p>
-                <div class="mt-6 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
-            </div>
-
-            <div class="glass-card card-hover-effect rounded-3xl p-8 text-center shadow-2xl fade-in-up" style="animation-delay: 0.2s;">
-                <div class="text-5xl font-black text-gradient-advanced mb-4">10K+</div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Participating Children</h3>
-                <p class="text-gray-600">Children who learned to love the environment</p>
-                <div class="mt-6 w-full h-1 bg-gradient-to-r from-green-500 to-teal-600 rounded-full"></div>
-            </div>
-
-            <div class="glass-card card-hover-effect rounded-3xl p-8 text-center shadow-2xl fade-in-up" style="animation-delay: 0.4s;">
-                <div class="text-5xl font-black text-gradient-advanced mb-4">1M+</div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Views</h3>
-                <p class="text-gray-600">Views on our environmental content</p>
-                <div class="mt-6 w-full h-1 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full"></div>
-            </div>
-
-            <div class="glass-card card-hover-effect rounded-3xl p-8 text-center shadow-2xl fade-in-right" style="animation-delay: 0.6s;">
-                <div class="text-5xl font-black text-gradient-advanced mb-4">50+</div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Environmental Projects</h3>
-                <p class="text-gray-600">Successfully implemented projects</p>
-                <div class="mt-6 w-full h-1 bg-gradient-to-r from-orange-500 to-red-600 rounded-full"></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<button id="backToTop" 
-        class="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 text-white rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 z-50 opacity-0 invisible btn-professional"
-        onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-    <i class="fas fa-arrow-up text-xl"></i>
-</button>
-
-<script>
-    // Back to top button visibility
-    window.addEventListener('scroll', function() {
-        const backToTop = document.getElementById('backToTop');
-        if (window.pageYOffset > 300) {
-            backToTop.style.opacity = '1';
-            backToTop.style.visibility = 'visible';
-        } else {
-            backToTop.style.opacity = '0';
-            backToTop.style.visibility = 'invisible';
+   <script >
+        // دالة للمساعدة في التحقق من وجود العنصر قبل التفاعل معه
+        function getElement(selector, isAll = false) {
+            const element = isAll ? document.querySelectorAll(selector) : document.querySelector(selector);
+            return element && (isAll ? element.length > 0 : true) ? element : null;
         }
-    });
 
-    // Category filter functionality
-    document.querySelectorAll('.category-pill').forEach(pill => {
-        pill.addEventListener('click', function() {
-            // Remove active class from all pills
-            document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
-            // Add active class to clicked pill
-            this.classList.add('active');
-            
-            // Add filtering logic here if needed
-            console.log('Selected category:', this.textContent.trim());
-        });
-    });
-
-    // Search functionality
-    document.querySelector('.search-box button').addEventListener('click', function(e) {
-        e.preventDefault();
-        const searchTerm = document.querySelector('.search-box input').value;
-        if (searchTerm.trim()) {
-            // Add search logic here
-            console.log('Searching for:', searchTerm);
-            // You can add AJAX search or redirect to search results
-        }
-    });
-
-    // Newsletter form submission
-    document.querySelector('.newsletter-bg form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = this.querySelector('input[type="email"]').value;
-        if (email) {
-            // Add newsletter subscription logic here
-            console.log('Newsletter subscription for:', email);
-            alert('Thank you! Your subscription has been successfully registered 🌱');
-            this.querySelector('input[type="email"]').value = '';
-        }
-    });
-
-    // Social sharing functionality
-    function shareArticle(url, title) {
-        if (navigator.share) {
-            navigator.share({
-                title: title,
-                url: url
+        // --- 1. زر العودة للأعلى (Back to top button visibility) ---
+        const backToTopBtn = getElement('#backToTop');
+        if (backToTopBtn) {
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopBtn.style.opacity = '1';
+                    backToTopBtn.style.visibility = 'visible';
+                } else {
+                    backToTopBtn.style.opacity = '0';
+                    backToTopBtn.style.visibility = 'hidden'; // تم التصحيح من 'invisible'
+                }
             });
-        } else {
-            // Fallback for browsers that don't support Web Share API
-            const shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
-            window.open(shareUrl, '_blank');
-        }
-    }
 
-    // Add share functionality to share buttons
-    document.querySelectorAll('.fa-share-alt').forEach(btn => {
-        btn.parentElement.addEventListener('click', function(e) {
-            e.preventDefault();
-            const articleCard = this.closest('.blog-card');
-            const title = articleCard.querySelector('h3').textContent;
-            const url = window.location.href;
-            shareArticle(url, title);
-        });
-    });
-
-    // Smooth scrolling for internal links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
+            // إضافة وظيفة النقر للعودة للأعلى
+            backToTopBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth' // للتمرير الناعم
                 });
-            }
-        });
-    });
+            });
+        }
 
-    // Add loading state to buttons
-    document.querySelectorAll('.btn-professional').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const originalText = this.innerHTML;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Loading...';
-            this.disabled = true;
-            
-            // Re-enable after 2 seconds (adjust as needed)
-            setTimeout(() => {
-                this.innerHTML = originalText;
-                this.disabled = false;
-            }, 2000);
-        });
-    });
-</script>
+        // --- 2. وظيفة تصفية الفئات (Category filter functionality) ---
+        const categoryPills = getElement('.category-pill', true); // true للحصول على كل العناصر
+        if (categoryPills) {
+            categoryPills.forEach(pill => {
+                pill.addEventListener('click', function() {
+                    // إزالة فئة 'active' من جميع الأقراص
+                    categoryPills.forEach(p => p.classList.remove('active'));
+                    // إضافة فئة 'active' إلى القرص الذي تم النقر عليه
+                    this.classList.add('active');
+
+                    // أضف منطق التصفية هنا إذا لزم الأمر
+                    console.log('الفئة المختارة:', this.textContent.trim());
+                });
+            });
+        }
+
+        // --- 3. وظيفة البحث (Search functionality) ---
+        const searchButton = getElement('.search-box button');
+        const searchInput = getElement('.search-box input');
+        if (searchButton && searchInput) {
+            searchButton.addEventListener('click', function(e) {
+                e.preventDefault(); // منع السلوك الافتراضي للزر (إرسال النموذج)
+                const searchTerm = searchInput.value.trim();
+                if (searchTerm) {
+                    // أضف منطق البحث هنا
+                    console.log('البحث عن:', searchTerm);
+                    // يمكنك إضافة بحث AJAX أو إعادة التوجيه إلى صفحة نتائج البحث
+                }
+            });
+        }
+
+        // --- 4. إرسال نموذج النشرة الإخبارية (Newsletter form submission) ---
+        const newsletterForm = getElement('.newsletter-bg form');
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // منع السلوك الافتراضي للنموذج (إعادة تحميل الصفحة)
+                const emailInput = this.querySelector('input[type="email"]');
+                const email = emailInput ? emailInput.value.trim() : '';
+
+                if (email) {
+                    // أضف منطق الاشتراك في النشرة الإخبارية هنا
+                    console.log('اشتراك النشرة الإخبارية لـ:', email);
+                    alert('شكرا لك! تم تسجيل اشتراكك بنجاح 🌱');
+                    if (emailInput) {
+                        emailInput.value = ''; // مسح حقل البريد الإلكتروني
+                    }
+                }
+            });
+        }
+
+        // --- 5. وظيفة المشاركة الاجتماعية (Social sharing functionality) ---
+        function shareArticle(url, title) {
+            if (navigator.share) { // Web Share API (للمتصفحات التي تدعمها)
+                navigator.share({
+                    title: title,
+                    url: url
+                }).catch(error => console.error('خطأ في المشاركة:', error));
+            } else {
+                // بديل للمتصفحات التي لا تدعم Web Share API (مثال: تويتر)
+                const shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+                window.open(shareUrl, '_blank', 'noopener,noreferrer'); // فتح في نافذة جديدة مع حماية
+            }
+        }
+
+        const shareButtons = getElement('.fa-share-alt', true);
+        if (shareButtons) {
+            shareButtons.forEach(btn => {
+                const parentLink = btn.parentElement; // يفترض أن الأيقونة داخل <a href="#">
+                if (parentLink && parentLink.tagName === 'A') { // التأكد من أنه رابط
+                    parentLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const articleCard = this.closest('.blog-card'); // البحث عن أقرب عنصر 'blog-card'
+                        if (articleCard) {
+                            const titleElement = articleCard.querySelector('h3');
+                            // إذا لم يكن هناك عنوان H3، يمكن استخدام عنوان الصفحة الافتراضي
+                            const title = titleElement ? titleElement.textContent.trim() : document.title; 
+                            const url = this.href && this.href !== '#' ? this.href : window.location.href; // استخدام رابط المقال إن وجد، وإلا رابط الصفحة الحالية
+                            shareArticle(url, title);
+                        } else {
+                            // إذا لم يتم العثور على .blog-card، يمكن مشاركة الصفحة الحالية
+                            shareArticle(window.location.href, document.title);
+                        }
+                    });
+                }
+            });
+        }
+
+        // --- 6. التمرير السلس للروابط الداخلية (Smooth scrolling for internal links) ---
+        const internalLinks = getElement('a[href^="#"]', true);
+        if (internalLinks) {
+            internalLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetSelector = this.getAttribute('href');
+                    const target = document.querySelector(targetSelector);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start' // التمرير ليكون الجزء العلوي من العنصر في بداية الرؤية
+                        });
+                    }
+                });
+            });
+        }
+
+        // --- 7. إضافة حالة التحميل للأزرار (Add loading state to buttons) ---
+        const professionalButtons = getElement('.btn-professional', true);
+        if (professionalButtons) {
+            professionalButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const originalText = this.innerHTML; // حفظ النص الأصلي للزر
+                    
+                    // منع النقر المتكرر أثناء التحميل
+                    if (this.disabled) {
+                        return;
+                    }
+
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>جاري التحميل...'; // إضافة أيقونة التحميل
+                    this.disabled = true; // تعطيل الزر
+
+                    // إعادة تمكين الزر واستعادة نصه بعد 2 ثانية (يمكنك تعديل المدة أو جعلها بعد اكتمال عملية حقيقية)
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    }, 2000); 
+                });
+            });
+        }
+    </script>
 @endsection
