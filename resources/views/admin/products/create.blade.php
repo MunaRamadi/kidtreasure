@@ -100,11 +100,54 @@
                                         name="age_group" 
                                         required>
                                     <option value="">اختر الفئة العمرية</option>
-                                    @foreach($ageGroups as $ageGroup)
-                                        <option value="{{ $ageGroup }}" {{ old('age_group') == $ageGroup ? 'selected' : '' }}>
-                                            {{ $ageGroup }}
-                                        </option>
-                                    @endforeach
+                                    <option value="1 سنة" {{ old('age_group') == '1 سنة' ? 'selected' : '' }}>
+                                        👶 1 سنة
+                                    </option>
+                                    <option value="2 سنة" {{ old('age_group') == '2 سنة' ? 'selected' : '' }}>
+                                        👶 2 سنة
+                                    </option>
+                                    <option value="3 سنوات" {{ old('age_group') == '3 سنوات' ? 'selected' : '' }}>
+                                        🧒 3 سنوات
+                                    </option>
+                                    <option value="4 سنوات" {{ old('age_group') == '4 سنوات' ? 'selected' : '' }}>
+                                        🧒 4 سنوات
+                                    </option>
+                                    <option value="5 سنوات" {{ old('age_group') == '5 سنوات' ? 'selected' : '' }}>
+                                        🧒 5 سنوات
+                                    </option>
+                                    <option value="6 سنوات" {{ old('age_group') == '6 سنوات' ? 'selected' : '' }}>
+                                        👦 6 سنوات
+                                    </option>
+                                    <option value="7 سنوات" {{ old('age_group') == '7 سنوات' ? 'selected' : '' }}>
+                                        👦 7 سنوات
+                                    </option>
+                                    <option value="8 سنوات" {{ old('age_group') == '8 سنوات' ? 'selected' : '' }}>
+                                        👦 8 سنوات
+                                    </option>
+                                    <option value="9 سنوات" {{ old('age_group') == '9 سنوات' ? 'selected' : '' }}>
+                                        👧 9 سنوات
+                                    </option>
+                                    <option value="10 سنوات" {{ old('age_group') == '10 سنوات' ? 'selected' : '' }}>
+                                        👧 10 سنوات
+                                    </option>
+                                    <option value="11 سنة" {{ old('age_group') == '11 سنة' ? 'selected' : '' }}>
+                                        🧑 11 سنة
+                                    </option>
+                                    <option value="12 سنة" {{ old('age_group') == '12 سنة' ? 'selected' : '' }}>
+                                        🧑 12 سنة
+                                    </option>
+                                    <option value="13 سنة" {{ old('age_group') == '13 سنة' ? 'selected' : '' }}>
+                                        🧑 13 سنة
+                                    </option>
+                                    <option value="3-5 سنوات" {{ old('age_group') == '3-5 سنوات' ? 'selected' : '' }}>
+                                        🧒 3-5 سنوات
+                                    </option>
+                                    <option value="6-8 سنوات" {{ old('age_group') == '6-8 سنوات' ? 'selected' : '' }}>
+                                        👦 6-8 سنوات
+                                    </option>
+                                    <option value="9-12 سنة" {{ old('age_group') == '9-12 سنة' ? 'selected' : '' }}>
+                                        👧 9-12 سنة
+                                    </option>
                                 </select>
                                 @error('age_group')
                                     <div class="invalid-feedback">{{ $message }}</div>
