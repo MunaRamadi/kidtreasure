@@ -120,6 +120,7 @@
             margin-left: 0.5rem; /* Adjust as needed for spacing */
         }
     </style>
+    
 </head>
 <body class="bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 min-h-screen">
     <header class="sticky top-0 z-50 glass-effect shadow-sm">
@@ -218,7 +219,6 @@
                         <span class="text-sm font-medium" data-translate="switch_lang_desktop">Arabic</span>
                     </div>
                 </div>
-
                 <div class="lg:hidden">
                     <button id="mobile-menu-button" class="relative p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-indigo-200">
                         <div class="w-5 h-0.5 bg-indigo-600 mb-1 transition-all duration-300" id="line1"></div>

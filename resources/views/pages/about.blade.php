@@ -374,7 +374,7 @@
                             <i class="fas fa-rocket mr-3 text-xl"></i>
                             <span>Explore Our Products</span>
                         </a>
-                        <a href="/contact" class="btn-professional glass-card text-white font-bold py-4 px-10 rounded-3xl text-lg border border-white/30 inline-flex items-center justify-center">
+                        <a href="/contact-us" class="btn-professional glass-card text-white font-bold py-4 px-10 rounded-3xl text-lg border border-white/30 inline-flex items-center justify-center">
                             <i class="fas fa-envelope mr-3 text-xl"></i>
                             <span>Contact Us</span>
                         </a>
@@ -457,7 +457,7 @@
                 </div>
                 <h3 class="text-3xl font-bold mb-6 text-center">Our Vision</h3>
                 <p class="text-white/90 text-lg leading-relaxed text-center">
-                    A world where every child has access to creative and sustainable education, empowering them to develop their full potential and become environmentally responsible citizens.
+                Our vision for "Kids' Treasures" is to be an inspiring creative platform that breathes new life into used toys, fostering a love for discovery, environmental awareness, and sustainable innovation in every home and school
                 </p>
             </div>
             
@@ -467,7 +467,8 @@
                 </div>
                 <h3 class="text-3xl font-bold mb-6 text-center">Our Mission</h3>
                 <p class="text-white/90 text-lg leading-relaxed text-center">
-                    To empower children by providing innovative and sustainable educational tools that foster creativity, curiosity, and environmental awareness.
+                    We provide interactive, upcycled boxes filled with carefully selected toys, artistic tools, and educational materials that empower children to learn through play, fostering creativity, environmental responsibility, and design thinking.
+
                 </p>
             </div>
             
@@ -476,28 +477,12 @@
                     <i class="fas fa-heart text-white text-3xl"></i>
                 </div>
                 <h3 class="text-3xl font-bold mb-6 text-center">Our Values</h3>
-                <ul class="text-white/90 leading-relaxed space-y-3 text-left values-list">
-                    <li class="flex items-center">
-                        <i class="fas fa-check-circle text-yellow-400 mr-3"></i>
-                        <span>Creativity & Innovation</span>
-                    </li>
-                    <li class="flex items-center">
-                        <i class="fas fa-check-circle text-green-400 mr-3"></i>
-                        <span>Environmental Sustainability</span>
-                    </li>
-                    <li class="flex items-center">
-                        <i class="fas fa-check-circle text-blue-400 mr-3"></i>
-                        <span>Active Learning</span>
-                    </li>
-                    <li class="flex items-center">
-                        <i class="fas fa-check-circle text-purple-400 mr-3"></i>
-                        <span>Inclusivity</span>
-                    </li>
-                    <li class="flex items-center">
-                        <i class="fas fa-check-circle text-pink-400 mr-3"></i>
-                        <span>Quality Excellence</span>
-                    </li>
-                </ul>
+               <p class="text-white/90 text-lg leading-relaxed text-center">
+                  
+From every forgotten toy a new treasure awaits
+We believe every old toy holds a fresh opportunity for learning and creativity — and that children are the true changemakers toward a smarter, more sustainable world.
+
+                </p>
             </div>
         </div>
     </div>
@@ -515,107 +500,85 @@
             </div>
         </div>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+            <!-- Mona Al-Ramadi -->
             <div class="team-card card-hover-effect rounded-3xl p-8 text-center shadow-xl fade-in-left">
                 <div class="mb-6">
                     <div class="relative">
                         <div class="absolute -inset-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur opacity-75"></div>
-                        <img src="{{ asset('images/team/mona-al-ramadi.jpg') }}" 
+                        <img src="{{ asset('images/36f9f17c-ea58-4750-8512-ef1401e71ecc.jfif') }}" 
                              alt="Mona Al-Ramadi" 
                              class="relative rounded-full w-32 h-32 mx-auto object-cover border-4 border-white shadow-xl">
                     </div>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Mona Al-Ramadi</h3>
-                <p class="text-blue-600 font-medium mb-4">Founder and CEO</p>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Mona<br>Al-Ramadi</h3>
                 <p class="text-gray-600 text-sm mb-6 leading-relaxed">
-                    A former teacher and early childhood education expert with a passion for sustainable and creative learning.
+                    Founder and CEO. She holds a Master's degree in Management from Yarmouk University. Mona has experience in administrative work, marketing, and financial collection.
                 </p>
-                <div class="flex justify-center space-x-4">
-                    <a href="#" class="text-blue-600 hover:text-blue-800 transition-colors">
-                        <i class="fab fa-linkedin text-xl"></i>
-                    </a>
-                    <a href="#" class="text-blue-400 hover:text-blue-600 transition-colors">
-                        <i class="fab fa-twitter text-xl"></i>
-                    </a>
-                    <a href="#" class="text-gray-700 hover:text-gray-900 transition-colors">
-                        <i class="fas fa-envelope text-xl"></i>
-                    </a>
-                </div>
             </div>
             
             <div class="team-card card-hover-effect rounded-3xl p-8 text-center shadow-xl fade-in-up" style="animation-delay: 0.2s;">
                 <div class="mb-6">
                     <div class="relative">
                         <div class="absolute -inset-2 bg-gradient-to-r from-green-500 to-teal-600 rounded-full blur opacity-75"></div>
-                        <img src="{{ asset('images/team/laila-abdullah.jpg') }}" 
+                        <img src="{{ asset('images/754dd7a0-05fa-4382-a07b-2c0085a26e27.jfif') }}" 
                              alt="Laila Abdullah" 
                              class="relative rounded-full w-32 h-32 mx-auto object-cover border-4 border-white shadow-xl">
                     </div>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Laila Abdullah</h3>
-                <p class="text-blue-600 font-medium mb-4">Product Development Manager</p>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Faisal<br> Al-Shalabi</h3>
                 <p class="text-gray-600 text-sm mb-6 leading-relaxed">
-                    An educational designer with extensive experience in developing learning materials for children.
+                   Holds a Master's degree in Management from Yarmouk University. He has experience in administrative and financial work, handicrafts, maintenance, and sales.
                 </p>
-                <div class="flex justify-center space-x-4">
-                    <a href="#" class="text-blue-600 hover:text-blue-800 transition-colors">
-                        <i class="fab fa-linkedin text-xl"></i>
-                    </a>
-                    <a href="#" class="text-gray-700 hover:text-gray-900 transition-colors">
-                        <i class="fas fa-envelope text-xl"></i>
-                    </a>
-                </div>
+            
             </div>
             
             <div class="team-card card-hover-effect rounded-3xl p-8 text-center shadow-xl fade-in-right" style="animation-delay: 0.4s;">
                 <div class="mb-6">
                     <div class="relative">
                         <div class="absolute -inset-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full blur opacity-75"></div>
-                        <img src="{{ asset('images/team/ahmed-al-khatib.jpg') }}" 
+                        <img src="{{ asset('images/433221b2-f364-4f22-9f6b-a03aa1e9bacd.jfif') }}" 
                              alt="Ahmed Al-Khatib" 
                              class="relative rounded-full w-32 h-32 mx-auto object-cover border-4 border-white shadow-xl">
                     </div>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Ahmed Al-Khatib</h3>
-                <p class="text-blue-600 font-medium mb-4">Workshops Manager</p>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Hassan <br>Al-Shalabi </h3>
                 <p class="text-gray-600 text-sm mb-6 leading-relaxed">
-                    A professional trainer with a passion for educating children and inspiring exploration.
+                   Holds a Bachelor's degree in Computer Science from Al-Balqa Applied University. He handles technical and IT support.
                 </p>
-                <div class="flex justify-center space-x-4">
-                    <a href="#" class="text-blue-600 hover:text-blue-800 transition-colors">
-                        <i class="fab fa-linkedin text-xl"></i>
-                    </a>
-                    <a href="#" class="text-gray-700 hover:text-gray-900 transition-colors">
-                        <i class="fas fa-envelope text-xl"></i>
-                    </a>
-                </div>
+            
             </div>
             
             <div class="team-card card-hover-effect rounded-3xl p-8 text-center shadow-xl fade-in-left" style="animation-delay: 0.6s;">
                 <div class="mb-6">
                     <div class="relative">
                         <div class="absolute -inset-2 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-full blur opacity-75"></div>
-                        <img src="{{ asset('images/team/sarah-al-qasim.jpg') }}" 
+                        <img src="{{ asset('images/58c2957e-5c77-438c-b3bb-9faba32a834e.jfif') }}" 
                              alt="Sarah Al-Qasim" 
                              class="relative rounded-full w-32 h-32 mx-auto object-cover border-4 border-white shadow-xl">
                     </div>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Sarah Al-Qasim</h3>
-                <p class="text-blue-600 font-medium mb-4">Marketing Manager</p>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Noor<br>Al-Shalabi</h3>
                 <p class="text-gray-600 text-sm mb-6 leading-relaxed">
-                    A marketing professional specializing in social media and digital marketing.
+                  Holds a Bachelor's degree in Business Administration from Al-Balqa Applied University. She performs administrative tasks and sales
                 </p>
-                <div class="flex justify-center space-x-4">
-                    <a href="#" class="text-blue-600 hover:text-blue-800 transition-colors">
-                        <i class="fab fa-linkedin text-xl"></i>
-                    </a>
-                    <a href="#" class="text-blue-400 hover:text-blue-600 transition-colors">
-                        <i class="fab fa-twitter text-xl"></i>
-                    </a>
-                    <a href="#" class="text-gray-700 hover:text-gray-900 transition-colors">
-                        <i class="fas fa-envelope text-xl"></i>
-                    </a>
+             
+            </div>
+
+             <div class="team-card card-hover-effect rounded-3xl p-8 text-center shadow-xl fade-in-left" style="animation-delay: 0.6s;">
+                <div class="mb-6">
+                    <div class="relative">
+                        <div class="absolute -inset-2 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-full blur opacity-75"></div>
+                        <img src="{{ asset('images/24f1ad5e-9b8d-49cc-9fcc-b7b94c5d5105.jfif') }}" 
+                             alt="Sarah Al-Qasim" 
+                             class="relative rounded-full w-32 h-32 mx-auto object-cover border-4 border-white shadow-xl">
+                    </div>
                 </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Mohammad<br>Al-Shalabi</h3>
+                <p class="text-gray-600 text-sm mb-6 leading-relaxed">
+                 A high school student who assists with sorting, classifying, and packaging toys.
+                </p>
+             
             </div>
         </div>
     </div>
@@ -635,10 +598,7 @@
             </p>
             
             <div class="flex flex-col sm:flex-row gap-6 justify-center">
-                <a href="/contact" class="btn-professional bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-yellow-500 hover:via-orange-600 hover:to-red-600 text-white font-bold py-4 px-10 rounded-3xl text-lg shadow-2xl inline-flex items-center justify-center pulse-advanced">
-                    <i class="fas fa-handshake mr-3 text-xl"></i>
-                    <span>Partner With Us</span>
-                </a>
+              
                 <a href="/products" class="btn-professional glass-card text-white font-bold py-4 px-10 rounded-3xl text-lg border border-white/30 inline-flex items-center justify-center">
                     <i class="fas fa-shopping-cart mr-3 text-xl"></i>
                     <span>Shop Our Products</span>
@@ -665,7 +625,7 @@
                 <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 shadow-xl">
                     <i class="fas fa-users text-white text-2xl"></i>
                 </div>
-                <div class="text-4xl font-bold text-blue-600 mb-2">5,000+</div>
+                <div class="text-4xl font-bold text-blue-600 mb-2">500+</div>
                 <div class="text-gray-700 font-medium">Children Reached</div>
             </div>
             
@@ -689,7 +649,7 @@
                 <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 shadow-xl">
                     <i class="fas fa-map-marker-alt text-white text-2xl"></i>
                 </div>
-                <div class="text-4xl font-bold text-orange-600 mb-2">3</div>
+                <div class="text-4xl font-bold text-orange-600 mb-2">12</div>
                 <div class="text-gray-700 font-medium">Governorates Covered</div>
             </div>
         </div>
@@ -725,38 +685,7 @@
 </section>
 
 <!-- Video Section -->
-<section class="py-24 bg-white">
-    <div class="max-w-6xl mx-auto px-6">
-        <div class="text-center mb-16 fade-in-up">
-            <h2 class="text-5xl md:text-7xl font-black text-gray-800 mb-8">
-                <span class="text-gradient-advanced">Our Story</span> in Motion
-            </h2>
-            <div class="flex justify-center mb-8">
-                <div class="w-32 h-2 bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500 rounded-full"></div>
-            </div>
-        </div>
-        
-        <div class="glass-card card-hover-effect rounded-3xl overflow-hidden shadow-2xl fade-in-up">
-            <div class="relative">
-                <div class="absolute -inset-8 bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500 rounded-3xl blur-xl opacity-30"></div>
-                <div class="relative aspect-w-16 aspect-h-9">
-                    <iframe class="w-full h-96 rounded-3xl" 
-                            src="https://youtu.be/xkXedgaE01w?list=PLiSv5Y43Zxg1xaDiiDVjiJoZFAwNg50yP" 
-                            title="Children's Treasures Introduction" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen></iframe>
-                </div>
-            </div>
-            <div class="p-8 text-center">
-                <h3 class="text-2xl font-bold text-gray-900 mb-4">Discover Our Journey</h3>
-                <p class="text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto">
-                    Watch how we design and produce our sustainable educational tools, and see the impact we're making in children's lives across Jordan.
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
+
 
 <!-- Join Us Section -->
 <section class="py-24 animated-bg text-white relative overflow-hidden">
@@ -806,10 +735,7 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row justify-center gap-6">
-                    <a href="/join-us" class="btn-professional bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-yellow-500 hover:via-orange-600 hover:to-red-600 text-white font-bold py-4 px-10 rounded-3xl text-lg shadow-2xl inline-flex items-center justify-center">
-                        <i class="fas fa-user-plus mr-3 text-xl"></i>
-                        <span>Join as a Volunteer</span>
-                    </a>
+             
                     <a href="/contact" class="btn-professional glass-card text-white font-bold py-4 px-10 rounded-3xl text-lg border border-white/30 inline-flex items-center justify-center">
                         <i class="fas fa-envelope mr-3 text-xl"></i>
                         <span>Contact Us</span>
@@ -839,23 +765,23 @@
             
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
-                    <img src="{{ asset('images/partners/jordan-education-ministry.png') }}" 
-                         alt="Jordan Ministry of Education" 
+                    <img src="{{ asset('https://d2az9qivg16qd4.cloudfront.net/s3fs-public/Ministry%20of%20Education%20Logo-01_0.png') }}" 
+                         alt="Ministry of Education" 
                          class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
                 </div>
                 <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
-                    <img src="{{ asset('images/partners/unicef.png') }}" 
-                         alt="UNICEF" 
+                    <img src="{{ asset('https://grc-jordan.org/wp-content/uploads/2022/08/Ministry-of-Environment.png') }}" 
+                         alt="Ministry of Environment" 
                          class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
                 </div>
                 <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
-                    <img src="{{ asset('images/partners/sustainable-education-foundation.png') }}" 
-                         alt="Sustainable Education Foundation" 
+                    <img src="{{ asset('https://amman.clustermappinginitiative.org/sites/default/files/The%20Children%27s%20Museum%20Jordan.png') }}" 
+                         alt="The Children's Museum Jordan" 
                          class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
                 </div>
                 <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
-                    <img src="{{ asset('images/partners/creative-learning-initiative.png') }}" 
-                         alt="Creative Learning Initiative" 
+                    <img src="{{ asset('https://media.licdn.com/dms/image/v2/D4E0BAQGyMJr7YeYu_Q/company-logo_200_200/B4EZZTBtcgHYAM-/0/1745149681356/orange_jordan_logo?e=1755734400&v=beta&t=Bn81SUJzdbnSYsp-JoJe6v54lX0MAEg3eBvKBFezNDE') }}" 
+                         alt="Orange Platform" 
                          class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
                 </div>
             </div>

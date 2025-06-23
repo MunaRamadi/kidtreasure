@@ -293,17 +293,17 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="{{ route('admin.products.show', $product->id) }}" 
+                                            <a href="{{ route('admin.products.show', $product) }}" 
                                                class="btn btn-info btn-sm" 
                                                title="عرض التفاصيل">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('admin.products.edit', $product->id) }}" 
+                                            <a href="{{ route('admin.products.edit', $product) }}" 
                                                class="btn btn-warning btn-sm" 
                                                title="تعديل">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form action="{{ route('admin.products.destroy', $product->id) }}" 
+                                            <form action="{{ route('admin.products.destroy', $product) }}" 
                                                   method="POST" 
                                                   class="d-inline"
                                                   onsubmit="return confirm('هل أنت متأكد من حذف هذا الصندوق؟')">
