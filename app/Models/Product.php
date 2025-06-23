@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Image;
+use App\Models\CartItem;
+use App\Models\OrderItem;
 
 class Product extends Model
 {
@@ -64,6 +67,14 @@ class Product extends Model
     }
 
     /**
+     * Get all images associated with this product
+     */
+    public function images()
+    {
+        return $this->hasMany(Image::class);
+    }
+
+    /**
      * الحصول على سعر المنتج
      */
     public function getPriceAttribute()
@@ -118,7 +129,7 @@ class Product extends Model
     }
 
     /**
-     * الحصول على الفئات الفريدة
+     * الحصول على الفئات الفريقة
      */
     public static function getCategories()
     {
@@ -132,7 +143,7 @@ class Product extends Model
     }
 
     /**
-     * الحصول على الفئات العمرية الفريدة
+     * الحصول على الفئات العمرية الفريقة
      */
     public static function getAgeGroups()
     {

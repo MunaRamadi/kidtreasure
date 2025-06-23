@@ -67,4 +67,12 @@ class WorkshopEvent extends Model
     {
         return $this->hasMany(WorkshopRegistration::class, 'event_id'); // Explicitly define FK if needed, though convention works here
     }
+    
+    /**
+     * Get the images for the workshop event.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(Image::class, 'workshop_event_id');
+    }
 }

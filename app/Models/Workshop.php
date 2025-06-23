@@ -52,4 +52,12 @@ class Workshop extends Model
     {
         return $this->hasMany(WorkshopEvent::class);
     }
+    
+    /**
+     * Get the images for the workshop.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(Image::class);
+    }
 }

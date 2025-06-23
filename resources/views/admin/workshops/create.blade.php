@@ -27,7 +27,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('admin.workshops.store') }}" method="POST">
+            <form action="{{ route('admin.workshops.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 
                 <div class="row mb-3">
@@ -91,6 +91,19 @@
                     @enderror
                 </div>
 
+                <div class="form-group mb-4">
+                    <label for="images" class="form-label">Workshop Images</label>
+                    <input type="file" class="form-control @error('images.*') is-invalid @enderror" id="images" name="images[]" multiple accept="image/*">
+                    <small class="form-text text-muted">You can upload multiple images. The first image will be set as the main image.</small>
+                    @error('images.*')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="image-preview-container mt-2 mb-4" id="imagePreviewContainer">
+                    <div class="row" id="imagePreview"></div>
+                </div>
+
                 <div class="d-flex justify-content-end">
                     <a href="{{ route('admin.workshops.index') }}" class="btn btn-secondary me-2">Cancel</a>
                     <button type="submit" class="btn btn-primary">Save Workshop</button>
@@ -103,14 +116,49 @@
 
 @section('scripts')
 <script>
-    // Add any JavaScript for form validation or enhancement here
     document.addEventListener('DOMContentLoaded', function() {
-        // Example: Add character counter for description fields
-        const descriptionEn = document.getElementById('description_en');
-        const descriptionAr = document.getElementById('description_ar');
+        // Image preview functionality
+        const imageInput = document.getElementById('images');
+        const imagePreview = document.getElementById('imagePreview');
         
-        // You could add rich text editor initialization here if needed
-        // For example: CKEDITOR.replace('description_en');
+        imageInput.addEventListener('change', function() {
+            imagePreview.innerHTML = '';
+            
+            if (this.files) {
+                Array.from(this.files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-3 mb-2';
+                        
+                        const card = document.createElement('div');
+                        card.className = 'card h-100';
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'card-img-top';
+                        img.style.height = '150px';
+                        img.style.objectFit = 'cover';
+                        
+                        const cardBody = document.createElement('div');
+                        cardBody.className = 'card-body p-2';
+                        
+                        const cardText = document.createElement('p');
+                        cardText.className = 'card-text small text-center mb-0';
+                        cardText.textContent = index === 0 ? 'Main Image' : `Image ${index + 1}`;
+                        
+                        cardBody.appendChild(cardText);
+                        card.appendChild(img);
+                        card.appendChild(cardBody);
+                        col.appendChild(card);
+                        imagePreview.appendChild(col);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
     });
 </script>
 @endsection
