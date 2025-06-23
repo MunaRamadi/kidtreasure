@@ -229,16 +229,16 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.workshops.*') ? 'active' : '' }}" href="{{ route('/events') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.events.*') ? 'active' : '' }}" href="{{ route('admin.workshops.index') }}">
                         <i class="fas fa-fw fa-calendar"></i>
                         <span>Events</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.workshops.*') ? 'active' : '' }}" href="{{ route('/images') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.images.*') ? 'active' : '' }}" href="{{ url('/admin/images') }}">
                         <i class="fas fa-fw fa-image"></i>
-                        <span>images</span>
+                        <span>Images</span>
                     </a>
                 </li>
 
