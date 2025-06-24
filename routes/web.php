@@ -16,7 +16,9 @@ use App\Http\Controllers\Admin\ProductsController;
 use App\Http\Controllers\Admin\OrdersController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\StoriesController;
+use App\Http\Controllers\Admin\WorkshopManagementController;
 use App\Http\Controllers\Admin\WorkshopsController;
+use App\Http\Controllers\Admin\WorkshopEventsController;
 use App\Http\Controllers\Admin\ContactMessagesController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +29,8 @@ Route::get('/about', [AboutController::class, 'index'])->name('about');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/workshops', [WorkshopController::class, 'index'])->name('workshops.index');
+Route::get('/workshops/{workshop}', [WorkshopController::class, 'show'])->name('workshops.show');
+Route::get('/workshops/list', [WorkshopController::class, 'listAll'])->name('workshops.list');
 Route::get('/workshops/{event}/register', [WorkshopController::class, 'showRegistrationForm'])->name('workshops.register.form');
 Route::post('/workshops/{event}/register', [WorkshopController::class, 'register'])->name('workshops.register');
 
@@ -46,6 +50,9 @@ Route::get('/blog/{post}', [BlogController::class, 'show'])->name('blog.show');
 // Contact Routes
 Route::get('/contact-us', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contact-us', [ContactController::class, 'store'])->name('contact.store');
+
+// Workshop interest registration route (public-facing)
+Route::post('/workshops/register-interest', [WorkshopController::class, 'registerInterest'])->name('workshops.register.interest');
 
 // Cart Routes
 Route::prefix('cart')->name('cart.')->group(function () {
@@ -150,6 +157,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::patch('/{story}/status', 'updateStatus')->name('update-status');
         Route::delete('/{story}', 'destroy')->name('destroy');
     });
+    
+ // إدارة الورش (Workshop Templates)
+Route::controller(WorkshopsController::class)->prefix('workshops')->name('workshops.')->group(function () {
+    Route::get('/', 'indexWorkshops')->name('index');
+    Route::get('/create', 'createWorkshop')->name('create');
+    Route::post('/', 'storeWorkshop')->name('store');
+    Route::get('/{workshop}', 'showWorkshop')->name('show');
+    Route::get('/{workshop}/edit', 'editWorkshop')->name('edit');
+    Route::put('/{workshop}', 'updateWorkshop')->name('update');
+    Route::delete('/{workshop}', 'destroyWorkshop')->name('destroy');
+    Route::get('/{workshop}/registrations', 'workshopRegistrations')->name('registrations');
+});
+    
+    // إدارة فعاليات الورش (WorkshopEvents)
+    Route::controller(WorkshopEventsController::class)->prefix('workshop-events')->name('workshop-events.')->group(function () {
 
     // Workshop Management
     Route::prefix('workshops')->name('workshops.')->controller(WorkshopsController::class)->group(function () {
@@ -162,6 +184,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::delete('/{workshop}', 'destroy')->name('destroy');
         Route::get('/{workshop}/registrations', 'registrations')->name('registrations');
         Route::patch('/registrations/{registration}/status', 'updateRegistrationStatus')->name('registrations.update-status');
+        Route::patch('/{workshop}/toggle-registration', 'toggleRegistrationStatus')->name('toggle-registration');
     });
 
     // Contact Messages Management

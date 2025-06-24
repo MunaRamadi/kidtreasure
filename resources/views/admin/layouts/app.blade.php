@@ -229,6 +229,20 @@
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.events.*') ? 'active' : '' }}" href="{{ route('admin.workshop-events.index') }}">
+                        <i class="fas fa-fw fa-calendar"></i>
+                        <span>Events</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.images.*') ? 'active' : '' }}" href="{{ url('/admin/images') }}">
+                        <i class="fas fa-fw fa-image"></i>
+                        <span>Images</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.blog.*') ? 'active' : '' }}" href="{{ route('admin.blog.index') }}">
                         <i class="fas fa-fw fa-blog"></i>
                         <span>Blog</span>
@@ -258,13 +272,14 @@
                     <i class="fa fa-bars"></i>
                 </button>
 
-                <ul class="navbar-nav ml-auto"> <li class="nav-item dropdown no-arrow">
+                <ul class="navbar-nav ms-auto"> 
+                    <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->name }}</span>
-                            <img class="img-profile rounded-circle" src="{{ Auth::user()->avatar ?? '/images/default-avatar.png' }}" width="30" height="30">
+                            <span class="me-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->name }}</span>
+                            <i class="fas fa-user-circle fa-fw"></i>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                        <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in" aria-labelledby="userDropdown">
                            <a class="dropdown-item" href="{{ route('profile.edit') }}">
                                 <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Profile

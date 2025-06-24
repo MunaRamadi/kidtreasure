@@ -11,6 +11,13 @@ class Workshop extends Model
     use HasFactory;
 
     /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -22,6 +29,9 @@ class Workshop extends Model
         'description_en',
         'target_age_group',
         'is_active',
+        'image_path',
+        'gallery_images',
+        'featured_image_path',
     ];
 
      /**
@@ -33,6 +43,7 @@ class Workshop extends Model
     {
         return [
             'is_active' => 'boolean',
+            'gallery_images' => 'array',
         ];
     }
 
@@ -44,5 +55,13 @@ class Workshop extends Model
     public function events(): HasMany
     {
         return $this->hasMany(WorkshopEvent::class);
+    }
+    
+    /**
+     * Get the images for the workshop.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(Image::class);
     }
 }
