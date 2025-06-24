@@ -4,18 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Category;
 
 class Story extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // إضافة هذا السطر لتحديد المفتاح الأساسي
+    protected $primaryKey = 'story_id';
+
     protected $fillable = [
         'user_id',
         'child_name',
@@ -26,207 +23,124 @@ class Story extends Model
         'title_en',
         'content_ar',
         'content_en',
-        'submission_date',
-        'status',
         'image_url',
         'video_url',
-        'admin_notes',
+        'submission_date',
+        'status',
         'reviewed_at',
         'reviewed_by',
-        'is_featured', // للقصص المميزة (الـ 4 بطاقات)
-        'display_order', // ترتيب عرض القصص المميزة
-        'views_count', // عدد المشاهدات
-        'likes_count', // عدد الإعجابات
+        'admin_notes',
+        'is_featured',
+        'display_order'
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'submission_date' => 'datetime',
-            'reviewed_at' => 'datetime',
-            'child_age' => 'integer',
-            'is_featured' => 'boolean',
-            'display_order' => 'integer',
-            'views_count' => 'integer',
-            'likes_count' => 'integer',
-        ];
-    }
+    protected $casts = [
+        'submission_date' => 'datetime',
+        'reviewed_at' => 'datetime',
+        'is_featured' => 'boolean',
+        'child_age' => 'integer',
+        'display_order' => 'integer'
+    ];
 
-    // Relationships
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'submission_date',
+        'reviewed_at'
+    ];
 
-    /**
-     * Get the user that submitted the story.
-     */
-    public function user(): BelongsTo
+    // Relations
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the admin user who reviewed the story.
-     */
-    public function reviewer(): BelongsTo
+    public function reviewer()
     {
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
-    // Accessors & Mutators
-
-    /**
-     * Get the status label in Arabic.
-     */
-    public function getStatusLabelAttribute(): string
+    // Accessors
+    public function getStatusLabelAttribute()
     {
-        return match($this->status) {
+        $labels = [
             'pending' => 'في الانتظار',
             'approved' => 'مقبولة',
-            'rejected' => 'مرفوضة',
-            default => 'غير محدد'
-        };
+            'rejected' => 'مرفوضة'
+        ];
+        
+        return $labels[$this->status] ?? 'غير محدد';
     }
 
-    /**
-     * Get the status color for display.
-     */
-    public function getStatusColorAttribute(): string
+    public function getStatusColorAttribute()
     {
-        return match($this->status) {
+        $colors = [
             'pending' => 'warning',
             'approved' => 'success',
-            'rejected' => 'danger',
-            default => 'secondary'
-        };
+            'rejected' => 'danger'
+        ];
+        
+        return $colors[$this->status] ?? 'secondary';
     }
 
-    /**
-     * Get the story type label.
-     */
-    public function getStoryTypeLabelAttribute(): string
-    {
-        return $this->is_featured ? 'قصة مميزة' : 'مرسلة من مستخدم';
-    }
-
-    /**
-     * Get the content based on locale.
-     */
-    public function getContentAttribute(): string
-    {
-        $locale = app()->getLocale();
-        if ($locale === 'en' && !empty($this->content_en)) {
-            return $this->content_en;
-        }
-        return $this->content_ar ?? $this->content_en ?? '';
-    }
-
-    /**
-     * Get the title based on locale.
-     */
-    public function getTitleAttribute(): string
-    {
-        $locale = app()->getLocale();
-        if ($locale === 'en' && !empty($this->title_en)) {
-            return $this->title_en;
-        }
-        return $this->title_ar ?? $this->title_en ?? '';
-    }
-
-    /**
-     * Get the full image URL.
-     */
-    public function getImageFullUrlAttribute(): ?string
+    public function getImageFullUrlAttribute()
     {
         if (!$this->image_url) {
             return null;
         }
         
-        // إذا كان الرابط يحتوي على storage/ فهو رابط كامل
-        if (str_contains($this->image_url, 'storage/')) {
-            return asset($this->image_url);
+        // إذا كان المسار يحتوي على دومين كامل
+        if (str_starts_with($this->image_url, 'http')) {
+            return $this->image_url;
         }
         
-        // وإلا فهو مسار فقط
-        return Storage::url($this->image_url);
+        // إضافة رابط التخزين
+        return asset('storage/' . $this->image_url);
     }
 
-    /**
-     * Get the full video URL.
-     */
-    public function getVideoFullUrlAttribute(): ?string
+    public function getVideoFullUrlAttribute()
     {
         if (!$this->video_url) {
             return null;
         }
         
-        // إذا كان الرابط يحتوي على storage/ فهو رابط كامل
-        if (str_contains($this->video_url, 'storage/')) {
-            return asset($this->video_url);
+        if (str_starts_with($this->video_url, 'http')) {
+            return $this->video_url;
         }
         
-        // وإلا فهو مسار فقط
-        return Storage::url($this->video_url);
+        return asset('storage/' . $this->video_url);
     }
 
-    /**
-     * Get a short excerpt from the content.
-     */
-    public function getExcerptAttribute(): string
-    {
-        $content = strip_tags($this->content);
-        return mb_substr($content, 0, 150) . (mb_strlen($content) > 150 ? '...' : '');
-    }
-
-    /**
-     * Check if story has media files.
-     */
-    public function getHasMediaAttribute(): bool
+    public function getHasMediaAttribute()
     {
         return !empty($this->image_url) || !empty($this->video_url);
     }
 
-    /**
-     * Get the submission time in a human readable format.
-     */
-    public function getSubmissionTimeAttribute(): string
-    {
-        return $this->created_at->diffForHumans();
-    }
-
-    /**
-     * Get the review time in a human readable format.
-     */
-    public function getReviewTimeAttribute(): ?string
-    {
-        return $this->reviewed_at ? $this->reviewed_at->diffForHumans() : null;
-    }
-
     // Scopes
-
-    /**
-     * Scope a query to only include approved stories.
-     */
-    public function scopeApproved($query)
-    {
-        return $query->where('status', 'approved');
-    }
-
-    /**
-     * Scope a query to only include pending stories.
-     */
     public function scopePending($query)
     {
         return $query->where('status', 'pending');
     }
 
-    /**
-     * Scope a query to only include rejected stories.
-     */
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
     public function scopeRejected($query)
     {
         return $query->where('status', 'rejected');
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    public function scopeUserSubmitted($query)
+    {
+        return $query->where(function($q) {
+            $q->where('is_featured', false)->orWhereNull('is_featured');
+        });
     }
 }

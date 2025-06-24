@@ -349,7 +349,7 @@
                 <div class="relative max-w-2xl mx-auto lg:mx-0">
                     <div class="absolute -inset-8 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-3xl blur-2xl opacity-70 animate-pulse"></div>
                     <div class="relative">
-                        <img src="https://media.istockphoto.com/id/473032112/photo/playful-preschoolers-having-fun-making-faces.jpg?s=612x612&w=0&k=20&c=VdLcY3TFnqmx0Pw0l4aFA-dTezKr1AC2CBgm9GE8heA=" 
+                        <img src="{{ asset('images/33352653-6e82-462c-b8f0-5849c941f6b1.jfif') }}" 
                              alt="Children playing and learning" 
                              class="relative rounded-3xl shadow-2xl w-full image-hover-effect">
                         <div class="absolute inset-0 rounded-3xl bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>

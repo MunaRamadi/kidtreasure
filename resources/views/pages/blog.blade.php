@@ -409,7 +409,7 @@
                 @foreach($posts as $index => $post)
                 <article class="blog-card card-hover-effect rounded-3xl overflow-hidden shadow-2xl fade-in-up" style="animation-delay: {{ $index * 0.1 }}s;">
                     <div class="relative">
-                        <img src="{{ $post->image_url ?? 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400&h=250&fit=crop' }}" 
+                        <img src="{{ $post->image_url ? asset('storage/' . $post->image_url) : 'https://images.unsplash.com/photo-1542601906-990-b4d3fb778b09?w=400&h=250&fit=crop' }}"  
                              alt="{{ $post->title_ar ?? $post->title_en }}" 
                              class="w-full h-56 object-cover image-hover-effect">
                         <div class="absolute top-6 right-6">

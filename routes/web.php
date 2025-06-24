@@ -29,29 +29,43 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->name('pro
 Route::get('/workshops', [WorkshopController::class, 'index'])->name('workshops.index');
 Route::get('/workshops/{event}/register', [WorkshopController::class, 'showRegistrationForm'])->name('workshops.register.form');
 Route::post('/workshops/{event}/register', [WorkshopController::class, 'register'])->name('workshops.register');
-Route::get('/stories', [StoryController::class, 'index'])->name('stories.index');
-Route::get('/stories/submit', [StoryController::class, 'create'])->name('stories.create');
-Route::post('/stories/submit', [StoryController::class, 'store'])->name('stories.store');
+
+// Public Stories Routes (للجمهور)
+Route::prefix('stories')->name('stories.')->group(function () {
+    Route::get('/', [StoryController::class, 'index'])->name('index');
+    Route::get('/create', [StoryController::class, 'create'])->name('create');
+    Route::post('/', [StoryController::class, 'store'])->name('store');
+    Route::get('/{story}', [StoryController::class, 'show'])->name('show');
+    Route::get('/stories/{story}', [StoriesController::class, 'show'])->name('stories.show');
+});
+
+// Blog Routes
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
 Route::get('/blog/{post}', [BlogController::class, 'show'])->name('blog.show');
+
+// Contact Routes
 Route::get('/contact-us', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contact-us', [ContactController::class, 'store'])->name('contact.store');
 
-// Cart Routes (تم التعديل هنا)
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add', [CartController::class, 'addItem'])->name('cart.add'); // تم توحيد مسار الإضافة
-Route::patch('/cart/{productId}', [CartController::class, 'update'])->name('cart.update'); // PATCH لتحديث الكمية، تم تغيير itemId إلى productId
-Route::delete('/cart/{productId}', [CartController::class, 'remove'])->name('cart.remove'); // DELETE للحذف، تم تغيير itemId إلى productId
-Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
-Route::get('/cart/mini', [CartController::class, 'miniCart'])->name('cart.mini');
+// Cart Routes
+Route::prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::post('/add', [CartController::class, 'addItem'])->name('add');
+    Route::patch('/{productId}', [CartController::class, 'update'])->name('update');
+    Route::delete('/{productId}', [CartController::class, 'remove'])->name('remove');
+    Route::post('/clear', [CartController::class, 'clearCart'])->name('clear');
+    Route::get('/mini', [CartController::class, 'miniCart'])->name('mini');
+});
 
 // Checkout Routes
-Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
-Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
-Route::get('/checkout/failed/{order}', [CheckoutController::class, 'failed'])->name('checkout.failed');
+Route::prefix('checkout')->name('checkout.')->group(function () {
+    Route::get('/', [CheckoutController::class, 'index'])->name('index');
+    Route::post('/process', [CheckoutController::class, 'process'])->name('process');
+    Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
+    Route::get('/failed/{order}', [CheckoutController::class, 'failed'])->name('failed');
+});
 
-// Dashboard Route - Updated
+// User Dashboard Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         if (auth()->user()->is_admin) {
@@ -59,6 +73,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
         return app(UserDashboardController::class)->index();
     })->name('dashboard');
+    
+    // User Story Management Routes (للمستخدمين المسجلين)
+    Route::prefix('my-stories')->name('my-stories.')->group(function () {
+        Route::get('/', [StoryController::class, 'myStories'])->name('index');
+        Route::get('/{story}/edit', [StoryController::class, 'edit'])->name('edit');
+        Route::put('/{story}', [StoryController::class, 'update'])->name('update');
+        Route::delete('/{story}', [StoryController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // Profile Routes
@@ -75,7 +97,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Product Management
-    Route::controller(ProductsController::class)->prefix('products')->name('products.')->group(function () {
+    Route::prefix('products')->name('products.')->controller(ProductsController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
@@ -85,14 +107,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('/{product}/duplicate', 'duplicate')->name('duplicate');
         Route::get('/{product}', 'show')->name('show');
         Route::get('/{product}/edit', 'edit')->name('edit');
-        Route::PATCH('/{product}', 'update')->name('update');
-        Route::PUT('/{product}', 'update');
+        Route::put('/{product}', 'update')->name('update');
+        Route::patch('/{product}', 'update')->name('patch');
         Route::delete('/{product}', 'destroy')->name('destroy');
         Route::patch('/{product}/toggle-status', 'toggleStatus')->name('toggle-status');
     });
 
     // Order Management
-    Route::controller(OrdersController::class)->prefix('orders')->name('orders.')->group(function () {
+    Route::prefix('orders')->name('orders.')->controller(OrdersController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{order}', 'show')->name('show');
         Route::patch('/{order}/status', 'updateStatus')->name('update-status');
@@ -100,7 +122,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     });
 
     // User Management
-    Route::controller(UsersController::class)->prefix('users')->name('users.')->group(function () {
+    Route::prefix('users')->name('users.')->controller(UsersController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{user}', 'show')->name('show');
         Route::get('/{user}/edit', 'edit')->name('edit');
@@ -109,30 +131,28 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::patch('/{user}/toggle-status', 'toggleStatus')->name('toggle-status');
     });
 
-    // Stories Management - UPDATED WITH MISSING ROUTES
-    Route::controller(StoriesController::class)->prefix('stories')->name('stories.')->group(function () {
+    // Admin Stories Management (إدارة القصص للمشرفين)
+    Route::prefix('stories')->name('stories.')->controller(StoriesController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
         Route::get('/export', 'export')->name('export');
-        Route::get('/analytics', 'analytics')->name('analytics'); // ADDED MISSING ROUTE
+        Route::get('/analytics', 'analytics')->name('analytics');
         Route::post('/bulk-action', 'bulkAction')->name('bulk-action');
-        Route::post('/{story}/quick-review', 'quickReview')->name('quick-review'); // ADDED MISSING ROUTE
-        
-        // Test route for development
+        Route::post('/{story}/quick-review', 'quickReview')->name('quick-review');
         Route::get('/create-test', 'createTestStory')->name('create-test');
         
-        // Individual story routes - using explicit route parameter names
-        Route::get('/{story}', 'show')->name('show')->where('story', '[0-9]+');
-        Route::get('/{story}/edit', 'edit')->name('edit')->where('story', '[0-9]+');
-        Route::patch('/{story}', 'update')->name('update')->where('story', '[0-9]+');
-        Route::put('/{story}', 'update')->name('update.put')->where('story', '[0-9]+');
-        Route::patch('/{story}/status', 'updateStatus')->name('update-status')->where('story', '[0-9]+');
-        Route::delete('/{story}', 'destroy')->name('destroy')->where('story', '[0-9]+');
+        // Individual story management routes
+        Route::get('/{story}', 'show')->name('show');
+        Route::get('/{story}/edit', 'edit')->name('edit');
+        Route::put('/{story}', 'update')->name('update');
+        Route::patch('/{story}', 'update')->name('patch');
+        Route::patch('/{story}/status', 'updateStatus')->name('update-status');
+        Route::delete('/{story}', 'destroy')->name('destroy');
     });
 
     // Workshop Management
-    Route::controller(WorkshopsController::class)->prefix('workshops')->name('workshops.')->group(function () {
+    Route::prefix('workshops')->name('workshops.')->controller(WorkshopsController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
@@ -145,7 +165,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     });
 
     // Contact Messages Management
-    Route::controller(ContactMessagesController::class)->prefix('contact-messages')->name('contact-messages.')->group(function () {
+    Route::prefix('contact-messages')->name('contact-messages.')->controller(ContactMessagesController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{message}', 'show')->name('show');
         Route::patch('/{message}/mark-as-read', 'markAsRead')->name('mark-as-read');
@@ -156,7 +176,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     });
 
     // Blog Management
-    Route::controller(AdminBlogController::class)->prefix('blog')->name('blog.')->group(function () {
+    Route::prefix('blog')->name('blog.')->controller(AdminBlogController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
@@ -168,7 +188,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     });
 
     // Settings Management
-    Route::controller(AdminController::class)->prefix('settings')->name('settings.')->group(function () {
+    Route::prefix('settings')->name('settings.')->controller(AdminController::class)->group(function () {
         Route::get('/', 'settingsIndex')->name('index');
     });
 });

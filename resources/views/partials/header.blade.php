@@ -56,6 +56,17 @@
 
         .cart-badge {
             animation: pulse 2s infinite;
+            transition: all 0.3s ease;
+        }
+
+        .cart-badge.hidden {
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .cart-badge.show {
+            opacity: 1;
+            transform: scale(1);
         }
 
         @keyframes pulse {
@@ -101,7 +112,7 @@
             margin-left: 0;
         }
         html[dir="rtl"] .ltr\:space-x-reverse {
-            --tw-space-x-reverse: 0.5rem; /* Equivalent to space-x-2 for example, adjust as needed */
+            --tw-space-x-reverse: 0.5rem;
         }
         html[dir="rtl"] .nav-link::after {
             left: initial;
@@ -117,7 +128,7 @@
         html[dir="rtl"] .fa-user,
         html[dir="rtl"] .fa-shopping-cart {
             margin-right: initial;
-            margin-left: 0.5rem; /* Adjust as needed for spacing */
+            margin-left: 0.5rem;
         }
     </style>
     
@@ -172,10 +183,10 @@
                         <i class="fas fa-user"></i>
                         <span>Login</span>
                     </a>
-               <a href="/cart" class="relative flex items-center bg-purple-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors duration-300 flex-1 justify-center text-sm" ">
-               <i class="fas fa-shopping-cart"></i>
-               <span class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">3</span>
-              </a>
+                   <a href="/cart" class="relative flex items-center bg-purple-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors duration-300 flex-1 justify-center text-sm">
+                       <i class="fas fa-shopping-cart"></i>
+                       <span id="desktop-cart-badge" class="cart-badge absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold hidden">0</span>
+                  </a>
                 </div>
                 <div class="lg:hidden">
                     <button id="mobile-menu-button" class="relative p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-indigo-200">
@@ -249,7 +260,7 @@
                         <a href="/cart" class="relative flex items-center space-x-2 ltr:space-x-reverse bg-purple-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors duration-300 flex-1 justify-center text-sm" data-translate="cart_button">
                             <i class="fas fa-shopping-cart"></i>
                             <span>Cart</span>
-                            <span class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">3</span>
+                            <span id="mobile-cart-badge" class="cart-badge absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold hidden">0</span>
                         </a>
                     </div>
                 </div>
@@ -257,7 +268,78 @@
         </div>
     </header>
 
+    
+
 <script>
+    // --- Cart Management ---
+    let cartCount = 0;
+
+    // Function to update cart badge display
+    function updateCartBadge() {
+        const desktopBadge = document.getElementById('desktop-cart-badge');
+        const mobileBadge = document.getElementById('mobile-cart-badge');
+        
+        if (cartCount > 0) {
+            desktopBadge.textContent = cartCount;
+            mobileBadge.textContent = cartCount;
+            desktopBadge.classList.remove('hidden');
+            mobileBadge.classList.remove('hidden');
+            desktopBadge.classList.add('show');
+            mobileBadge.classList.add('show');
+        } else {
+            desktopBadge.classList.add('hidden');
+            mobileBadge.classList.add('hidden');
+            desktopBadge.classList.remove('show');
+            mobileBadge.classList.remove('show');
+        }
+    }
+
+    // Function to add item to cart
+    function addToCart() {
+        cartCount++;
+        updateCartBadge();
+        
+        // Add a little animation feedback
+        const badges = document.querySelectorAll('.cart-badge');
+        badges.forEach(badge => {
+            badge.style.animation = 'none';
+            badge.offsetHeight; // Trigger reflow
+            badge.style.animation = 'pulse 0.6s ease-in-out';
+        });
+    }
+
+    // Function to clear cart
+    function clearCart() {
+        cartCount = 0;
+        updateCartBadge();
+    }
+
+    // Initialize cart on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load cart count from storage if you want persistence
+        const savedCartCount = parseInt(localStorage.getItem('cartCount') || '0');
+        cartCount = savedCartCount;
+        updateCartBadge();
+    });
+
+    // Save cart count to storage whenever it changes
+    function saveCartCount() {
+        localStorage.setItem('cartCount', cartCount.toString());
+    }
+
+    // Override the addToCart function to include saving
+    const originalAddToCart = addToCart;
+    addToCart = function() {
+        originalAddToCart();
+        saveCartCount();
+    };
+
+    // Override the clearCart function to include saving
+    const originalClearCart = clearCart;
+    clearCart = function() {
+        originalClearCart();
+        saveCartCount();
+    };
     
     // --- Translations Object ---
     const translations = {
@@ -266,7 +348,7 @@
             'company_name': "Children's Treasures",
             'nav_home': "Home",
             'nav_products': "Products",
-            'nav_products_mobile': "Educational Tools", // Slightly different for mobile
+            'nav_products_mobile': "Educational Tools",
             'nav_workshops': "Workshops",
             'nav_stories': "Stories",
             'nav_blog': "Blog",
@@ -274,8 +356,8 @@
             'nav_contact': "Contact Us",
             'login_button': "Login",
             'cart_button': "Cart",
-            'switch_lang_desktop': "العربية", // Text shown for switching to Arabic
-            'switch_lang_mobile': "Switch to Arabic" // Text shown for switching to Arabic in mobile
+            'switch_lang_desktop': "العربية",
+            'switch_lang_mobile': "Switch to Arabic"
         },
         'ar': {
             'page_title': "كنوز الأطفال - Children's Treasures",
@@ -290,13 +372,13 @@
             'nav_contact': "اتصل بنا",
             'login_button': "تسجيل الدخول",
             'cart_button': "السلة",
-            'switch_lang_desktop': "English", // Text shown for switching to English
-            'switch_lang_mobile': "التبديل إلى الإنجليزية" // Text shown for switching to English in mobile
+            'switch_lang_desktop': "English",
+            'switch_lang_mobile': "التبديل إلى الإنجليزية"
         }
     };
 
     // --- Language Handling Functions ---
-    const html = document.documentElement; // The <html> tag
+    const html = document.documentElement;
     const desktopLanguageSwitcher = document.getElementById('desktop-language-switcher');
     const mobileLanguageSwitcher = document.getElementById('mobile-language-switcher');
     
@@ -308,13 +390,12 @@
                 element.textContent = translations[lang][key];
             }
         });
-        document.title = translations[lang]['page_title']; // Update page title
+        document.title = translations[lang]['page_title'];
         html.setAttribute('lang', lang);
         html.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
 
-        // Update Tailwind CSS classes for RTL/LTR when needed (though Tailwind usually handles it with `dir` attribute)
         if (lang === 'ar') {
-            document.body.classList.add('rtl'); // Add a class for specific RTL adjustments
+            document.body.classList.add('rtl');
             document.body.classList.remove('ltr');
         } else {
             document.body.classList.add('ltr');
@@ -338,19 +419,18 @@
         }
     }
 
-    // Initialize language on page load
+    // Initialize language and other functionality on page load
     document.addEventListener('DOMContentLoaded', function() {
-        const storedLang = localStorage.getItem('preferredLang') || 'en'; // Default to English
+        const storedLang = localStorage.getItem('preferredLang') || 'en';
         applyTranslations(storedLang);
 
-        // Highlight active nav link based on current language
+        // Highlight active nav link
         const currentPath = window.location.pathname;
         document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active-nav', 'text-indigo-600'); // Remove active classes first
+            link.classList.remove('active-nav', 'text-indigo-600');
             if (link.getAttribute('href') === currentPath) {
                 link.classList.add('active-nav');
-                // Ensure text color is applied after language switch, or rely on active-nav styling
-                link.classList.add('text-indigo-600'); 
+                link.classList.add('text-indigo-600');
             }
         });
 
@@ -388,7 +468,7 @@
                 const newLang = currentLang === 'en' ? 'ar' : 'en';
                 
                 localStorage.setItem('preferredLang', newLang);
-                window.location.reload(); // Reload the page to apply the new language
+                window.location.reload();
             });
         });
     });

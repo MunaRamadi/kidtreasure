@@ -1,15 +1,14 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Story;
 use App\Models\User;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Auth;
 
 class StoriesController extends Controller
 {
@@ -18,357 +17,318 @@ class StoriesController extends Controller
         $this->middleware(['auth', 'admin']);
     }
 
+    /**
+     * عرض جميع القصص في لوحة الإدارة
+     */
     public function index(Request $request)
     {
-        try {
-            Log::info('Accessing stories admin dashboard', ['user_id' => auth()->id()]);
-            
-            $query = Story::query();
-            $query->with(['user', 'reviewer']);
-            
-            // تصنيف القصص حسب النوع
-            $storyType = $request->get('type', 'all'); // all, featured, user_submitted
-            
-            if ($storyType === 'featured') {
-                $query->where('is_featured', true);
-            } elseif ($storyType === 'user_submitted') {
-                $query->where(function($q) {
-                    $q->where('is_featured', false)->orWhereNull('is_featured');
-                });
-            }
-            
-            // البحث المتقدم
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where(function($q) use ($search) {
-                    $q->where('child_name', 'like', "%{$search}%")
-                      ->orWhere('parent_name', 'like', "%{$search}%")
-                      ->orWhere('title_ar', 'like', "%{$search}%")
-                      ->orWhere('title_en', 'like', "%{$search}%")
-                      ->orWhere('content_ar', 'like', "%{$search}%")
-                      ->orWhere('content_en', 'like', "%{$search}%");
-                });
-            }
+        $query = Story::with(['user', 'reviewer']);
 
-            // التصفية حسب الحالة
-            if ($request->filled('status')) {
-                $query->where('status', $request->status);
-            }
-
-            // التصفية حسب التاريخ
-            if ($request->filled('date_from')) {
-                $query->whereDate('created_at', '>=', $request->date_from);
-            }
-            
-            if ($request->filled('date_to')) {
-                $query->whereDate('created_at', '<=', $request->date_to);
-            }
-
-            // ترتيب النتائج
-            $sortBy = $request->get('sort', 'newest');
-            switch ($sortBy) {
-                case 'oldest':
-                    $query->orderBy('created_at', 'asc');
-                    break;
-                case 'name':
-                    $query->orderBy('child_name', 'asc');
-                    break;
-                case 'pending_first':
-                    $query->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')")
-                          ->orderBy('created_at', 'desc');
-                    break;
-                default:
-                    $query->orderBy('created_at', 'desc');
-            }
-            
-            $stories = $query->paginate(12)->withQueryString();
-            
-            // إحصائيات مفصلة
-            $stats = [
-                'total' => Story::count(),
-                'pending' => Story::where('status', 'pending')->count(),
-                'approved' => Story::where('status', 'approved')->count(),
-                'rejected' => Story::where('status', 'rejected')->count(),
-                'featured' => Story::where('is_featured', true)->count(),
-                'user_submitted' => Story::where(function($q) {
-                    $q->where('is_featured', false)->orWhereNull('is_featured');
-                })->count(),
-                'today' => Story::whereDate('created_at', today())->count(),
-                'this_week' => Story::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
-            ];
-
-            return view('admin.stories.index', compact('stories', 'stats', 'storyType', 'sortBy'));
-            
-        } catch (\Exception $e) {
-            Log::error('Error in stories admin dashboard', [
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
-            ]);
-            
-            // إنشاء paginator فارغ في حالة الخطأ
-            $stories = new LengthAwarePaginator(
-                collect(),
-                0,
-                12,
-                1,
-                [
-                    'path' => $request->url(),
-                    'pageName' => 'page',
-                ]
-            );
-            
-            $stats = [
-                'total' => 0, 'pending' => 0, 'approved' => 0, 'rejected' => 0,
-                'featured' => 0, 'user_submitted' => 0, 'today' => 0, 'this_week' => 0
-            ];
-            
-            $storyType = $request->get('type', 'all');
-            $sortBy = $request->get('sort', 'newest');
-            
-            return view('admin.stories.index', compact('stories', 'stats', 'storyType', 'sortBy'))
-                ->with('error', 'حدث خطأ في تحميل لوحة إدارة القصص: ' . $e->getMessage());
+        // فلترة حسب الحالة
+        if ($request->has('status') && $request->status !== '') {
+            $query->where('status', $request->status);
         }
+
+        // فلترة حسب القصص المميزة
+        if ($request->has('featured') && $request->featured !== '') {
+            $query->where('is_featured', $request->featured == '1');
+        }
+
+        // البحث
+        if ($request->has('search') && $request->search !== '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title_ar', 'like', "%{$search}%")
+                  ->orWhere('title_en', 'like', "%{$search}%")
+                  ->orWhere('child_name', 'like', "%{$search}%")
+                  ->orWhere('content_ar', 'like', "%{$search}%")
+                  ->orWhere('content_en', 'like', "%{$search}%");
+            });
+        }
+
+        $stories = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        // إحصائيات سريعة
+        $stats = [
+            'total' => Story::count(),
+            'pending' => Story::pending()->count(),
+            'approved' => Story::approved()->count(),
+            'rejected' => Story::rejected()->count(),
+            'featured' => Story::featured()->count(),
+        ];
+
+        return view('admin.stories.index', compact('stories', 'stats'));
     }
 
+    /**
+     * عرض نموذج إنشاء قصة جديدة من الإدارة
+     */
     public function create()
     {
-        $users = User::orderBy('name')->get();
-        return view('admin.stories.create', compact('users'));
+        return view('admin.stories.create');
     }
 
+    /**
+     * حفظ قصة جديدة من الإدارة
+     */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'child_name' => 'required|string|max:255',
-            'child_age' => 'required|integer|min:1|max:18',
-            'parent_name' => 'required|string|max:255',
+            'child_age' => 'nullable|integer|min:1|max:18',
+            'parent_name' => 'nullable|string|max:255',
             'parent_contact' => 'nullable|string|max:255',
-            'title_ar' => 'required|string|max:255',
-            'title_en' => 'nullable|string|max:255',
+            'title_ar' => 'nullable|string|max:500',
+            'title_en' => 'nullable|string|max:500',
             'content_ar' => 'required|string',
             'content_en' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'video' => 'nullable|mimes:mp4,mov,avi,wmv|max:51200',
+            'lesson_learned' => 'nullable|string',
+            'materials_used' => 'nullable|string|max:500',
+            'duration' => 'nullable|string|max:100',
+            'difficulty_level' => 'nullable|in:Easy,Medium,Hard',
             'status' => 'required|in:pending,approved,rejected',
             'is_featured' => 'boolean',
             'display_order' => 'nullable|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'video' => 'nullable|mimes:mp4,avi,mov,wmv|max:10240',
+            'admin_notes' => 'nullable|string',
         ]);
 
-        $data = $request->only([
-            'child_name', 'child_age', 'parent_name', 
-            'parent_contact', 'title_ar', 'title_en', 'content_ar', 
-            'content_en', 'status'
-        ]);
-
-        $data['user_id'] = $request->user_id ?? auth()->id();
-        $data['submission_date'] = now();
-        $data['is_featured'] = $request->boolean('is_featured', false);
-        $data['display_order'] = $request->display_order ?? 0;
-
-        // إذا كانت قصة مميزة، تأكد من أنها معتمدة
-        if ($data['is_featured']) {
-            $data['status'] = 'approved';
-            $data['reviewed_at'] = now();
-            $data['reviewed_by'] = auth()->id();
-        }
-
-        // رفع الصورة مع تخزين المسار فقط (بدون URL كامل)
+        // رفع الصورة
+        $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('stories/images', 'public');
-            $data['image_url'] = $imagePath; // نحفظ المسار فقط
         }
 
-        // رفع الفيديو مع تخزين المسار فقط (بدون URL كامل)
+        // رفع الفيديو
+        $videoPath = null;
         if ($request->hasFile('video')) {
             $videoPath = $request->file('video')->store('stories/videos', 'public');
-            $data['video_url'] = $videoPath; // نحفظ المسار فقط
         }
 
-        $story = Story::create($data);
-        
-        Log::info('Story created by admin', [
-            'story_id' => $story->id, 
-            'admin_id' => auth()->id(),
-            'is_featured' => $data['is_featured']
+        // إنشاء القصة
+        $story = Story::create([
+            'user_id' => Auth::id(), // الإدارة هي من أنشأت القصة
+            'child_name' => $validated['child_name'],
+            'child_age' => $validated['child_age'],
+            'parent_name' => $validated['parent_name'],
+            'parent_contact' => $validated['parent_contact'],
+            'title_ar' => $validated['title_ar'],
+            'title_en' => $validated['title_en'],
+            'content_ar' => $validated['content_ar'],
+            'content_en' => $validated['content_en'],
+            'image_url' => $imagePath,
+            'video_url' => $videoPath,
+            'lesson_learned_ar' => $validated['lesson_learned'],
+            'materials_used' => $validated['materials_used'],
+            'duration' => $validated['duration'],
+            'difficulty_level' => $validated['difficulty_level'],
+            'submission_date' => now(),
+            'status' => $validated['status'],
+            'is_featured' => $request->boolean('is_featured'),
+            'display_order' => $validated['display_order'] ?? 0,
+            'admin_notes' => $validated['admin_notes'] ?? null,
+            'reviewed_at' => $validated['status'] !== 'pending' ? now() : null,
+            'reviewed_by' => $validated['status'] !== 'pending' ? Auth::id() : null,
         ]);
 
-        $message = $data['is_featured'] ? 'تم إضافة القصة المميزة بنجاح' : 'تم إضافة القصة بنجاح';
-        
         return redirect()->route('admin.stories.index')
-            ->with('success', $message);
+            ->with('success', 'تم إنشاء القصة بنجاح!');
     }
 
+    /**
+     * عرض تفاصيل القصة في لوحة الإدارة
+     */
     public function show(Story $story)
     {
-        $story->load('user', 'reviewer');
-        
-        // تسجيل عرض القصة للمراجعة
-        if ($story->status === 'pending') {
-            Log::info('Admin viewing pending story', [
-                'story_id' => $story->id,
-                'admin_id' => auth()->id()
-            ]);
-        }
-        
+        $story->load(['user', 'reviewer']);
         return view('admin.stories.show', compact('story'));
     }
 
+    /**
+     * عرض نموذج تعديل القصة
+     */
     public function edit(Story $story)
+     // Fetch all categories from the database
     {
-        $users = User::orderBy('name')->get();
-        return view('admin.stories.edit', compact('story', 'users'));
+        $categories = Category::all();
+
+    // Pass both the story and the categories to the view
+    return view('admin.stories.edit', compact('story', 'categories'));
+    
+        
     }
 
+    /**
+     * تحديث القصة
+     */
     public function update(Request $request, Story $story)
     {
-        $request->validate([
+        $validated = $request->validate([
             'child_name' => 'required|string|max:255',
-            'child_age' => 'required|integer|min:1|max:18',
-            'parent_name' => 'required|string|max:255',
+            'child_age' => 'nullable|integer|min:1|max:18',
+            'parent_name' => 'nullable|string|max:255',
             'parent_contact' => 'nullable|string|max:255',
-            'title_ar' => 'required|string|max:255',
-            'title_en' => 'nullable|string|max:255',
+            'title_ar' => 'nullable|string|max:500',
+            'title_en' => 'nullable|string|max:500',
             'content_ar' => 'required|string',
             'content_en' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'video' => 'nullable|mimes:mp4,mov,avi,wmv|max:51200',
+            'lesson_learned' => 'nullable|string',
+            'materials_used' => 'nullable|string|max:500',
+            'duration' => 'nullable|string|max:100',
+            'difficulty_level' => 'nullable|in:Easy,Medium,Hard',
             'status' => 'required|in:pending,approved,rejected',
-            'admin_notes' => 'nullable|string',
             'is_featured' => 'boolean',
             'display_order' => 'nullable|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'video' => 'nullable|mimes:mp4,avi,mov,wmv|max:10240',
+            'admin_notes' => 'nullable|string',
+            'remove_image' => 'boolean',
+            'remove_video' => 'boolean',
         ]);
 
-        $data = $request->only([
-            'child_name', 'child_age', 'parent_name', 
-            'parent_contact', 'title_ar', 'title_en', 'content_ar', 
-            'content_en', 'status', 'admin_notes'
-        ]);
-
-        $data['is_featured'] = $request->boolean('is_featured', false);
-        $data['display_order'] = $request->display_order ?? $story->display_order ?? 0;
-
-        // تحديث معلومات المراجعة إذا تم تغيير الحالة
-        if ($story->status !== $request->status) {
-            $data['reviewed_at'] = now();
-            $data['reviewed_by'] = auth()->id();
+        // حذف الصورة إذا طُلب ذلك
+        if ($request->boolean('remove_image') && $story->image_url) {
+            Storage::disk('public')->delete($story->image_url);
+            $validated['image_url'] = null;
         }
 
-        // إذا تم تحويلها لقصة مميزة، تأكد من أنها معتمدة
-        if ($data['is_featured'] && $story->status !== 'approved') {
-            $data['status'] = 'approved';
-            $data['reviewed_at'] = now();
-            $data['reviewed_by'] = auth()->id();
+        // حذف الفيديو إذا طُلب ذلك
+        if ($request->boolean('remove_video') && $story->video_url) {
+            Storage::disk('public')->delete($story->video_url);
+            $validated['video_url'] = null;
         }
 
-        // رفع الصورة الجديدة
+        // تحديث الصورة إذا تم رفع واحدة جديدة
         if ($request->hasFile('image')) {
             if ($story->image_url) {
                 Storage::disk('public')->delete($story->image_url);
             }
-            $imagePath = $request->file('image')->store('stories/images', 'public');
-            $data['image_url'] = $imagePath; // نحفظ المسار فقط
+            $validated['image_url'] = $request->file('image')->store('stories/images', 'public');
         }
 
-        // رفع الفيديو الجديد
+        // تحديث الفيديو إذا تم رفع واحد جديد
         if ($request->hasFile('video')) {
             if ($story->video_url) {
                 Storage::disk('public')->delete($story->video_url);
             }
-            $videoPath = $request->file('video')->store('stories/videos', 'public');
-            $data['video_url'] = $videoPath; // نحفظ المسار فقط
+            $validated['video_url'] = $request->file('video')->store('stories/videos', 'public');
         }
 
-        $story->update($data);
-        
-        Log::info('Story updated by admin', [
-            'story_id' => $story->id, 
-            'admin_id' => auth()->id(),
-            'old_status' => $story->getOriginal('status'),
-            'new_status' => $request->status,
-            'is_featured' => $data['is_featured']
-        ]);
+        // تحديث معلومات المراجعة
+        $oldStatus = $story->status;
+        if ($validated['status'] !== $oldStatus && $validated['status'] !== 'pending') {
+            $validated['reviewed_at'] = now();
+            $validated['reviewed_by'] = Auth::id();
+        } elseif ($validated['status'] === 'pending') {
+            $validated['reviewed_at'] = null;
+            $validated['reviewed_by'] = null;
+        }
 
-        return redirect()->route('admin.stories.index')
-            ->with('success', 'تم تحديث القصة بنجاح');
+        $story->update($validated);
+
+        return redirect()->route('admin.stories.show', $story)
+            ->with('success', 'تم تحديث القصة بنجاح!');
     }
 
+    /**
+     * تحديث حالة القصة
+     */
+    public function updateStatus(Request $request, Story $story)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,approved,rejected',
+            'admin_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $story->update([
+            'status' => $request->status,
+            'reviewed_at' => $request->status !== 'pending' ? now() : null,
+            'reviewed_by' => $request->status !== 'pending' ? Auth::id() : null,
+            'admin_notes' => $request->admin_notes,
+        ]);
+
+        $statusLabels = [
+            'pending' => 'في الانتظار',
+            'approved' => 'مقبولة',
+            'rejected' => 'مرفوضة'
+        ];
+
+        return back()->with('success', 'تم تحديث حالة القصة إلى: ' . $statusLabels[$request->status]);
+    }
+
+    /**
+     * حذف القصة
+     */
     public function destroy(Story $story)
     {
         // حذف الملفات المرفقة
         if ($story->image_url) {
             Storage::disk('public')->delete($story->image_url);
         }
-        
         if ($story->video_url) {
             Storage::disk('public')->delete($story->video_url);
         }
 
-        $storyId = $story->id;
-        $isFeatured = $story->is_featured;
         $story->delete();
-        
-        Log::info('Story deleted by admin', [
-            'story_id' => $storyId, 
-            'admin_id' => auth()->id(),
-            'was_featured' => $isFeatured
-        ]);
 
-        $message = $isFeatured ? 'تم حذف القصة المميزة بنجاح' : 'تم حذف القصة بنجاح';
-        
         return redirect()->route('admin.stories.index')
-            ->with('success', $message);
+            ->with('success', 'تم حذف القصة بنجاح.');
     }
 
-    // عمليات متعددة للقصص
+    /**
+     * تفعيل/إلغاء تفعيل القصة كمميزة
+     */
+    public function toggleFeatured(Story $story)
+    {
+        $story->update([
+            'is_featured' => !$story->is_featured,
+        ]);
+
+        $message = $story->is_featured ? 'تم إضافة القصة للقصص المميزة!' : 'تم إزالة القصة من القصص المميزة.';
+        
+        return back()->with('success', $message);
+    }
+
+    /**
+     * الإجراءات المجمعة
+     */
     public function bulkAction(Request $request)
     {
         $request->validate([
             'action' => 'required|in:approve,reject,delete,feature,unfeature',
-            'story_ids' => 'required|array',
-            'story_ids.*' => 'exists:stories,id'
+            'stories' => 'required|array|min:1',
+            'stories.*' => 'exists:stories,story_id',
+            'admin_notes' => 'nullable|string|max:1000',
         ]);
 
-        $storyIds = $request->story_ids;
-        $action = $request->action;
+        $stories = Story::whereIn('story_id', $request->stories);
+        $count = $stories->count();
 
-        switch ($action) {
+        switch ($request->action) {
             case 'approve':
-                Story::whereIn('id', $storyIds)->update([
+                $stories->update([
                     'status' => 'approved',
                     'reviewed_at' => now(),
-                    'reviewed_by' => auth()->id()
+                    'reviewed_by' => Auth::id(),
                 ]);
-                Log::info('Bulk approve stories', ['story_ids' => $storyIds, 'admin_id' => auth()->id()]);
-                return back()->with('success', 'تم اعتماد القصص المحددة بنجاح');
+                $message = "تم اعتماد {$count} قصة بنجاح!";
+                break;
 
             case 'reject':
-                Story::whereIn('id', $storyIds)->update([
+                $stories->update([
                     'status' => 'rejected',
                     'reviewed_at' => now(),
-                    'reviewed_by' => auth()->id()
+                    'reviewed_by' => Auth::id(),
+                    'admin_notes' => $request->admin_notes,
                 ]);
-                Log::info('Bulk reject stories', ['story_ids' => $storyIds, 'admin_id' => auth()->id()]);
-                return back()->with('success', 'تم رفض القصص المحددة بنجاح');
-
-            case 'feature':
-                Story::whereIn('id', $storyIds)->update([
-                    'is_featured' => true,
-                    'status' => 'approved', // القصص المميزة يجب أن تكون معتمدة
-                    'reviewed_at' => now(),
-                    'reviewed_by' => auth()->id()
-                ]);
-                Log::info('Bulk feature stories', ['story_ids' => $storyIds, 'admin_id' => auth()->id()]);
-                return back()->with('success', 'تم تمييز القصص المحددة بنجاح');
-
-            case 'unfeature':
-                Story::whereIn('id', $storyIds)->update(['is_featured' => false]);
-                Log::info('Bulk unfeature stories', ['story_ids' => $storyIds, 'admin_id' => auth()->id()]);
-                return back()->with('success', 'تم إلغاء تمييز القصص المحددة بنجاح');
+                $message = "تم رفض {$count} قصة.";
+                break;
 
             case 'delete':
-                $stories = Story::whereIn('id', $storyIds)->get();
-                foreach ($stories as $story) {
+                // حذف الملفات المرفقة
+                $storyInstances = $stories->get();
+                foreach ($storyInstances as $story) {
                     if ($story->image_url) {
                         Storage::disk('public')->delete($story->image_url);
                     }
@@ -376,190 +336,145 @@ class StoriesController extends Controller
                         Storage::disk('public')->delete($story->video_url);
                     }
                 }
-                Story::whereIn('id', $storyIds)->delete();
-                Log::info('Bulk delete stories', ['story_ids' => $storyIds, 'admin_id' => auth()->id()]);
-                return back()->with('success', 'تم حذف القصص المحددة بنجاح');
+                $stories->delete();
+                $message = "تم حذف {$count} قصة بنجاح.";
+                break;
+
+            case 'feature':
+                $stories->update(['is_featured' => true]);
+                $message = "تم إضافة {$count} قصة للقصص المميزة!";
+                break;
+
+            case 'unfeature':
+                $stories->update(['is_featured' => false]);
+                $message = "تم إزالة {$count} قصة من القصص المميزة.";
+                break;
         }
-        
+
+        return back()->with('success', $message);
     }
 
-    // مراجعة سريعة للقصة
+    /**
+     * مراجعة سريعة
+     */
     public function quickReview(Request $request, Story $story)
     {
         $request->validate([
             'action' => 'required|in:approve,reject',
-            'admin_notes' => 'nullable|string|max:500'
+            'admin_notes' => 'nullable|string|max:1000',
         ]);
 
         $story->update([
             'status' => $request->action === 'approve' ? 'approved' : 'rejected',
             'reviewed_at' => now(),
-            'reviewed_by' => auth()->id(),
-            'admin_notes' => $request->admin_notes
+            'reviewed_by' => Auth::id(),
+            'admin_notes' => $request->admin_notes,
         ]);
 
-        Log::info('Quick story review', [
-            'story_id' => $story->id,
-            'action' => $request->action,
-            'admin_id' => auth()->id()
-        ]);
-
-        $message = $request->action === 'approve' ? 'تم اعتماد القصة بنجاح' : 'تم رفض القصة';
+        $message = $request->action === 'approve' ? 'تم اعتماد القصة بنجاح!' : 'تم رفض القصة.';
         
-        return response()->json([
-            'success' => true,
-            'message' => $message,
-            'new_status' => $story->status_label
-        ]);
+        return response()->json(['success' => true, 'message' => $message]);
     }
 
-    // تحديث حالة القصة منفرداً
-    public function updateStatus(Request $request, Story $story)
-    {
-        $request->validate([
-            'status' => 'required|in:pending,approved,rejected',
-            'admin_notes' => 'nullable|string|max:500'
-        ]);
-
-        $story->update([
-            'status' => $request->status,
-            'reviewed_at' => now(),
-            'reviewed_by' => auth()->id(),
-            'admin_notes' => $request->admin_notes
-        ]);
-
-        Log::info('Story status updated', [
-            'story_id' => $story->id,
-            'new_status' => $request->status,
-            'admin_id' => auth()->id()
-        ]);
-
-        return back()->with('success', 'تم تحديث حالة القصة بنجاح');
-    }
-
-    // إحصائيات مفصلة
-    public function analytics()
-    {
-        $analytics = [
-            'stories_by_status' => Story::selectRaw('status, COUNT(*) as count')
-                ->groupBy('status')
-                ->pluck('count', 'status')
-                ->toArray(),
-            
-            'stories_by_month' => Story::selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as count')
-                ->where('created_at', '>=', now()->subMonths(12))
-                ->groupBy('year', 'month')
-                ->orderBy('year', 'desc')
-                ->orderBy('month', 'desc')
-                ->get()
-                ->map(function($item) {
-                    return [
-                        'date' => $item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT),
-                        'count' => $item->count
-                    ];
-                }),
-            
-            'pending_stories' => Story::where('status', 'pending')
-                ->with('user')
-                ->orderBy('created_at', 'asc')
-                ->limit(5)
-                ->get(),
-            
-            'featured_stories_count' => Story::where('is_featured', true)->count(),
-            'user_submissions_count' => Story::where(function($q) {
-                $q->where('is_featured', false)->orWhereNull('is_featured');
-            })->count(),
-        ];
-
-        return view('admin.stories.analytics', compact('analytics'));
-    }
-
-    // تصدير القصص مع خيارات متقدمة
+    /**
+     * تصدير القصص إلى CSV
+     */
     public function export(Request $request)
     {
-        $query = Story::with('user', 'reviewer');
+        $query = Story::with(['user', 'reviewer']);
 
-        // تطبيق الفلاتر
-        if ($request->filled('type')) {
-            if ($request->type === 'featured') {
-                $query->where('is_featured', true);
-            } elseif ($request->type === 'user_submitted') {
-                $query->where(function($q) {
-                    $q->where('is_featured', false)->orWhereNull('is_featured');
-                });
-            }
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('child_name', 'like', "%{$search}%")
-                  ->orWhere('parent_name', 'like', "%{$search}%")
-                  ->orWhere('title_ar', 'like', "%{$search}%")
-                  ->orWhere('title_en', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('status')) {
+        // تطبيق نفس الفلاتر
+        if ($request->has('status') && $request->status !== '') {
             $query->where('status', $request->status);
         }
-
-        if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
+        if ($request->has('featured') && $request->featured !== '') {
+            $query->where('is_featured', $request->featured == '1');
         }
 
-        if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
-
-        $stories = $query->orderBy('created_at', 'desc')->get();
-
-        $filename = 'stories_export_' . date('Y-m-d_H-i-s') . '.csv';
+        $stories = $query->get();
+        
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="stories_' . date('Y-m-d') . '.csv"',
         ];
 
         $callback = function() use ($stories) {
             $file = fopen('php://output', 'w');
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
+            
+            // BOM for UTF-8
+            fputs($file, "\xEF\xBB\xBF");
             
             // Headers
             fputcsv($file, [
                 'ID', 'اسم الطفل', 'عمر الطفل', 'اسم الوالد', 'معلومات التواصل',
-                'العنوان بالعربية', 'العنوان بالإنجليزية', 'محتوى القصة', 'الحالة',
-                'نوع القصة', 'ترتيب العرض', 'تاريخ الإنشاء', 'تاريخ المراجعة', 
-                'المراجع', 'ملاحظات الإدارة'
+                'العنوان بالعربية', 'العنوان بالإنجليزية', 'المحتوى بالعربية', 'المحتوى بالإنجليزية',
+                'الدرس المستفاد', 'المواد المستخدمة', 'المدة', 'مستوى الصعوبة',
+                'الحالة', 'مميزة؟', 'ترتيب العرض', 'تاريخ الإرسال', 'تاريخ المراجعة', 'مراجع بواسطة', 'ملاحظات الإدارة'
             ]);
 
             // Data
             foreach ($stories as $story) {
                 fputcsv($file, [
-                    $story->id,
-                    $story->child_name ?? '',
-                    $story->child_age ?? '',
-                    $story->parent_name ?? '',
-                    $story->parent_contact ?? '',
-                    $story->title_ar ?? '',
-                    $story->title_en ?? '',
-                    strip_tags($story->content_ar ?? ''),
-                    $story->status_label ?? '',
-                    $story->is_featured ? 'قصة مميزة' : 'مرسلة من مستخدم',
-                    $story->display_order ?? 0,
-                    $story->created_at ? $story->created_at->format('Y-m-d H:i:s') : '',
-                    $story->reviewed_at ? $story->reviewed_at->format('Y-m-d H:i:s') : '',
-                    $story->reviewer ? $story->reviewer->name : '',
-                    $story->admin_notes ?? ''
+                    $story->story_id,
+                    $story->child_name,
+                    $story->child_age,
+                    $story->parent_name,
+                    $story->parent_contact,
+                    $story->title_ar,
+                    $story->title_en,
+                    substr($story->content_ar, 0, 100) . '...', // اختصار المحتوى
+                    substr($story->content_en ?? '', 0, 100) . '...',
+                    $story->lesson_learned_ar,
+                    $story->materials_used,
+                    $story->duration,
+                    $story->difficulty_level,
+                    $story->status_label,
+                    $story->is_featured ? 'نعم' : 'لا',
+                    $story->display_order,
+                    $story->submission_date?->format('Y-m-d H:i'),
+                    $story->reviewed_at?->format('Y-m-d H:i'),
+                    $story->reviewer?->name,
+                    $story->admin_notes,
                 ]);
             }
-
+            
             fclose($file);
         };
 
         return response()->stream($callback, 200, $headers);
     }
 
-    // دالة لإنشاء قصة تجريبية (للتطوير فقط)
+    /**
+     * إحصائيات القصص
+     */
+    public function analytics()
+    {
+        $stats = [
+            'total_stories' => Story::count(),
+            'pending_stories' => Story::pending()->count(),
+            'approved_stories' => Story::approved()->count(),
+            'rejected_stories' => Story::rejected()->count(),
+            'featured_stories' => Story::featured()->count(),
+            'stories_with_media' => Story::where(function($query) {
+                $query->whereNotNull('image_url')->orWhereNotNull('video_url');
+            })->count(),
+            'monthly_submissions' => Story::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+                ->whereYear('created_at', date('Y'))
+                ->groupBy('month')
+                ->pluck('count', 'month')
+                ->toArray(),
+            'status_distribution' => Story::selectRaw('status, COUNT(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray(),
+        ];
+
+        return view('admin.stories.analytics', compact('stats'));
+    }
+
+    /**
+     * إنشاء قصة تجريبية للتطوير
+     */
     public function createTestStory()
     {
         if (!app()->environment('local')) {
@@ -567,24 +482,26 @@ class StoriesController extends Controller
         }
 
         $story = Story::create([
-            'user_id' => auth()->id(),
-            'child_name' => 'أحمد محمد',
+            'user_id' => Auth::id(),
+            'child_name' => 'أحمد التجريبي',
             'child_age' => 8,
-            'parent_name' => 'محمد أحمد',
+            'parent_name' => 'والد تجريبي',
             'parent_contact' => 'test@example.com',
-            'title_ar' => 'قصة تجريبية للاختبار',
-            'title_en' => 'Test Story for Development',
-            'content_ar' => 'هذه قصة تجريبية تم إنشاؤها لأغراض الاختبار والتطوير.',
-            'content_en' => 'This is a test story created for testing and development purposes.',
+            'title_ar' => 'قصة تجريبية - ' . now()->format('Y-m-d H:i:s'),
+            'title_en' => 'Test Story - ' . now()->format('Y-m-d H:i:s'),
+            'content_ar' => 'هذه قصة تجريبية تم إنشاؤها تلقائياً لأغراض التطوير والاختبار.',
+            'content_en' => 'This is a test story created automatically for development and testing purposes.',
+            'lesson_learned_ar' => 'درس تجريبي مستفاد',
+            'materials_used' => 'مواد تجريبية',
+            'duration' => '30 دقيقة',
+            'difficulty_level' => 'Easy',
             'submission_date' => now(),
             'status' => 'pending',
             'is_featured' => false,
             'display_order' => 0,
         ]);
 
-        Log::info('Test story created', ['story_id' => $story->id, 'admin_id' => auth()->id()]);
-
-        return redirect()->route('admin.stories.index')
-            ->with('success', 'تم إنشاء قصة تجريبية بنجاح - ID: ' . $story->id);
+        return redirect()->route('admin.stories.show', $story)
+            ->with('success', 'تم إنشاء قصة تجريبية بنجاح!');
     }
 }
