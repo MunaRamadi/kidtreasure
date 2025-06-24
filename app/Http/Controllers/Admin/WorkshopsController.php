@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
+use App\Models\Workshop;
 use App\Models\WorkshopEvent;
 use App\Models\WorkshopRegistration;
 use App\Models\Image;
@@ -14,199 +15,348 @@ class WorkshopsController extends Controller
         $this->middleware(['auth', 'admin']);
     }
 
-    public function index()
+    /**
+     * Display a listing of workshop templates/categories with search, filtering and pagination.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function indexWorkshops(Request $request)
     {
-        $workshops = WorkshopEvent::withCount('registrations')
-            ->latest('event_date')
-            ->paginate(15);
+        $query = Workshop::query();
+
+        // Search by name
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = '%' . $request->search . '%';
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name_en', 'like', $searchTerm)
+                  ->orWhere('name_ar', 'like', $searchTerm);
+            });
+        }
+
+        // Filter by status
+        if ($request->has('status') && $request->status != 'all') {
+            $status = $request->status === 'active' ? 1 : 0;
+            $query->where('is_active', $status);
+        }
+
+        // Sort results
+        $sortField = 'created_at';
+        $sortDirection = 'desc';
+
+        if ($request->has('sort')) {
+            switch ($request->sort) {
+                case 'name_asc':
+                    $sortField = 'name_en';
+                    $sortDirection = 'asc';
+                    break;
+                case 'name_desc':
+                    $sortField = 'name_en';
+                    $sortDirection = 'desc';
+                    break;
+                case 'oldest':
+                    $sortField = 'created_at';
+                    $sortDirection = 'asc';
+                    break;
+                case 'latest':
+                default:
+                    $sortField = 'created_at';
+                    $sortDirection = 'desc';
+                    break;
+            }
+        }
+
+        $query->orderBy($sortField, $sortDirection);
+
+        // Get workshops with their events count
+        $workshops = $query->withCount('events')->paginate(10)->withQueryString();
 
         return view('admin.workshops.index', compact('workshops'));
     }
 
-    public function create()
+    /**
+     * Show the form for creating a new workshop template.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function createWorkshop()
     {
         return view('admin.workshops.create');
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created workshop template in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function storeWorkshop(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'event_date' => 'required|date|after:now',
-            'duration_hours' => 'required|numeric|min:0.5',
-            'max_attendees' => 'required|integer|min:1',
-            'price_jod' => 'required|numeric|min:0',
-            'location' => 'required|string|max:255',
-            'age_group' => 'required|string|max:50',
-            'is_open_for_registration' => 'boolean',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        $validated = $request->validate([
+            'name_en' => 'required|string|max:255',
+            'name_ar' => 'required|string|max:255',
+            'description_en' => 'required|string',
+            'description_ar' => 'required|string',
+            'target_age_group' => 'required|string|max:50',
+            'is_active' => 'boolean',
+            'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'featured_image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $workshop = WorkshopEvent::create($request->all());
-
-        // Handle multiple image uploads
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $imageFile) {
-                $path = $imageFile->store('workshops', 'public');
-                
-                $image = new Image([
-                    'image_path' => $path,
-                    'workshop_event_id' => $workshop->id,
-                    'sort_order' => $index,
-                    'is_main' => ($index === 0) // First image is the main image
-                ]);
-                
-                $image->save();
-            }
+        $workshopData = $request->except(['image_path', 'featured_image_path', 'gallery_images']);
+        
+        // Set default value for is_active if not provided
+        if (!isset($workshopData['is_active'])) {
+            $workshopData['is_active'] = false;
+        }
+        
+        $workshop = Workshop::create($workshopData);
+        
+        // Handle main image upload
+        if ($request->hasFile('image_path')) {
+            $path = $request->file('image_path')->store('workshops', 'public');
+            $workshop->image_path = $path;
         }
 
+        // Handle featured image upload
+        if ($request->hasFile('featured_image_path')) {
+            $path = $request->file('featured_image_path')->store('workshops', 'public');
+            $workshop->featured_image_path = $path;
+        }
+
+        // Handle gallery images
+        if ($request->hasFile('gallery_images')) {
+            $galleryPaths = [];
+            foreach ($request->file('gallery_images') as $image) {
+                $path = $image->store('workshops/gallery', 'public');
+                $galleryPaths[] = $path;
+            }
+            $workshop->gallery_images = $galleryPaths;
+        }
+        
+        $workshop->save();
+
         return redirect()->route('admin.workshops.index')
-            ->with('success', 'تم إضافة الورشة بنجاح');
+            ->with('success', 'Workshop template created successfully.');
     }
 
-    public function show(WorkshopEvent $workshop)
+    /**
+     * Display the specified workshop template.
+     *
+     * @param  \App\Models\Workshop  $workshop
+     * @return \Illuminate\Http\Response
+     */
+    public function showWorkshop(Workshop $workshop)
     {
-        $workshop->load(['registrations.user', 'images']);
+        // Load the workshop with its events and recent registrations
+        $workshop->load(['events' => function($query) {
+            $query->orderBy('event_date', 'asc');
+        }, 'events.registrations']);
+
         return view('admin.workshops.show', compact('workshop'));
     }
 
-    public function edit(WorkshopEvent $workshop)
+    /**
+     * Show the form for editing the specified workshop template.
+     *
+     * @param  \App\Models\Workshop  $workshop
+     * @return \Illuminate\Http\Response
+     */
+    public function editWorkshop(Workshop $workshop)
     {
-        $workshop->load('images');
+        // Load the workshop with its events
+        $workshop->load(['events' => function($query) {
+            $query->orderBy('event_date', 'asc');
+        }]);
+
         return view('admin.workshops.edit', compact('workshop'));
     }
 
-    public function update(Request $request, WorkshopEvent $workshop)
+    /**
+     * Update the specified workshop template in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Workshop  $workshop
+     * @return \Illuminate\Http\Response
+     */
+    public function updateWorkshop(Request $request, Workshop $workshop)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'event_date' => 'required|date',
-            'duration_hours' => 'required|numeric|min:0.5',
-            'max_attendees' => 'required|integer|min:1',
-            'price_jod' => 'required|numeric|min:0',
-            'location' => 'required|string|max:255',
-            'age_group' => 'required|string|max:50',
-            'is_open_for_registration' => 'boolean',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'delete_images' => 'nullable|array',
-            'delete_images.*' => 'integer|exists:images,id'
+        $validated = $request->validate([
+            'name_en' => 'required|string|max:255',
+            'name_ar' => 'required|string|max:255',
+            'description_en' => 'required|string',
+            'description_ar' => 'required|string',
+            'target_age_group' => 'required|string|max:50',
+            'is_active' => 'boolean',
+            'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'featured_image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'remove_main_image' => 'nullable|boolean',
+            'remove_featured_image' => 'nullable|boolean',
+            'remove_gallery_images' => 'nullable|array',
+            'remove_gallery_images.*' => 'nullable|integer',
         ]);
 
-        $workshop->update($request->all());
-
-        // Delete images if requested
-        if ($request->has('delete_images')) {
-            $imagesToDelete = Image::whereIn('id', $request->delete_images)
-                ->where('workshop_event_id', $workshop->id)
-                ->get();
-                
-            foreach ($imagesToDelete as $image) {
-                // Delete the file from storage
-                if (Storage::disk('public')->exists($image->image_path)) {
-                    Storage::disk('public')->delete($image->image_path);
-                }
-                
-                // Delete the database record
-                $image->delete();
-            }
+        $workshopData = $request->except([
+            'image_path', 'featured_image_path', 'gallery_images', 
+            'remove_main_image', 'remove_featured_image', 'remove_gallery_images'
+        ]);
+        
+        // Set default value for is_active if not provided
+        if (!isset($workshopData['is_active'])) {
+            $workshopData['is_active'] = false;
         }
 
-        // Handle new image uploads
-        if ($request->hasFile('images')) {
-            $currentMaxOrder = $workshop->images()->max('sort_order') ?? -1;
+        $workshop->update($workshopData);
+
+        // Handle main image upload
+        if ($request->hasFile('image_path')) {
+            // Delete old image if exists
+            if ($workshop->image_path && Storage::disk('public')->exists($workshop->image_path)) {
+                Storage::disk('public')->delete($workshop->image_path);
+            }
             
-            foreach ($request->file('images') as $index => $imageFile) {
-                $path = $imageFile->store('workshops', 'public');
-                
-                $image = new Image([
-                    'image_path' => $path,
-                    'workshop_event_id' => $workshop->id,
-                    'sort_order' => $currentMaxOrder + $index + 1,
-                    'is_main' => false // New uploads are not main by default
-                ]);
-                
-                $image->save();
-            }
+            // Upload new image
+            $path = $request->file('image_path')->store('workshops', 'public');
+            $workshop->image_path = $path;
         }
 
-        return redirect()->route('admin.workshops.index')
-            ->with('success', 'تم تحديث الورشة بنجاح');
+        // Handle featured image upload
+        if ($request->hasFile('featured_image_path')) {
+            // Delete old image if exists
+            if ($workshop->featured_image_path && Storage::disk('public')->exists($workshop->featured_image_path)) {
+                Storage::disk('public')->delete($workshop->featured_image_path);
+            }
+            
+            // Upload new image
+            $path = $request->file('featured_image_path')->store('workshops', 'public');
+            $workshop->featured_image_path = $path;
+        }
+
+        // Handle gallery images
+        if ($request->hasFile('gallery_images')) {
+            $galleryPaths = $workshop->gallery_images ?? [];
+            
+            foreach ($request->file('gallery_images') as $image) {
+                $path = $image->store('workshops/gallery', 'public');
+                $galleryPaths[] = $path;
+            }
+            
+            $workshop->gallery_images = $galleryPaths;
+        }
+
+        // Remove main image if requested
+        if ($request->boolean('remove_main_image') && $workshop->image_path) {
+            if (Storage::disk('public')->exists($workshop->image_path)) {
+                Storage::disk('public')->delete($workshop->image_path);
+            }
+            
+            $workshop->image_path = null;
+        }
+
+        // Remove featured image if requested
+        if ($request->boolean('remove_featured_image') && $workshop->featured_image_path) {
+            if (Storage::disk('public')->exists($workshop->featured_image_path)) {
+                Storage::disk('public')->delete($workshop->featured_image_path);
+            }
+            
+            $workshop->featured_image_path = null;
+        }
+
+        // Remove selected gallery images if requested
+        if ($request->has('remove_gallery_images') && is_array($request->remove_gallery_images)) {
+            $galleryImages = $workshop->gallery_images ?? [];
+            $newGalleryImages = [];
+            
+            foreach ($galleryImages as $index => $imagePath) {
+                if (!in_array($index, $request->remove_gallery_images)) {
+                    $newGalleryImages[] = $imagePath;
+                } else {
+                    // Delete the image file
+                    if (Storage::disk('public')->exists($imagePath)) {
+                        Storage::disk('public')->delete($imagePath);
+                    }
+                }
+            }
+            
+            $workshop->gallery_images = $newGalleryImages;
+        }
+
+        $workshop->save();
+
+        return redirect()->route('admin.workshops.show', $workshop)
+            ->with('success', 'Workshop template updated successfully.');
     }
 
-    public function destroy(WorkshopEvent $workshop)
+    /**
+     * Remove the specified workshop template from storage.
+     *
+     * @param  \App\Models\Workshop  $workshop
+     * @return \Illuminate\Http\Response
+     */
+    public function destroyWorkshop(Workshop $workshop)
     {
-        // Delete associated images from storage
-        foreach ($workshop->images as $image) {
-            if (Storage::disk('public')->exists($image->image_path)) {
-                Storage::disk('public')->delete($image->image_path);
+        // Check if there are any events with registrations
+        $hasRegistrations = $workshop->events()->whereHas('registrations')->exists();
+
+        if ($hasRegistrations) {
+            return redirect()->route('admin.workshops.show', $workshop)
+                ->with('error', 'Cannot delete workshop template with existing registrations.');
+        }
+
+        // Delete all associated events first
+        $workshop->events()->delete();
+        
+        // Delete images if exists
+        if ($workshop->image_path && Storage::disk('public')->exists($workshop->image_path)) {
+            Storage::disk('public')->delete($workshop->image_path);
+        }
+        
+        if ($workshop->featured_image_path && Storage::disk('public')->exists($workshop->featured_image_path)) {
+            Storage::disk('public')->delete($workshop->featured_image_path);
+        }
+        
+        if ($workshop->gallery_images) {
+            foreach ($workshop->gallery_images as $image) {
+                if (Storage::disk('public')->exists($image)) {
+                    Storage::disk('public')->delete($image);
+                }
             }
         }
         
+        // Then delete the workshop
         $workshop->delete();
 
         return redirect()->route('admin.workshops.index')
-            ->with('success', 'تم حذف الورشة بنجاح');
+            ->with('success', 'Workshop template deleted successfully.');
     }
 
-    public function registrations(WorkshopEvent $workshop)
+    /**
+     * Display all registrations for a workshop template.
+     *
+     * @param  \App\Models\Workshop  $workshop
+     * @return \Illuminate\Http\Response
+     */
+    public function workshopRegistrations(Workshop $workshop)
     {
-        $registrations = $workshop->registrations()
-            ->with('user')
-            ->latest()
-            ->paginate(20);
+        // Get all events for this workshop
+        $workshop->load('events');
+        
+        // Get all registrations across all events
+        $registrations = $workshop->events->flatMap->registrations->sortByDesc('created_at');
+        
+        // Paginate the collection manually
+        $page = request()->get('page', 1);
+        $perPage = 20;
+        $registrations = new \Illuminate\Pagination\LengthAwarePaginator(
+            $registrations->forPage($page, $perPage),
+            $registrations->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
 
         return view('admin.workshops.registrations', compact('workshop', 'registrations'));
-    }
-
-    public function updateRegistrationStatus(Request $request, WorkshopRegistration $registration)
-    {
-        $request->validate([
-            'status' => 'required|in:pending,confirmed,cancelled'
-        ]);
-
-        $registration->update(['status' => $request->status]);
-
-        return back()->with('success', 'تم تحديث حالة التسجيل بنجاح');
-    }
-    
-    /**
-     * Update the main image for a workshop event
-     */
-    public function setMainImage(Request $request, WorkshopEvent $workshop)
-    {
-        $request->validate([
-            'image_id' => 'required|exists:images,id'
-        ]);
-        
-        // Reset all images to not main
-        $workshop->images()->update(['is_main' => false]);
-        
-        // Set the selected image as main
-        Image::where('id', $request->image_id)
-            ->where('workshop_event_id', $workshop->id)
-            ->update(['is_main' => true]);
-            
-        return back()->with('success', 'تم تعيين الصورة الرئيسية بنجاح');
-    }
-    
-    /**
-     * Update the sort order of images
-     */
-    public function updateImageOrder(Request $request, WorkshopEvent $workshop)
-    {
-        $request->validate([
-            'image_order' => 'required|array',
-            'image_order.*' => 'integer|exists:images,id'
-        ]);
-        
-        foreach ($request->image_order as $index => $imageId) {
-            Image::where('id', $imageId)
-                ->where('workshop_event_id', $workshop->id)
-                ->update(['sort_order' => $index]);
-        }
-        
-        return response()->json(['success' => true]);
     }
 }

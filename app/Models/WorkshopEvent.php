@@ -25,6 +25,8 @@ class WorkshopEvent extends Model
      */
     protected $fillable = [
         'workshop_id',
+        'title',
+        'description',
         'event_date',
         'event_time',
         'location',
@@ -32,6 +34,9 @@ class WorkshopEvent extends Model
         'max_attendees',
         'current_attendees',
         'is_open_for_registration',
+        'image_path',
+        'gallery_images',
+        'featured_image_path',
     ];
 
     /**
@@ -46,6 +51,7 @@ class WorkshopEvent extends Model
             'event_time' => 'datetime:H:i', // Cast time to handle easily
             'price_jod' => 'decimal:2',
             'is_open_for_registration' => 'boolean',
+            'gallery_images' => 'array',
         ];
     }
 

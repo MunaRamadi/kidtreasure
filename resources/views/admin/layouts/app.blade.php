@@ -229,7 +229,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.events.*') ? 'active' : '' }}" href="{{ route('admin.workshops.index') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.events.*') ? 'active' : '' }}" href="{{ route('admin.workshop-events.index') }}">
                         <i class="fas fa-fw fa-calendar"></i>
                         <span>Events</span>
                     </a>

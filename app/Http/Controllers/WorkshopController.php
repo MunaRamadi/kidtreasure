@@ -28,6 +28,41 @@ class WorkshopController extends Controller
         return view('pages.workshop', compact('workshops', 'upcomingEvents'));
     }
 
+    /**
+     * Display a listing of all workshops with their events
+     * 
+     * @return \Illuminate\View\View
+     */
+    public function listAll()
+    {
+        // Get all active workshops with their events
+        $workshops = Workshop::where('is_active', true)
+            ->with(['events' => function($query) {
+                $query->where('event_date', '>=', now())
+                      ->orderBy('event_date');
+            }])
+            ->get();
+        
+        return view('pages.workshops-list', compact('workshops'));
+    }
+
+    /**
+     * Display the specified workshop with its upcoming events
+     * 
+     * @param \App\Models\Workshop $workshop
+     * @return \Illuminate\View\View
+     */
+    public function show(Workshop $workshop)
+    {
+        // Load upcoming events for this workshop
+        $workshop->load(['events' => function($query) {
+            $query->where('event_date', '>=', now())
+                  ->orderBy('event_date');
+        }]);
+        
+        return view('pages.workshop-show', compact('workshop'));
+    }
+
  
     public function showRegistrationForm(WorkshopEvent $event)
     {
