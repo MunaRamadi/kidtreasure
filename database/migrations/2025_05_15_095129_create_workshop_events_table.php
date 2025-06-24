@@ -10,8 +10,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('workshop_events', function (Blueprint $table) {
-            $table->id('event_id');
-            $table->foreignId('workshop_id')->constrained('workshops', 'workshop_id')->cascadeOnDelete();
+            $table->id('id');
+            $table->foreignId('workshop_id')->constrained('workshops', 'id')->cascadeOnDelete();
             $table->date('event_date');
             $table->time('event_time');
             $table->string('location');

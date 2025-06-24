@@ -25,6 +25,8 @@ class WorkshopEvent extends Model
      */
     protected $fillable = [
         'workshop_id',
+        'title',
+        'description',
         'event_date',
         'event_time',
         'location',
@@ -32,6 +34,9 @@ class WorkshopEvent extends Model
         'max_attendees',
         'current_attendees',
         'is_open_for_registration',
+        'image_path',
+        'gallery_images',
+        'featured_image_path',
     ];
 
     /**
@@ -46,6 +51,7 @@ class WorkshopEvent extends Model
             'event_time' => 'datetime:H:i', // Cast time to handle easily
             'price_jod' => 'decimal:2',
             'is_open_for_registration' => 'boolean',
+            'gallery_images' => 'array',
         ];
     }
 
@@ -57,7 +63,7 @@ class WorkshopEvent extends Model
      */
     public function workshop(): BelongsTo
     {
-        return $this->belongsTo(Workshop::class);
+        return $this->belongsTo(Workshop::class, 'workshop_id', 'id');
     }
 
     /**
@@ -66,5 +72,13 @@ class WorkshopEvent extends Model
     public function registrations(): HasMany
     {
         return $this->hasMany(WorkshopRegistration::class, 'event_id'); // Explicitly define FK if needed, though convention works here
+    }
+    
+    /**
+     * Get the images for the workshop event.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(Image::class, 'workshop_event_id');
     }
 }

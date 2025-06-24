@@ -21,7 +21,6 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->timestamp('registration_date')->useCurrent();
             $table->enum('language_preference', ['ar', 'en'])->default('ar');
-            $table->enum('role', ['customer', 'admin', 'workshop_attendee'])->default('customer');
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();
