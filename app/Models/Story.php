@@ -4,17 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // Import BelongsTo
+use App\Models\Category;
 
 class Story extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // إضافة هذا السطر لتحديد المفتاح الأساسي
+    protected $primaryKey = 'story_id';
+
     protected $fillable = [
         'user_id',
         'child_name',
@@ -25,31 +23,124 @@ class Story extends Model
         'title_en',
         'content_ar',
         'content_en',
-        'submission_date',
-        'status',
         'image_url',
         'video_url',
+        'submission_date',
+        'status',
+        'reviewed_at',
+        'reviewed_by',
+        'admin_notes',
+        'is_featured',
+        'display_order'
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'submission_date' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'submission_date' => 'datetime',
+        'reviewed_at' => 'datetime',
+        'is_featured' => 'boolean',
+        'child_age' => 'integer',
+        'display_order' => 'integer'
+    ];
 
-    // Relationships
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'submission_date',
+        'reviewed_at'
+    ];
 
-    /**
-     * Get the user that submitted the story.
-     */
-    public function user(): BelongsTo
+    // Relations
+    public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function reviewer()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    // Accessors
+    public function getStatusLabelAttribute()
+    {
+        $labels = [
+            'pending' => 'في الانتظار',
+            'approved' => 'مقبولة',
+            'rejected' => 'مرفوضة'
+        ];
+        
+        return $labels[$this->status] ?? 'غير محدد';
+    }
+
+    public function getStatusColorAttribute()
+    {
+        $colors = [
+            'pending' => 'warning',
+            'approved' => 'success',
+            'rejected' => 'danger'
+        ];
+        
+        return $colors[$this->status] ?? 'secondary';
+    }
+
+    public function getImageFullUrlAttribute()
+    {
+        if (!$this->image_url) {
+            return null;
+        }
+        
+        // إذا كان المسار يحتوي على دومين كامل
+        if (str_starts_with($this->image_url, 'http')) {
+            return $this->image_url;
+        }
+        
+        // إضافة رابط التخزين
+        return asset('storage/' . $this->image_url);
+    }
+
+    public function getVideoFullUrlAttribute()
+    {
+        if (!$this->video_url) {
+            return null;
+        }
+        
+        if (str_starts_with($this->video_url, 'http')) {
+            return $this->video_url;
+        }
+        
+        return asset('storage/' . $this->video_url);
+    }
+
+    public function getHasMediaAttribute()
+    {
+        return !empty($this->image_url) || !empty($this->video_url);
+    }
+
+    // Scopes
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    public function scopeRejected($query)
+    {
+        return $query->where('status', 'rejected');
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    public function scopeUserSubmitted($query)
+    {
+        return $query->where(function($q) {
+            $q->where('is_featured', false)->orWhereNull('is_featured');
+        });
     }
 }

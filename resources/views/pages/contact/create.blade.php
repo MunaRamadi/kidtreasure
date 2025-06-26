@@ -501,7 +501,7 @@
                             </div>
                             <div>
                                 <h4 class="font-semibold text-white mb-1">Phone</h4>
-                                <p class="text-white/80" dir="ltr">+962 7X XXX XXXX</p>
+                                <p class="text-white/80" dir="ltr">+962 7 9779 3944</p>
                                 <p class="text-sm text-white/60">Available 24/7</p>
                             </div>
                         </div>
@@ -514,7 +514,7 @@
                             </div>
                             <div>
                                 <h4 class="font-semibold text-white mb-1">Email</h4>
-                                <p class="text-white/80">info@example.com</p>
+                                <p class="text-white/80">munaramadi@yahoo.com</p>
                                 <p class="text-sm text-white/60">Reply within 1 hour</p>
                             </div>
                         </div>

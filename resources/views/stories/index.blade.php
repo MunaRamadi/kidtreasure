@@ -507,29 +507,22 @@ Creativity ')
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($stories as $index => $story)
+            <a href="{{ route('stories.show', $story) }}" class="block transition-transform transform hover:-translate-y-2">
                 <div class="glass-card card-hover-effect rounded-3xl overflow-hidden border border-white/20 fade-in-up" style="animation-delay: {{ $index * 0.1 }}s;">
                     @if($story->image_url || $story->video_url)
                         <div class="relative aspect-video overflow-hidden">
                             <div class="absolute -inset-4 bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 rounded-3xl blur-xl opacity-50 animate-pulse"></div>
                             <div class="relative">
-                                @if($story->video_url)
-                                    <video class="w-full h-full object-cover image-hover-effect" controls poster="{{ $story->image_url }}">
-                                        <source src="{{ $story->video_url }}" type="video/mp4">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                    <div class="absolute top-4 right-4 bg-red-500 text-white px-3 py-2 rounded-full text-sm font-semibold shadow-lg">
-                                        <i class="fas fa-video mr-1"></i>
-                                        Video
-                                    </div>
-                                @elseif($story->image_url)
-                                    <img src="{{ $story->image_url }}"
-                                         alt="{{ $story->title_ar ?? $story->title_en }}"
-                                         class="w-full h-full object-cover image-hover-effect">
-                                    <div class="absolute top-4 right-4 bg-green-500 text-white px-3 py-2 rounded-full text-sm font-semibold shadow-lg">
-                                        <i class="fas fa-image mr-1"></i>
-                                        Image
-                                    </div>
-                                @endif
+                               @if($story->video_full_url)
+    <video class="w-full h-full object-cover image-hover-effect" controls poster="{{ $story->image_full_url }}">
+        <source src="{{ $story->video_full_url }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+@elseif($story->image_full_url)
+    <img src="{{ $story->image_full_url }}"
+         alt="{{ $story->title_ar ?? $story->title_en }}"
+         class="w-full h-full object-cover image-hover-effect">
+@endif
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-t-3xl"></div>
                             </div>
                         </div>
@@ -587,6 +580,7 @@ Creativity ')
                         </div>
                     </div>
                 </div>
+                 </a>
             @endforeach
         </div>
 

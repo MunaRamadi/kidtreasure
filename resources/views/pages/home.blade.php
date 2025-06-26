@@ -340,10 +340,7 @@
                             <i class="fas fa-rocket mr-3 text-xl"></i>
                             <span>Explore Our World</span>
                         </a>
-                        <a href="/order" class="btn-professional glass-card text-white font-bold py-4 px-10 rounded-3xl text-lg border border-white/30 inline-flex items-center justify-center">
-                            <i class="fas fa-magic mr-3 text-xl"></i>
-                            <span>Start the Adventure</span>
-                        </a>
+                     
                     </div>
                 </div>
             </div>
@@ -352,7 +349,7 @@
                 <div class="relative max-w-2xl mx-auto lg:mx-0">
                     <div class="absolute -inset-8 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-3xl blur-2xl opacity-70 animate-pulse"></div>
                     <div class="relative">
-                        <img src="https://media.istockphoto.com/id/473032112/photo/playful-preschoolers-having-fun-making-faces.jpg?s=612x612&w=0&k=20&c=VdLcY3TFnqmx0Pw0l4aFA-dTezKr1AC2CBgm9GE8heA=" 
+                        <img src="{{ asset('images/33352653-6e82-462c-b8f0-5849c941f6b1.jfif') }}" 
                              alt="Children playing and learning" 
                              class="relative rounded-3xl shadow-2xl w-full image-hover-effect">
                         <div class="absolute inset-0 rounded-3xl bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
@@ -442,13 +439,15 @@
                 <h3 class="text-3xl font-bold mb-6">Talk to Our Experts</h3>
                 <p class="text-white/90 mb-8 text-lg leading-relaxed">Get a free consultation from our specialized team to choose the best solutions for your child.</p>
                 <div class="space-y-4">
-                    <a href="tel:+962-XXX-XXXX" class="btn-professional bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600 text-white font-bold py-4 px-10 rounded-2xl text-lg inline-flex items-center w-full justify-center">
+                    <a href="tel:+962797793944" class="btn-professional bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600 text-white font-bold py-4 px-10 rounded-2xl text-lg inline-flex items-center w-full justify-center">
                         <i class="fas fa-phone mr-3"></i>
                         <span>Call Directly</span>
+                        
                     </a>
-                    <a href="https://wa.me/962XXXXXXXX" class="btn-professional bg-gradient-to-r from-green-600 via-green-700 to-emerald-800 text-white font-bold py-4 px-10 rounded-2xl text-lg inline-flex items-center w-full justify-center">
+                    <a href="https://wa.me/+962797793944" class="btn-professional bg-gradient-to-r from-green-600 via-green-700 to-emerald-800 text-white font-bold py-4 px-10 rounded-2xl text-lg inline-flex items-center w-full justify-center">
                         <i class="fab fa-whatsapp mr-3"></i>
                         <span>WhatsApp Now</span>
+                       
                     </a>
                 </div>
             </div>

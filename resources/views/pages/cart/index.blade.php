@@ -1,319 +1,133 @@
 @extends('layouts.app')
 
-@section('title', 'سلة التسوق')
-
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">سلة التسوق</h1>
-            <p class="text-gray-600 mt-2">راجع منتجاتك المختارة قبل إتمام الطلب</p>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    .cart-container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
+    .cart-header { background: white; padding: 20px 30px; border-bottom: 2px solid #f0f0f0; }
+    .cart-header h2 { font-size: 24px; color: #333; font-weight: 600; }
+    .cart-content { display: flex; min-height: 500px; }
+    .cart-items { flex: 1; padding: 30px; background: #fafafa; }
+    .cart-item { display: flex; align-items: center; padding: 20px; margin-bottom: 20px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: transform 0.2s ease; }
+    .cart-item:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .item-image { width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; text-align: center; margin-left: 20px; margin-right: 16px; }
+    .item-details { flex: 1; }
+    .item-name { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 5px; }
+    .item-specs { color: #666; font-size: 14px; margin-bottom: 15px; }
+    .quantity-control { display: flex; align-items: center; gap: 10px; }
+    .qty-btn { width: 35px; height: 35px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; font-weight: bold; color: #666; transition: all 0.2s ease; }
+    .qty-btn:hover { border-color: #4f46e5; color: #4f46e5; background: #f8faff; }
+    .qty-input { width: 50px; height: 35px; text-align: center; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; font-weight: 600; }
+    .item-price { font-size: 20px; font-weight: bold; color: #333; margin: 0 20px; }
+    .remove-btn { width: 30px; height: 30px; border: none; background: #fee2e2; color: #dc2626; border-radius: 50%; cursor: pointer; font-size: 16px; transition: all 0.2s ease; }
+    .remove-btn:hover { background: #fecaca; transform: scale(1.1); }
+    .order-summary { width: 350px; background: white; padding: 30px; border-right: 2px solid #f0f0f0; }
+    .summary-header { font-size: 20px; font-weight: 600; color: #333; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
+    .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 16px; }
+    .summary-label { color: #666; }
+    .summary-value { font-weight: 600; color: #333; }
+    .free-shipping { color: #059669; font-weight: 600; }
+    .total-row { margin-top: 20px; padding-top: 20px; border-top: 2px solid #f0f0f0; font-size: 18px; font-weight: bold; }
+    .promo-section { margin: 25px 0; }
+    .promo-input { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; margin-bottom: 10px; }
+    .promo-input:focus { outline: none; border-color: #4f46e5; }
+    .apply-btn { width: 100%; padding: 10px; background: #374151; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s ease; }
+    .apply-btn:hover { background: #1f2937; }
+    .checkout-btn { width: 100%; padding: 15px; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-size: 22px; font-weight: 700; cursor: pointer; margin: 24px auto 0 auto; transition: all 0.2s ease; display: block; text-align: center; box-shadow: 0 2px 8px rgba(79,70,229,0.10); letter-spacing: 0.5px; }
+    .checkout-btn:hover { background: linear-gradient(90deg, #5a67d8 0%, #6c47a2 100%); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(79, 70, 229, 0.18); }
+    .payment-methods { display: flex; gap: 8px; margin-top: 15px; justify-content: center; }
+    .payment-icon { width: 40px; height: 25px; background: #f3f4f6; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666; font-weight: bold; }
+    .visa { background: #1a1f71; color: white; }
+    .mastercard { background: #eb001b; color: white; }
+    .paypal { background: #0070ba; color: white; }
+    .apple { background: #000; color: white; }
+    .google { background: #4285f4; color: white; }
+    @media (max-width: 768px) { .cart-content { flex-direction: column; } .order-summary { width: 100%; border-right: none; border-top: 2px solid #f0f0f0; } .cart-item { flex-direction: column; text-align: center; } .item-image { margin: 0 0 15px 0; } }
+</style>
+<div class="cart-container">
+    <div class="cart-header">
+        <h2>{{ __('cart.cart') }} ({{ isset($cart) ? $cart->items->count() : 0 }} {{ __('cart.product') }})</h2>
+    </div>
+    <div class="cart-content">
+        <div class="cart-items">
+            @if(isset($cart) && $cart->items->count() > 0)
+                @foreach($cart->items as $item)
+                <div class="cart-item">
+                    <div class="item-image">
+                        @if($item->product->image_path)
+                            <img src="{{ asset('storage/' . $item->product->image_path) }}" alt="{{ $item->product->name }}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+                        @else
+                            {{ app()->getLocale() == 'ar' ? ($item->product->name ?? '') : ($item->product->name_en ?? $item->product->name) }}
+                        @endif
+                    </div>
+                    <div class="item-details">
+                        <div class="item-name">{{ app()->getLocale() == 'ar' ? ($item->product->name ?? '') : ($item->product->name_en ?? $item->product->name) }}</div>
+                        <div class="item-specs">{{ $item->product->description ? Str::limit(strip_tags($item->product->description), 40) : '' }}</div>
+                        <div class="quantity-control">
+                            <form action="{{ route('cart.update', $item->product_id) }}" method="POST" style="display:inline-flex;align-items:center;gap:10px;">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" name="quantity" value="{{ $item->quantity - 1 }}" class="qty-btn" @if($item->quantity <= 1) disabled style="opacity:0.5;cursor:not-allowed;" @endif>−</button>
+                                <input type="number" name="quantity" class="qty-input" value="{{ $item->quantity }}" min="1" onchange="this.form.submit()">
+                                <button type="submit" name="quantity" value="{{ $item->quantity + 1 }}" class="qty-btn">+</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="item-price">{{ number_format($item->price, 2) }} JOD</div>
+                    <form action="{{ route('cart.remove', $item->product_id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="remove-btn">🗑</button>
+                    </form>
+                </div>
+                @endforeach
+            @else
+                <div style="text-align:center;color:#888;font-size:18px;padding:40px 0;">{{ __('cart.empty') }}</div>
+            @endif
         </div>
-
-        @if($cart->total_items > 0)
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Cart Items -->
-                <div class="lg:col-span-2">
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <div class="p-6 border-b border-gray-200">
-                            <h2 class="text-xl font-semibold text-gray-900">المنتجات ({{ $cart->total_items }} منتج)</h2>
-                        </div>
-                        
-                        <div class="divide-y divide-gray-200">
-                            @foreach($cart->items as $item)
-                                <div class="p-6 cart-item" data-item-id="{{ $item->id }}">
-                                    <div class="flex items-center space-x-4 space-x-reverse">
-                                        <!-- Product Image -->
-                                        <div class="flex-shrink-0">
-                                            @if($item->product_image)
-                                                <img src="{{ $item->product_image }}" alt="{{ $item->product_name }}" 
-                                                     class="w-20 h-20 object-cover rounded-lg">
-                                            @else
-                                                <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
-                                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                    </svg>
-                                                </div>
-                                            @endif
-                                        </div>
-
-                                        <!-- Product Details -->
-                                        <div class="flex-1 min-w-0">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ $item->product_name }}</h3>
-                                            <p class="text-sm text-gray-500 mt-1">السعر: {{ number_format($item->price, 2) }} د.أ</p>
-                                            
-                                            <!-- Quantity Controls -->
-                                            <div class="flex items-center mt-3 space-x-3 space-x-reverse">
-                                                <label class="text-sm font-medium text-gray-700">الكمية:</label>
-                                                <div class="flex items-center border border-gray-300 rounded-md">
-                                                    <button type="button" class="quantity-btn decrease-btn px-3 py-1 text-gray-600 hover:text-gray-800 hover:bg-gray-100" 
-                                                            data-item-id="{{ $item->id }}" data-action="decrease">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                                                        </svg>
-                                                    </button>
-                                                    <input type="number" 
-                                                           class="quantity-input w-16 px-2 py-1 text-center border-0 focus:ring-0" 
-                                                           value="{{ $item->quantity }}" 
-                                                           min="1" 
-                                                           data-item-id="{{ $item->id }}">
-                                                    <button type="button" class="quantity-btn increase-btn px-3 py-1 text-gray-600 hover:text-gray-800 hover:bg-gray-100" 
-                                                            data-item-id="{{ $item->id }}" data-action="increase">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Price and Remove -->
-                                        <div class="flex flex-col items-end space-y-2">
-                                            <div class="text-lg font-semibold text-gray-900 item-subtotal">
-                                                {{ number_format($item->total, 2) }} د.أ
-                                            </div>
-                                            <button type="button" class="remove-item-btn text-red-600 hover:text-red-800 text-sm" 
-                                                    data-item-id="{{ $item->id }}">
-                                                <svg class="w-5 h-5 inline-block ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                </svg>
-                                                حذف
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <!-- Clear Cart Button -->
-                        <div class="p-6 bg-gray-50 border-t border-gray-200">
-                            <button type="button" id="clear-cart-btn" 
-                                    class="text-red-600 hover:text-red-800 text-sm font-medium">
-                                <svg class="w-5 h-5 inline-block ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                                تفريغ السلة بالكامل
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Order Summary -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">ملخص الطلب</h3>
-                        
-                        <div class="space-y-3 border-b border-gray-200 pb-4 mb-4">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">عدد المنتجات:</span>
-                                <span class="font-medium cart-total-items">{{ $cart->total_items }}</span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">المجموع الفرعي:</span>
-                                <span class="font-medium cart-subtotal">{{ number_format($cart->total_price, 2) }} د.أ</span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">الشحن:</span>
-                                <span class="font-medium">سيتم حسابه في الدفع</span>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-between text-lg font-semibold text-gray-900 mb-6">
-                            <span>المجموع:</span>
-                            <span class="cart-total-price">{{ number_format($cart->total_price, 2) }} د.أ</span>
-                        </div>
-                        
-                        <div class="space-y-3">
-                            <a href="{{ route('checkout.index') }}" 
-                               class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 text-center block">
-                                متابعة إلى الدفع
-                            </a>
-                            
-                            <a href="{{ route('products.index') }}" 
-                               class="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors duration-200 text-center block">
-                                متابعة التسوق
-                            </a>
-                        </div>
-                    </div>
-                </div>
+        <div class="order-summary">
+            <div class="summary-header">{{ __('cart.cart') }}</div>
+            <div class="summary-row">
+                <span class="summary-label">{{ __('cart.total') }}</span>
+                <span class="summary-value">{{ isset($cart) ? number_format($cart->total_price, 2) : '0.00' }} JOD</span>
             </div>
-        @else
-            <!-- Empty Cart -->
-            <div class="text-center py-16">
-                <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
-                    </svg>
-                </div>
-                <h2 class="text-2xl font-semibold text-gray-900 mb-2">سلة التسوق فارغة</h2>
-                <p class="text-gray-600 mb-8">لم تقم بإضافة أي منتجات إلى سلة التسوق بعد</p>
-                <a href="{{ route('products.index') }}" 
-                   class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
-                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                    تصفح المنتجات
-                </a>
+            <div class="summary-row">
+                <span class="summary-label">{{ __('cart.quantity') }}</span>
+                <span class="summary-value">{{ isset($cart) ? $cart->items->sum('quantity') : 0 }}</span>
             </div>
-        @endif
+            <div class="summary-row">
+                <span class="summary-label">{{ __('cart.unit_price') }}</span>
+                <span class="summary-value">{{ isset($cart) && $cart->items->count() > 0 ? number_format($cart->items->sum(function($i){return $i->price;})/$cart->items->count(), 2) : '0.00' }} JOD</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">{{ __('cart.subtotal') }}</span>
+                <span class="summary-value">{{ isset($cart) ? number_format($cart->total_price, 2) : '0.00' }} JOD</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">{{ __('cart.proceed') }}</span>
+                @if(isset($cart) && $cart->items->count() > 0)
+                    <span class="free-shipping" style="color: #28a745;">{{ __('cart.proceed') }}</span>
+                @else
+                    <span class="free-shipping" style="color: #888;">{{ __('cart.empty') }}</span>
+                @endif
+            </div>
+            <div class="summary-row total-row">
+                <span class="summary-label">{{ __('cart.total') }}</span>
+                <span class="summary-value">{{ isset($cart) ? number_format($cart->total_price, 2) : '0.00' }} JOD</span>
+            </div>
+            <div class="promo-section">
+                <input type="text" class="promo-input" placeholder="{{ __('cart.promo') ?? 'Promo code' }}">
+                <button class="apply-btn" type="button">{{ __('cart.apply') ?? 'Apply' }}</button>
+            </div>
+            <a href="{{ route('checkout.index') }}" class="checkout-btn">{{ __('cart.proceed') }}</a>
+            <div class="payment-methods">
+                <div class="payment-icon visa">VISA</div>
+                <div class="payment-icon mastercard">MC</div>
+                <div class="payment-icon paypal">PP</div>
+                <div class="payment-icon apple">PAY</div>
+                <div class="payment-icon google">GP</div>
+            </div>
+        </div>
     </div>
 </div>
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Update quantity buttons
-    document.querySelectorAll('.quantity-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const itemId = this.dataset.itemId;
-            const action = this.dataset.action;
-            const input = document.querySelector(`input[data-item-id="${itemId}"]`);
-            let currentValue = parseInt(input.value);
-            
-            if (action === 'increase') {
-                input.value = currentValue + 1;
-            } else if (action === 'decrease' && currentValue > 1) {
-                input.value = currentValue - 1;
-            }
-            
-            updateCartItem(itemId, input.value);
-        });
-    });
-    
-    // Direct quantity input change
-    document.querySelectorAll('.quantity-input').forEach(input => {
-        input.addEventListener('change', function() {
-            const itemId = this.dataset.itemId;
-            const quantity = Math.max(1, parseInt(this.value) || 1);
-            this.value = quantity;
-            updateCartItem(itemId, quantity);
-        });
-    });
-    
-    // Remove item buttons
-    document.querySelectorAll('.remove-item-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const itemId = this.dataset.itemId;
-            removeCartItem(itemId);
-        });
-    });
-    
-    // Clear cart button
-    document.getElementById('clear-cart-btn')?.addEventListener('click', function() {
-        if (confirm('هل أنت متأكد من تفريغ سلة التسوق بالكامل؟')) {
-            clearCart();
-        }
-    });
-    
-    function updateCartItem(itemId, quantity) {
-        fetch(`/cart/update-item/${itemId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({ quantity: quantity })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Update item subtotal
-                const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
-                const subtotalElement = itemElement.querySelector('.item-subtotal');
-                subtotalElement.textContent = parseFloat(data.item.subtotal).toFixed(2) + ' د.أ';
-                
-                // Update cart totals
-                updateCartTotals(data.cart);
-                
-                showNotification(data.message, 'success');
-            } else {
-                showNotification(data.message, 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('حدث خطأ أثناء تحديث السلة', 'error');
-        });
-    }
-    
-    function removeCartItem(itemId) {
-        fetch(`/cart/remove-item/${itemId}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Remove item from DOM
-                document.querySelector(`[data-item-id="${itemId}"]`).remove();
-                
-                // Update cart totals
-                updateCartTotals(data.cart);
-                
-                // Check if cart is empty
-                if (data.cart.total_items === 0) {
-                    location.reload();
-                }
-                
-                showNotification(data.message, 'success');
-            } else {
-                showNotification('حدث خطأ أثناء حذف المنتج', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('حدث خطأ أثناء حذف المنتج', 'error');
-        });
-    }
-    
-    function clearCart() {
-        fetch('/cart/clear', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                showNotification('حدث خطأ أثناء تفريغ السلة', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('حدث خطأ أثناء تفريغ السلة', 'error');
-        });
-    }
-    
-    function updateCartTotals(cart) {
-        document.querySelector('.cart-total-items').textContent = cart.total_items;
-        document.querySelector('.cart-subtotal').textContent = parseFloat(cart.total_price).toFixed(2) + ' د.أ';
-        document.querySelector('.cart-total-price').textContent = parseFloat(cart.total_price).toFixed(2) + ' د.أ';
-    }
-    
-    function showNotification(message, type) {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        // Remove after 3 seconds
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-    }
-});
-</script>
-@endpush
 @endsection

@@ -26,6 +26,7 @@ class User extends Authenticatable
         'language_preference', // Added
         'role', // Added
         'is_active', // Added
+        'is_admin', // Added is_admin field
     ];
 
     /**

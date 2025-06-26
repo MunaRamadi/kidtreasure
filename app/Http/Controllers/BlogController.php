@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\BlogPost; 
 use Illuminate\Http\Request;
 
@@ -14,14 +13,16 @@ class BlogController extends Controller
                         ->orderBy('publication_date', 'desc')
                         ->paginate(9);
         
-        // Fixed: Changed from 'index' to 'blog' to match your blog.blade.php file
         return view('pages.blog', compact('posts'));
     }
 
     
-    public function show($id) 
+    public function show(BlogPost $post) 
     {
-        $post = BlogPost::where('id', $id)->where('is_published', true)->firstOrFail();
+        // Check if the post is published
+        if (!$post->is_published) {
+            abort(404);
+        }
         
         return view('pages.blog.show', compact('post'));
     }
