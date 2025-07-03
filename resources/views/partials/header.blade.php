@@ -166,10 +166,10 @@
                         <i class="fas fa-blog mr-2"></i>Blog
                     </a>
                     <a href="/about" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_about">
-                        <i class="fas fa-info-circle mr-2"></i>About Us
+                        <i class="fas fa-info-circle mr-2"></i><span class="whitespace-nowrap">About Us</span>
                     </a>
-                    <a href="/contact-us" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_contact">
-                        <i class="fas fa-envelope mr-2"></i>Contact Us
+                    <a href="/contact" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_contact">
+                        <i class="fas fa-envelope mr-2"></i><span class="whitespace-nowrap">Contact Us</span>
                     </a>
                 </nav>
 
@@ -179,11 +179,11 @@
                     @guest
                     <a href="/login" class="flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-white font-medium px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 text-sm" data-translate="login_button">
                         <i class="fas fa-user"></i>
-                        <span>Login</span>
+                        <span>{{ app()->getLocale() == 'en' ? 'Login' : 'تسجيل الدخول' }}</span>
                     </a>
                     <a href="/register" class="flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-white font-medium px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 text-sm" data-translate="register_button">
                         <i class="fas fa-user-plus"></i>
-                        <span>Register</span>
+                        <span>{{ app()->getLocale() == 'en' ? 'Register' : 'إنشاء حساب' }}</span>
                     </a>
                     @else
                     <div class="relative" x-data="{ open: false }">
@@ -201,13 +201,10 @@
                              x-transition:leave-end="opacity-0 scale-95" 
                              class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50"
                              style="display: none;">
-                            <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="profile_option">
+                            <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="profile_option">
                                 <i class="fas fa-user-circle mr-2"></i> Profile
                             </a>
-                            <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="settings_option">
-                                <i class="fas fa-cog mr-2"></i> Settings
-                            </a>
-                            <a href="/orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="orders_option">
+                            <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="orders_option">
                                 <i class="fas fa-shopping-bag mr-2"></i> Orders
                             </a>
                             <div class="border-t border-gray-100 my-1"></div>
@@ -227,7 +224,11 @@
                     @endguest
                        <div id="desktop-language-switcher" class="language-switcher flex items-center space-x-1 ltr:space-x-reverse text-gray-600 hover:text-indigo-600 cursor-pointer">
                         <i class="fas fa-language text-lg"></i>
-                        <span class="text-sm font-medium" data-translate="switch_lang_desktop">Arabic</span>
+                        @if(app()->getLocale() == 'en')
+                            <a href="{{ route('lang.switch', 'ar') }}" class="text-sm font-medium">العربية</a>
+                        @else
+                            <a href="{{ route('lang.switch', 'en') }}" class="text-sm font-medium">English</a>
+                        @endif
                     </div>
                    <a href="/cart" class="relative flex items-center bg-purple-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors duration-300 flex-1 justify-center text-sm">
                        <i class="fas fa-shopping-cart"></i>
@@ -282,11 +283,11 @@
                         </a>
                         <a href="/about" class="flex items-center space-x-3 ltr:space-x-reverse text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 p-3 rounded-lg transition-all duration-300" data-translate="nav_about">
                             <i class="fas fa-info-circle text-sm w-5"></i>
-                            <span class="font-medium text-sm">About Us</span>
+                            <span class="font-medium text-sm whitespace-nowrap">About Us</span>
                         </a>
                         <a href="/contact" class="flex items-center space-x-3 ltr:space-x-reverse text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 p-3 rounded-lg transition-all duration-300">
                             <i class="fas fa-envelope text-sm w-5"></i>
-                            <span class="font-medium text-sm">Contact Us</span>
+                            <span class="font-medium text-sm whitespace-nowrap">Contact Us</span>
                         </a>
                     </div>
                 </div>
@@ -317,15 +318,15 @@
                         </a>
                         @else
                         <div class="grid grid-cols-2 gap-2 w-full">
-                            <a href="/profile" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="profile_option">
+                            <a href="{{ route('user.dashboard') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="profile_option">
                                 <i class="fas fa-user-circle"></i>
                                 <span>Profile</span>
                             </a>
-                            <a href="/settings" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="settings_option">
+                            <a href="{{ route('user.dashboard') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="settings_option">
                                 <i class="fas fa-cog"></i>
                                 <span>Settings</span>
                             </a>
-                            <a href="/orders" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="orders_option">
+                            <a href="{{ route('user.dashboard') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="orders_option">
                                 <i class="fas fa-shopping-bag"></i>
                                 <span>Orders</span>
                             </a>

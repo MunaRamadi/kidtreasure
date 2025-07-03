@@ -1,5 +1,6 @@
 @extends('layouts.app')
-@section('content')
+
+@section('title', 'لوحة التحكم')
 
 <style>
     /* CSS Variables for Colors */
@@ -389,76 +390,131 @@
         <div class="star" style="top: 70%; left: 50%; animation-delay: 1.5s;"></div>
     </div>
     
-    <div class="max-w-7xl mx-auto px-6 relative z-10">
-        <div class="text-center fade-in-up">
-            <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
-                <span class="block text-white drop-shadow-2xl">Welcome to Your</span>
-                <span class="block text-gradient-advanced text-5xl md:text-7xl">Dashboard</span>
-            </h1>
-            <p class="text-xl md:text-2xl text-white/95 font-light max-w-3xl mx-auto">
-                Manage your sustainable educational journey with comprehensive insights and controls
-            </p>
+    <div class="container position-relative m-auto mt-6" style="z-index: 10;">
+        <div class="row align-items-center">
+            <div class="col-lg-6 order-2 order-lg-1">
+                <div class="fade-in-up text-center text-lg-end">
+                    <h1 class="display-1 fw-black mb-4 text-white" style="line-height: 1.1;">
+                        <span class="d-block">مرحباً</span>
+                        <span class="d-block text-gradient-advanced display-2">{{ Auth::user()->name }}</span>
+                        <span class="d-block h2 fw-bold mt-4 text-white-50">لوحة التحكم الخاصة بك</span>
+                    </h1>
+                </div>
+                
+                <div class="fade-in-left text-center text-lg-end">
+                    <p class="h4 mb-5 text-white-75 fw-light">
+                        نظرة عامة على نشاطك وإنجازاتك في عالم الإبداع والتعلم التفاعلي
+                    </p>
+                </div>
+                
+                <div class="fade-in-right">
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-end">
+                        <a href="/products" class="btn-professional btn btn-lg px-5 py-3 rounded-pill fw-bold text-white pulse-advanced" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="fas fa-rocket me-2"></i>
+                            استكشف المنتجات
+                        </a>
+                        <a href="{{ route('stories.create') }}" class="btn-professional btn btn-outline-light btn-lg px-5 py-3 rounded-pill fw-bold">
+                            <i class="fas fa-plus me-2"></i>
+                            أضف قصة جديدة
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 order-1 order-lg-2 fade-in-up mb-5 mb-lg-0">
+                <div class="position-relative">
+                    <div class="position-absolute" style="inset: -2rem; background: linear-gradient(135deg, #f093fb, #f5576c, #667eea); border-radius: 2rem; filter: blur(20px); opacity: 0.7; animation: pulse 3s infinite;"></div>
+                    <div class="glass-card rounded-4 p-4 position-relative">
+                        <div class="text-center text-white">
+                            <div class="bg-white bg-opacity-10 rounded-3 p-3 d-inline-block mb-3">
+                                <span class="h4 fw-bold text-gradient-advanced">{{ now()->format('d M Y') }}</span>
+                            </div>
+                            <h3 class="h5 mb-0">اليوم هو يوم رائع للإبداع! 🌟</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- Statistics Section -->
-<section class="py-16 section-bg-pattern bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="text-center mb-12 fade-in-up">
-            <h2 class="text-3xl md:text-5xl font-black text-gray-800 mb-4">
-                <span class="text-gradient-advanced">Your Statistics</span>
+<!-- Stats Section -->
+<section class="py-5 section-bg-pattern dashboard-bg">
+    <div class="container py-5 m-auto">
+        <div class="text-center mb-5 fade-in-up">
+            <h2 class="display-4 fw-black text-dark mb-4">
+                <span class="text-gradient-advanced">إحصائياتك</span>
             </h2>
             <div class="flex justify-center mb-6">
                 <div class="w-24 h-1 bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500 rounded-full"></div>
             </div>
         </div>
-        
-        <div class="dashboard-grid">
-            <div class="stat-card card-hover-effect p-8 rounded-3xl fade-in-left">
-                <div class="bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 rounded-3xl w-16 h-16 flex items-center justify-center mb-6 shadow-2xl">
-                    <i class="fas fa-box text-white text-2xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">Total Products</h3>
-                <p class="text-4xl font-black text-gradient-advanced mb-4">{{ $totalProducts ?? '127' }}</p>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 85%;"></div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 col-lg-3 fade-in-up" style="animation-delay: 0.1s;">
+                <div class="glass-card card-hover-effect rounded-4 h-100 p-4 text-center">
+                    <div class="stat-icon text-primary mx-auto mb-4">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <h6 class="text-muted mb-2">الطلبات</h6>
+                    <h2 class="mb-3 fw-bold text-dark">{{ $stats['orders'] }}</h2>
+                    <div class="pt-3 border-top">
+                        <small class="text-success fw-bold">
+                            <i class="fas fa-arrow-up me-1"></i>
+                            {{ $stats['orders'] > 0 ? round(($stats['completed_orders']/$stats['orders'])*100) : 0 }}% معدل الإنجاز
+                        </small>
+                    </div>
                 </div>
                 <p class="text-sm text-gray-600 mt-2">+12% from last month</p>
             </div>
-            
-            <div class="stat-card card-hover-effect p-8 rounded-3xl fade-in-up" style="animation-delay: 0.2s;">
-                <div class="bg-gradient-to-br from-green-500 via-emerald-600 to-teal-700 rounded-3xl w-16 h-16 flex items-center justify-center mb-6 shadow-2xl">
-                    <i class="fas fa-users text-white text-2xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">Active Users</h3>
-                <p class="text-4xl font-black text-gradient-advanced mb-4">{{ $activeUsers ?? '2,543' }}</p>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 92%;"></div>
+
+            <div class="col-md-6 col-lg-3 fade-in-up" style="animation-delay: 0.2s;">
+                <div class="glass-card card-hover-effect rounded-4 h-100 p-4 text-center">
+                    <div class="stat-icon text-success mx-auto mb-4">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h6 class="text-muted mb-2">طلبات مكتملة</h6>
+                    <h2 class="mb-3 fw-bold text-dark">{{ $stats['completed_orders'] }}</h2>
+                    <div class="pt-3 border-top">
+                        <small class="text-muted fw-bold">
+                            <i class="fas fa-clock me-1"></i>
+                            {{ $stats['pending_orders'] }} قيد الانتظار
+                        </small>
+                    </div>
                 </div>
                 <p class="text-sm text-gray-600 mt-2">+8% from last month</p>
             </div>
-            
-            <div class="stat-card card-hover-effect p-8 rounded-3xl fade-in-right" style="animation-delay: 0.4s;">
-                <div class="bg-gradient-to-br from-purple-500 via-pink-600 to-rose-700 rounded-3xl w-16 h-16 flex items-center justify-center mb-6 shadow-2xl">
-                    <i class="fas fa-chart-line text-white text-2xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">Revenue</h3>
-                <p class="text-4xl font-black text-gradient-advanced mb-4">JD {{ $revenue ?? '15,240' }}</p>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 78%;"></div>
+
+            <div class="col-md-6 col-lg-3 fade-in-up" style="animation-delay: 0.3s;">
+                <div class="glass-card card-hover-effect rounded-4 h-100 p-4 text-center">
+                    <div class="stat-icon text-info mx-auto mb-4">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h6 class="text-muted mb-2">قصص منشورة</h6>
+                    <h2 class="mb-3 fw-bold text-dark">{{ $stats['approved_stories'] }}</h2>
+                    <div class="pt-3 border-top">
+                        <small class="text-muted fw-bold">
+                            <i class="fas fa-pen me-1"></i>
+                            {{ $stats['stories'] }} إجمالي القصص
+                        </small>
+                    </div>
                 </div>
                 <p class="text-sm text-gray-600 mt-2">+15% from last month</p>
             </div>
-            
-            <div class="stat-card card-hover-effect p-8 rounded-3xl fade-in-left" style="animation-delay: 0.6s;">
-                <div class="bg-gradient-to-br from-yellow-500 via-orange-600 to-red-700 rounded-3xl w-16 h-16 flex items-center justify-center mb-6 shadow-2xl">
-                    <i class="fas fa-shopping-cart text-white text-2xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">Orders</h3>
-                <p class="text-4xl font-black text-gradient-advanced mb-4">{{ $totalOrders ?? '432' }}</p>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 95%;"></div>
+
+            <div class="col-md-6 col-lg-3 fade-in-up" style="animation-delay: 0.4s;">
+                <div class="glass-card card-hover-effect rounded-4 h-100 p-4 text-center">
+                    <div class="stat-icon text-warning mx-auto mb-4">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h6 class="text-muted mb-2">ورش مسجلة</h6>
+                    <h2 class="mb-3 fw-bold text-dark">{{ $stats['workshop_registrations'] }}</h2>
+                    <div class="pt-3 border-top">
+                        <small class="text-primary fw-bold">
+                            <i class="fas fa-calendar-check me-1"></i>
+                            {{ $upcomingWorkshops->count() }} قادمة
+                        </small>
+                    </div>
                 </div>
                 <p class="text-sm text-gray-600 mt-2">+22% from last month</p>
             </div>
@@ -488,17 +544,65 @@
                                 <p class="text-sm text-gray-600">Educational Kit #1234 - 5 minutes ago</p>
                             </div>
                         </div>
+<section class="py-5 animated-bg text-white position-relative overflow-hidden">
+    <div class="floating-elements m-auto">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+    
+    <div class="container py-5 position-relative m-auto" style="z-index: 10;">
+        <div class="text-center mb-5 fade-in-up">
+            <h2 class="display-4 fw-black mb-4">نشاطك الأخير</h2>
+            <p class="h5 text-white-75 mb-5">
+                تابع آخر طلباتك وقصصك والورش القادمة
+            </p>
+        </div>
+
+        <!-- Recent Orders & Stories -->
+        <div class="row g-4 mb-5">
+            <!-- Recent Orders -->
+            <div class="col-lg-8 fade-in-left">
+                <div class="glass-card card-hover-effect rounded-4 h-100 p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold mb-0 text-white">آخر الطلبات</h4>
                     </div>
                     
-                    <div class="activity-item">
-                        <div class="flex items-center">
-                            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full w-10 h-10 flex items-center justify-center mr-4">
-                                <i class="fas fa-user text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800">New User Registration</h4>
-                                <p class="text-sm text-gray-600">Ahmad Ali joined - 12 minutes ago</p>
-                            </div>
+                    @if($recentOrders->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table dashboard-table text-white">
+                                <thead>
+                                    <tr class="text-white-50">
+                                        <th>رقم الطلب</th>
+                                        <th>التاريخ</th>
+                                        <th>الحالة</th>
+                                        <th class="text-end">الإجمالي</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($recentOrders as $order)
+                                    <tr>
+                                        <td>
+                                            <a href="#" class="text-warning fw-bold">#{{ $order->id }}</a>
+                                        </td>
+                                        <td class="text-white-75">{{ $order->created_at->format('d/m/Y') }}</td>
+                                        <td>
+                                            <span class="status-badge text-white">
+                                                {{ $order->order_status }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end fw-bold text-success">{{ number_format($order->total, 2) }} ر.س</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-cart fa-4x text-white-50 mb-4"></i>
+                            <h5 class="text-white-75">لا توجد طلبات حتى الآن</h5>
+                            <a href="/products" class="btn-professional btn btn-outline-light mt-3 rounded-pill px-4">
+                                <i class="fas fa-store me-2"></i> تصفح المتجر
+                            </a>
                         </div>
                     </div>
                     
@@ -535,36 +639,84 @@
                             <p class="text-2xl font-bold text-white">24/7</p>
                             <p class="text-sm text-white/80">Support Available</p>
                         </div>
+        </div>
+    </div>
+</section>
+
+<!-- Upcoming Workshops Section -->
+<section class="py-5 section-bg-pattern dashboard-bg">
+    <div class="container py-5 m-auto">
+        <div class="text-center mb-5 fade-in-up">
+            <h2 class="display-4 fw-black text-dark mb-4">
+                <span class="text-gradient-advanced">ورش العمل القادمة</span>
+            </h2>
+            <div class="d-flex justify-content-center mb-4">
+                <div style="width: 8rem; height: 4px; background: linear-gradient(135deg, #667eea, #764ba2, #f093fb); border-radius: 2px;"></div>
+            </div>
+        </div>
+        
+        <div class="row fade-in-up" style="animation-delay: 0.4s;">
+            <div class="col-12">
+                <div class="glass-card rounded-4 p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold mb-0 text-dark">الورش المسجل بها</h4>
+                        <a href="{{ route('workshops.index') }}" class="btn btn-sm btn-outline-primary rounded-pill">
+                            عرض الكل <i class="fas fa-arrow-left ms-2"></i>
+                        </a>
                     </div>
                     
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="text-white text-sm">Sales Target</span>
-                                <span class="text-white text-sm">85%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 85%;"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="text-white text-sm">User Engagement</span>
-                                <span class="text-white text-sm">92%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 92%;"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="text-white text-sm">Sustainability Goal</span>
-                                <span class="text-white text-sm">78%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 78%;"></div>
+                    @if($upcomingWorkshops->count() > 0)
+                        <div class="row g-4">
+                            @foreach($upcomingWorkshops as $workshop)
+                            <div class="col-md-6 col-lg-4">
+                                <div class="workshop-card rounded-4 h-100 overflow-hidden">
+                                    @if($workshop->image)
+                                        <img src="{{ asset('storage/' . $workshop->image) }}" 
+                                             class="card-img-top" 
+                                             style="height: 200px; object-fit: cover;" 
+                                             alt="{{ $workshop->title }}">
+                                    @else
+                                        <div class="bg-gradient-primary d-flex align-items-center justify-content-center text-white" 
+                                             style="height: 200px;">
+                                            <i class="fas fa-chalkboard-teacher fa-4x opacity-50"></i>
+                                        </div>
+                                    @endif
+                                    
+                                    <div class="card-body p-4">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <h5 class="card-title fw-bold text-dark mb-0">
+                                                {{ Str::limit($workshop->title, 40) }}
+                                            </h5>
+                                            <span class="badge bg-success rounded-pill">مسجل</span>
+                                        </div>
+                                        
+                                        <p class="card-text text-muted mb-3">
+                                            {{ Str::limit($workshop->description, 80) }}
+                                        </p>
+                                        
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div class="d-flex align-items-center text-muted">
+                                                <i class="far fa-calendar-alt me-2"></i>
+                                                <small>{{ $workshop->start_date ? \Carbon\Carbon::parse($workshop->start_date)->format('d/m/Y') : 'غير محدد' }}</small>
+                                            </div>
+                                            <div class="d-flex align-items-center text-muted">
+                                                <i class="far fa-clock me-2"></i>
+                                                <small>{{ $workshop->duration ?? 'غير محدد' }} ساعة</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center text-muted">
+                                                <i class="fas fa-user-tie me-2"></i>
+                                                <small>{{ $workshop->instructor ?? 'المدرب غير محدد' }}</small>
+                                            </div>
+                                            <a href="{{ route('workshops.show', $workshop->id) }}" 
+                                               class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                                عرض التفاصيل
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -581,7 +733,7 @@
         <div class="floating-element"></div>
     </div>
     
-    <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
+    <div class="max-w-4xl mx-auto px-6 text-center relative m-auto z-10">
         <div class="fade-in-up">
             <h2 class="text-3xl md:text-5xl font-black mb-8">Ready to Take Action?</h2>
             <p class="text-xl text-white/95 mb-12 leading-relaxed">
@@ -608,14 +760,89 @@
                         Contact Support
                     </a>
                   
+
+        <div class="row g-4 fade-in-up" style="animation-delay: 0.2s;">
+            <div class="col-md-6 col-lg-3">
+                <div class="glass-card card-hover-effect rounded-4 h-100 p-4 text-center">
+                    <div class="stat-icon text-primary mx-auto mb-4">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h5 class="fw-bold text-white mb-3">تصفح المتجر</h5>
+                    <p class="text-white-75 mb-4">اكتشف منتجاتنا الرائعة</p>
+                    <a href="/products" class="btn-professional btn btn-outline-light rounded-pill px-4">
+                        تصفح الآن <i class="fas fa-arrow-left ms-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="glass-card card-hover-effect rounded-4 h-100 p-4 text-center">
+                    <div class="stat-icon text-success mx-auto mb-4">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h5 class="fw-bold text-white mb-3">قصة جديدة</h5>
+                    <p class="text-white-75 mb-4">شارك إبداعك مع العالم</p>
+                    <a href="{{ route('stories.create') }}" class="btn-professional btn btn-outline-light rounded-pill px-4">
+                        أضف قصة <i class="fas fa-pen ms-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="glass-card card-hover-effect rounded-4 h-100 p-4 text-center">
+                    <div class="stat-icon text-info mx-auto mb-4">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <h5 class="fw-bold text-white mb-3">ورش العمل</h5>
+                    <p class="text-white-75 mb-4">انضم لورش تطوير المهارات</p>
+                    <a href="{{ route('workshops.index') }}" class="btn-professional btn btn-outline-light rounded-pill px-4">
+                        عرض الورش <i class="fas fa-chalkboard-teacher ms-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="glass-card card-hover-effect rounded-4 h-100 p-4 text-center">
+                    <div class="stat-icon text-warning mx-auto mb-4">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <h5 class="fw-bold text-white mb-3">الملف الشخصي</h5>
+                    <p class="text-white-75 mb-4">إدارة حسابك وإعداداتك</p>
+                    <a href="{{ route('profile.edit') }}" class="btn-professional btn btn-outline-light rounded-pill px-4">
+                        تحديث الملف <i class="fas fa-user ms-2"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
+<!-- Motivational Quote Section -->
+<section class="py-5 section-bg-pattern dashboard-bg">
+    <div class="container py-5 m-auto">
+        <div class="row justify-content-center fade-in-up">
+            <div class="col-lg-8">
+                <div class="glass-card rounded-4 p-5 text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-quote-left fa-2x text-gradient-advanced mb-4"></i>
+                    </div>
+                    <blockquote class="blockquote mb-4">
+                        <p class="h4 fw-light text-dark mb-0" style="line-height: 1.8;">
+                            "الإبداع هو الذكاء وهو يستمتع، والتعلم رحلة لا تنتهي نحو اكتشاف إمكانياتك اللامحدودة"
+                        </p>
+                    </blockquote>
+                    <footer class="blockquote-footer">
+                        <cite title="Source Title" class="text-gradient-advanced fw-bold">منصة الإبداع والتعلم</cite>
+                    </footer>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
+@endsection
 
+@section('scripts')
 <script>
     // Add smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -676,13 +903,24 @@
         });
     });
 
-    // Add progress bar animation on scroll
-    const progressBars = document.querySelectorAll('.progress-fill');
-    const progressObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const width = entry.target.style.width;
-                entry.target.style.width = '0%';
+    // Progress bars animation (if any exist)
+    document.querySelectorAll('.progress-bar').forEach(bar => {
+        const width = bar.style.width || bar.getAttribute('aria-valuenow') + '%';
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 500);
+    });
+
+    // Add loading states for buttons
+    document.querySelectorAll('.btn-professional').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (!this.classList.contains('disabled')) {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري التحميل...';
+                this.classList.add('disabled');
+                
+                // Re-enable after 2 seconds (adjust as needed)
                 setTimeout(() => {
                     entry.target.style.width = width;
                     entry.target.style.transition = 'width 2s ease-in-out';
