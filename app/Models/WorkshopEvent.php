@@ -36,7 +36,9 @@ class WorkshopEvent extends Model
         'is_open_for_registration',
         'image_path',
         'gallery_images',
-        'featured_image_path',
+        'age_group',
+        'duration_hours',
+        'status',
     ];
 
     /**
@@ -52,6 +54,8 @@ class WorkshopEvent extends Model
             'price_jod' => 'decimal:2',
             'is_open_for_registration' => 'boolean',
             'gallery_images' => 'array',
+            'age_group' => 'string',
+            'duration_hours' => 'decimal:1',
         ];
     }
 
@@ -80,5 +84,39 @@ class WorkshopEvent extends Model
     public function images(): HasMany
     {
         return $this->hasMany(Image::class, 'workshop_event_id');
+    }
+    
+    /**
+     * Get the current number of attendees by counting actual registrations
+     * 
+     * @return int
+     */
+    public function getCurrentAttendeesAttribute(): int
+    {
+        return $this->registrations()->count();
+    }
+    
+    /**
+     * Get the URL for adding this event to Google Calendar
+     * 
+     * @return string
+     */
+    public function getGoogleCalendarUrl()
+    {
+        // Format start date and time
+        $startDateTime = $this->event_date->format('Ymd') . 'T' . \Carbon\Carbon::parse($this->event_time)->format('His');
+        
+        // Calculate end date and time by adding duration hours
+        $endDateTime = $this->event_date->copy()->addHours((int)$this->duration_hours)->format('Ymd') . 'T' . 
+                       \Carbon\Carbon::parse($this->event_time)->addHours((int)$this->duration_hours)->format('His');
+        
+        // Build the Google Calendar URL with all event details
+        return "https://calendar.google.com/calendar/render?" . http_build_query([
+            'action' => 'TEMPLATE',
+            'text' => $this->title,
+            'dates' => $startDateTime . '/' . $endDateTime,
+            'details' => strip_tags($this->description ?? ''),
+            'location' => $this->location
+        ]);
     }
 }

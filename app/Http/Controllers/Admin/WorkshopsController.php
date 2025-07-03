@@ -25,13 +25,20 @@ class WorkshopsController extends Controller
     {
         $query = Workshop::query();
 
-        // Search by name
+        // Search by name (both English and Arabic)
         if ($request->has('search') && !empty($request->search)) {
             $searchTerm = '%' . $request->search . '%';
             $query->where(function($q) use ($searchTerm) {
                 $q->where('name_en', 'like', $searchTerm)
-                  ->orWhere('name_ar', 'like', $searchTerm);
+                  ->orWhere('name_ar', 'like', $searchTerm)
+                  ->orWhere('description_en', 'like', $searchTerm)
+                  ->orWhere('description_ar', 'like', $searchTerm);
             });
+        }
+
+        // Filter by target age group
+        if ($request->has('age_group') && !empty($request->age_group)) {
+            $query->where('target_age_group', 'like', '%' . $request->age_group . '%');
         }
 
         // Filter by status
@@ -99,12 +106,10 @@ class WorkshopsController extends Controller
             'description_ar' => 'required|string',
             'target_age_group' => 'required|string|max:50',
             'is_active' => 'boolean',
-            'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'featured_image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $workshopData = $request->except(['image_path', 'featured_image_path', 'gallery_images']);
+        $workshopData = $request->except(['image']);
         
         // Set default value for is_active if not provided
         if (!isset($workshopData['is_active'])) {
@@ -113,26 +118,10 @@ class WorkshopsController extends Controller
         
         $workshop = Workshop::create($workshopData);
         
-        // Handle main image upload
-        if ($request->hasFile('image_path')) {
-            $path = $request->file('image_path')->store('workshops', 'public');
-            $workshop->image_path = $path;
-        }
-
-        // Handle featured image upload
-        if ($request->hasFile('featured_image_path')) {
-            $path = $request->file('featured_image_path')->store('workshops', 'public');
-            $workshop->featured_image_path = $path;
-        }
-
-        // Handle gallery images
-        if ($request->hasFile('gallery_images')) {
-            $galleryPaths = [];
-            foreach ($request->file('gallery_images') as $image) {
-                $path = $image->store('workshops/gallery', 'public');
-                $galleryPaths[] = $path;
-            }
-            $workshop->gallery_images = $galleryPaths;
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('workshops', 'public');
+            $workshop->image = $path; // Use image instead of image_path
         }
         
         $workshop->save();
@@ -189,18 +178,12 @@ class WorkshopsController extends Controller
             'description_ar' => 'required|string',
             'target_age_group' => 'required|string|max:50',
             'is_active' => 'boolean',
-            'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'featured_image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'remove_main_image' => 'nullable|boolean',
-            'remove_featured_image' => 'nullable|boolean',
-            'remove_gallery_images' => 'nullable|array',
-            'remove_gallery_images.*' => 'nullable|integer',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'remove_image' => 'nullable|boolean',
         ]);
 
         $workshopData = $request->except([
-            'image_path', 'featured_image_path', 'gallery_images', 
-            'remove_main_image', 'remove_featured_image', 'remove_gallery_images'
+            'image', 'remove_image'
         ]);
         
         // Set default value for is_active if not provided
@@ -210,77 +193,25 @@ class WorkshopsController extends Controller
 
         $workshop->update($workshopData);
 
-        // Handle main image upload
-        if ($request->hasFile('image_path')) {
+        // Handle image upload
+        if ($request->hasFile('image')) {
             // Delete old image if exists
-            if ($workshop->image_path && Storage::disk('public')->exists($workshop->image_path)) {
-                Storage::disk('public')->delete($workshop->image_path);
+            if ($workshop->image && Storage::disk('public')->exists($workshop->image)) {
+                Storage::disk('public')->delete($workshop->image);
             }
             
             // Upload new image
-            $path = $request->file('image_path')->store('workshops', 'public');
-            $workshop->image_path = $path;
+            $path = $request->file('image')->store('workshops', 'public');
+            $workshop->image = $path; // Use image instead of image_path
         }
 
-        // Handle featured image upload
-        if ($request->hasFile('featured_image_path')) {
-            // Delete old image if exists
-            if ($workshop->featured_image_path && Storage::disk('public')->exists($workshop->featured_image_path)) {
-                Storage::disk('public')->delete($workshop->featured_image_path);
+        // Remove image if requested
+        if ($request->boolean('remove_image') && $workshop->image) {
+            if (Storage::disk('public')->exists($workshop->image)) {
+                Storage::disk('public')->delete($workshop->image);
             }
             
-            // Upload new image
-            $path = $request->file('featured_image_path')->store('workshops', 'public');
-            $workshop->featured_image_path = $path;
-        }
-
-        // Handle gallery images
-        if ($request->hasFile('gallery_images')) {
-            $galleryPaths = $workshop->gallery_images ?? [];
-            
-            foreach ($request->file('gallery_images') as $image) {
-                $path = $image->store('workshops/gallery', 'public');
-                $galleryPaths[] = $path;
-            }
-            
-            $workshop->gallery_images = $galleryPaths;
-        }
-
-        // Remove main image if requested
-        if ($request->boolean('remove_main_image') && $workshop->image_path) {
-            if (Storage::disk('public')->exists($workshop->image_path)) {
-                Storage::disk('public')->delete($workshop->image_path);
-            }
-            
-            $workshop->image_path = null;
-        }
-
-        // Remove featured image if requested
-        if ($request->boolean('remove_featured_image') && $workshop->featured_image_path) {
-            if (Storage::disk('public')->exists($workshop->featured_image_path)) {
-                Storage::disk('public')->delete($workshop->featured_image_path);
-            }
-            
-            $workshop->featured_image_path = null;
-        }
-
-        // Remove selected gallery images if requested
-        if ($request->has('remove_gallery_images') && is_array($request->remove_gallery_images)) {
-            $galleryImages = $workshop->gallery_images ?? [];
-            $newGalleryImages = [];
-            
-            foreach ($galleryImages as $index => $imagePath) {
-                if (!in_array($index, $request->remove_gallery_images)) {
-                    $newGalleryImages[] = $imagePath;
-                } else {
-                    // Delete the image file
-                    if (Storage::disk('public')->exists($imagePath)) {
-                        Storage::disk('public')->delete($imagePath);
-                    }
-                }
-            }
-            
-            $workshop->gallery_images = $newGalleryImages;
+            $workshop->image = null; // Use image instead of image_path
         }
 
         $workshop->save();
@@ -308,21 +239,9 @@ class WorkshopsController extends Controller
         // Delete all associated events first
         $workshop->events()->delete();
         
-        // Delete images if exists
-        if ($workshop->image_path && Storage::disk('public')->exists($workshop->image_path)) {
-            Storage::disk('public')->delete($workshop->image_path);
-        }
-        
-        if ($workshop->featured_image_path && Storage::disk('public')->exists($workshop->featured_image_path)) {
-            Storage::disk('public')->delete($workshop->featured_image_path);
-        }
-        
-        if ($workshop->gallery_images) {
-            foreach ($workshop->gallery_images as $image) {
-                if (Storage::disk('public')->exists($image)) {
-                    Storage::disk('public')->delete($image);
-                }
-            }
+        // Delete image if exists
+        if ($workshop->image && Storage::disk('public')->exists($workshop->image)) {
+            Storage::disk('public')->delete($workshop->image);
         }
         
         // Then delete the workshop
@@ -338,7 +257,7 @@ class WorkshopsController extends Controller
      * @param  \App\Models\Workshop  $workshop
      * @return \Illuminate\Http\Response
      */
-    public function workshopRegistrations(Workshop $workshop)
+    public function registrationsWorkshop(Workshop $workshop)
     {
         // Get all events for this workshop
         $workshop->load('events');
@@ -358,5 +277,43 @@ class WorkshopsController extends Controller
         );
 
         return view('admin.workshops.registrations', compact('workshop', 'registrations'));
+    }
+
+    /**
+     * Remove an image from a workshop via AJAX
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Workshop  $workshop
+     * @return \Illuminate\Http\Response
+     */
+    public function removeImage(Request $request, Workshop $workshop)
+    {
+        // Validate request
+        $request->validate([
+            'type' => 'required|string|in:main',
+        ]);
+
+        $success = false;
+
+        if ($workshop->image) {
+            // Delete the image file from storage
+            if (Storage::disk('public')->exists($workshop->image)) {
+                Storage::disk('public')->delete($workshop->image);
+            }
+            
+            // Update the workshop record
+            $workshop->image = null; // Use image instead of image_path
+            $workshop->save();
+            $success = true;
+        } else {
+            // If there was no image to begin with, still return success
+            $success = true;
+        }
+
+        if ($success) {
+            return response()->json(['success' => true, 'message' => 'Image removed successfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Failed to remove image'], 400);
     }
 }

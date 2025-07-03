@@ -10,21 +10,22 @@ class UserDashboardController extends Controller
 {
     public function index()
     {
+        // Redirect to profile as the main page
+        return $this->profile();
+    }
+    
+    public function profile()
+    {
         $user = Auth::user();
         
         // إحصائيات المستخدم
-             $stats = [
+        $stats = [
             'orders' => $user->orders()->count(),
             'completed_orders' => $user->orders()->where('order_status', 'delivered')->count(),
             'pending_orders' => $user->orders()->where('order_status', 'pending')->count(),
             'stories' => $user->stories()->count(),
             'approved_stories' => $user->stories()->where('status', 'approved')->count(),
             'workshop_registrations' => $user->workshopRegistrations()->count(),
-            'products' => 0, // أضف هذا إذا لم يكن لديك علاقة للمنتجات، أو استخدم العدد الفعلي
-            'users' => User::count(), // هذا قد يكون لعرض المسؤول، فكر في إزالته إذا كانت لوحة تحكم مستخدمة فقط
-            // 'messages' => $user->messages()->where('is_read', false)->count(), // مثال: رسائل غير مقروءة للمستخدم
-            // أو إذا كانت الرسائل تشير إلى رسائل الاتصال التي أرسلها المستخدم:
-            // 'messages' => $user->contactMessages()->count(),
         ];
 
         // آخر الطلبات
@@ -53,5 +54,21 @@ class UserDashboardController extends Controller
             'recentStories', 
             'upcomingWorkshops'
         ));
+    }
+    
+    public function orders()
+    {
+        $user = Auth::user();
+        $orders = $user->orders()->latest()->paginate(10);
+        
+        return view('user.orders', compact('user', 'orders'));
+    }
+    
+    public function tickets()
+    {
+        $user = Auth::user();
+        $tickets = $user->supportTickets()->latest()->paginate(10);
+        
+        return view('user.tickets', compact('user', 'tickets'));
     }
 }

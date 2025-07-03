@@ -25,7 +25,32 @@ class WorkshopController extends Controller
             ->orderBy('event_date')
             ->get();
 
-        return view('pages.workshop', compact('workshops', 'upcomingEvents'));
+        // Get featured workshops (selecting those marked as featured or with most events/registrations)
+        $featuredWorkshops = Workshop::where('is_active', true)
+            ->where(function($query) {
+                $query->where('is_featured', true)
+                      ->orWhereHas('events', function($q) {
+                          $q->where('event_date', '>=', now());
+                      });
+            })
+            ->withCount(['events', 'events as registrations_count' => function($query) {
+                $query->withCount('registrations');
+            }])
+            ->orderBy('is_featured', 'desc')
+            ->orderByDesc('events_count')
+            ->orderByDesc('registrations_count')
+            ->with(['events' => function($query) {
+                $query->where('event_date', '>=', now())
+                      ->orderBy('event_date')
+                      ->with('registrations');
+            }])
+            ->limit(5) // Limit to 5 featured workshops for the carousel
+            ->get();
+
+        // Get a single featured workshop (for backward compatibility)
+        $featuredWorkshop = $featuredWorkshops->first();
+
+        return view('pages.workshop.workshop', compact('workshops', 'upcomingEvents', 'featuredWorkshop', 'featuredWorkshops'));
     }
 
     /**
@@ -35,15 +60,23 @@ class WorkshopController extends Controller
      */
     public function listAll()
     {
-        // Get all active workshops with their events
-        $workshops = Workshop::where('is_active', true)
-            ->with(['events' => function($query) {
-                $query->where('event_date', '>=', now())
-                      ->orderBy('event_date');
-            }])
-            ->get();
+        $workshops = Workshop::with(['events' => function ($query) {
+            $query->where('event_date', '>=', now())
+                  ->where('is_open_for_registration', true)
+                  ->orderBy('event_date', 'asc');
+        }])->get();
+
+        $userRegistrations = [];
         
-        return view('pages.workshops-list', compact('workshops'));
+        if (auth()->check()) {
+            // Get all registrations for the current user
+            $userRegistrations = WorkshopRegistration::where('user_id', auth()->id())
+                ->with('event')
+                ->get()
+                ->keyBy('event_id');
+        }
+
+        return view('pages.workshop.workshops-list', compact('workshops', 'userRegistrations'));
     }
 
     /**
@@ -60,7 +93,7 @@ class WorkshopController extends Controller
                   ->orderBy('event_date');
         }]);
         
-        return view('pages.workshop-show', compact('workshop'));
+        return view('pages.workshop.workshop-show', compact('workshop'));
     }
 
  
@@ -70,41 +103,140 @@ class WorkshopController extends Controller
         if (!$event->is_open_for_registration || $event->event_date < now()) {
             return redirect()->route('workshops.index')->with('error', 'هذه الورشة غير متاحة للتسجيل حالياً.');
         }
-        return view('pages.workshops.register', compact('event'));
+        return view('pages.workshop.register', compact('event'));
+    }
+
+    /**
+     * Display registration form for a workshop event
+     * This method is used by the workshops list page
+     * 
+     * @param \App\Models\WorkshopEvent $event
+     * @return \Illuminate\View\View
+     */
+    public function registerForm(WorkshopEvent $event)
+    {
+        // Redirect to the existing registration form method
+        return $this->showRegistrationForm($event);
+    }
+
+    /**
+     * Display details for a specific workshop event
+     * 
+     * @param \App\Models\WorkshopEvent $event
+     * @return \Illuminate\View\View
+     */
+    public function showEvent(WorkshopEvent $event)
+    {
+        // Load the workshop relationship
+        $event->load('workshop');
+        
+        // Check if the current user is registered for this event
+        $userRegistered = false;
+        $registration = null;
+        
+        if (auth()->check()) {
+            $registration = WorkshopRegistration::where('event_id', $event->id)
+                ->where('user_id', auth()->id())
+                ->first();
+                
+            $userRegistered = !is_null($registration);
+        }
+        
+        return view('pages.workshop.event-show', compact('event', 'userRegistered', 'registration'));
     }
 
    
   
     public function register(Request $request, WorkshopEvent $event)
     {
-        // مثال: التحقق من صحة بيانات النموذج
+        // Validate form data
         $request->validate([
             'attendee_name' => 'required|string|max:255',
-            'parent_name' => 'nullable|string|max:255', 
-            'parent_contact' => 'nullable|string|max:255',
-           
+            'parent_name' => 'required|string|max:255', 
+            'parent_contact' => 'required|string|max:255',
+            'special_requirements' => 'nullable|string',
         ]);
 
-        // مثال: التحقق مرة أخرى من حالة الفعالية قبل التسجيل النهائي
+        // Check if the event is still open for registration
         if (!$event->is_open_for_registration || $event->event_date < now()) {
              return back()->withInput()->with('error', 'تعذر التسجيل. الورشة غير متاحة.');
         }
 
-        // مثال: حفظ بيانات التسجيل في قاعدة البيانات
+        // Save registration data to database
         $registration = WorkshopRegistration::create([
-            'user_id' => Auth::id(), 
+            'user_id' => Auth::id() ?? null, // Use authenticated user ID if available
             'event_id' => $event->id,
             'attendee_name' => $request->attendee_name,
-            'parent_name' => $request->parent_name ?? (Auth::user()->name ?? null), 
-            'parent_contact' => $request->parent_contact ?? (Auth::user()->email ?? Auth::user()->phone ?? null), 
+            'parent_name' => $request->parent_name, 
+            'parent_contact' => $request->parent_contact, 
+            'special_requirements' => $request->special_requirements,
             'registration_date' => now(),
             'status' => 'pending', 
             'payment_status' => ($event->price_jod > 0) ? 'pending' : 'not_applicable', 
         ]);
+        
+        // Increment the attendee count for the event
         $event->increment('current_attendees');
-        return redirect()->route('workshops.index')->with('success', 'تم تسجيلك في الورشة بنجاح!');
 
-       
+        // Redirect back to workshops list with success message
+        return redirect()->route('workshops.list')->with('success', 'Registration successful! Thank you for registering for ' . $event->title . '.');
+    }
+
+    /**
+     * Handle the workshop interest registration form submission
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function registerInterest(Request $request)
+    {
+        // Validate form data
+        $validated = $request->validate([
+            'event_id' => 'required|exists:workshop_events,id',
+            'parent_name' => 'required|string|max:255',
+            'parent_contact' => 'required|string|max:255',
+            'attendee_name' => 'required|string|max:255',
+            'special_requirements' => 'nullable|string',
+        ]);
+        
+        // Get the event
+        $event = WorkshopEvent::findOrFail($validated['event_id']);
+        
+        // Store registration in database
+        $registration = WorkshopRegistration::create([
+            'user_id' => Auth::id() ?? null, // Use authenticated user ID if available
+            'event_id' => $validated['event_id'],
+            'attendee_name' => $validated['attendee_name'],
+            'parent_name' => $validated['parent_name'],
+            'parent_contact' => $validated['parent_contact'],
+            'registration_date' => now(),
+            'status' => 'pending',
+            'payment_status' => ($event->price_jod > 0) ? 'pending' : 'not_applicable',
+        ]);
+        
+        // Increment the attendee count for the event
+        $event->increment('current_attendees');
+        
+        // Redirect with success message
+        return redirect()->route('workshops.index')->with('success', 'Thank you for registering! Your registration has been received.');
+    }
+
+    /**
+     * Display a listing of workshop registrations.
+     */
+    public function registrations()
+    {
+        // Check if user is authenticated and has admin role
+        if (!Auth::check() || !Auth::user()->hasRole('admin')) {
+            return redirect()->route('workshops.list')->with('error', 'Unauthorized access.');
+        }
+
+        // Get all workshop registrations with user and event information
+        $registrations = WorkshopRegistration::with(['user', 'event'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pages.workshop.registrations', compact('registrations'));
     }
 
     /**
@@ -190,43 +322,5 @@ class WorkshopController extends Controller
         ];
 
         return view('pages.workshop', compact('workshops', 'upcomingEvents'));
-    }
-
-    /**
-     * Handle the workshop interest registration form submission
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function registerInterest(Request $request)
-    {
-        // Validate form data
-        $validated = $request->validate([
-            'parent_name' => 'required|string|max:255',
-            'parent_email' => 'required|email|max:255',
-            'parent_phone' => 'required|string|max:20',
-            'child_name' => 'required|string|max:255',
-            'child_age' => 'required|integer|min:3|max:18',
-            'preferred_day' => 'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
-            'special_requirements' => 'nullable|string',
-            'privacy_policy' => 'required|accepted',
-        ]);
-        
-        // Store interest registration in database
-        // If you have a WorkshopInterest model, use it here
-        // Otherwise, you can create a simple DB entry
-        DB::table('workshop_interests')->insert([
-            'parent_name' => $validated['parent_name'],
-            'parent_email' => $validated['parent_email'],
-            'parent_phone' => $validated['parent_phone'],
-            'child_name' => $validated['child_name'],
-            'child_age' => $validated['child_age'],
-            'preferred_day' => $validated['preferred_day'],
-            'special_requirements' => $validated['special_requirements'] ?? null,
-            'created_at' => now(),
-        ]);
-        
-        // Redirect with success message
-        return redirect()->route('workshop')->with('success', 'Thank you for your interest! We will contact you about upcoming workshops.');
     }
 }

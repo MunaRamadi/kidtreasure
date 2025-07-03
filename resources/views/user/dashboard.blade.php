@@ -390,7 +390,7 @@
         <div class="star" style="top: 70%; left: 50%; animation-delay: 1.5s;"></div>
     </div>
     
-    <div class="container position-relative" style="z-index: 10;">
+    <div class="container position-relative m-auto mt-6" style="z-index: 10;">
         <div class="row align-items-center">
             <div class="col-lg-6 order-2 order-lg-1">
                 <div class="fade-in-up text-center text-lg-end">
@@ -440,7 +440,7 @@
 
 <!-- Stats Section -->
 <section class="py-5 section-bg-pattern dashboard-bg">
-    <div class="container py-5">
+    <div class="container py-5 m-auto">
         <div class="text-center mb-5 fade-in-up">
             <h2 class="display-4 fw-black text-dark mb-4">
                 <span class="text-gradient-advanced">إحصائياتك</span>
@@ -520,12 +520,12 @@
 
 <!-- Recent Activity Section -->
 <section class="py-5 animated-bg text-white position-relative overflow-hidden">
-    <div class="floating-elements">
+    <div class="floating-elements m-auto">
         <div class="floating-element"></div>
         <div class="floating-element"></div>
     </div>
     
-    <div class="container py-5 position-relative" style="z-index: 10;">
+    <div class="container py-5 position-relative m-auto" style="z-index: 10;">
         <div class="text-center mb-5 fade-in-up">
             <h2 class="display-4 fw-black mb-4">نشاطك الأخير</h2>
             <p class="h5 text-white-75 mb-5">
@@ -630,7 +630,7 @@
 
 <!-- Upcoming Workshops Section -->
 <section class="py-5 section-bg-pattern dashboard-bg">
-    <div class="container py-5">
+    <div class="container py-5 m-auto">
         <div class="text-center mb-5 fade-in-up">
             <h2 class="display-4 fw-black text-dark mb-4">
                 <span class="text-gradient-advanced">ورش العمل القادمة</span>
@@ -728,7 +728,7 @@
         <div class="floating-element"></div>
     </div>
     
-    <div class="container py-5 position-relative" style="z-index: 10;">
+    <div class="container py-5 position-relative m-auto" style="z-index: 10;">
         <div class="text-center mb-5 fade-in-up">
             <h2 class="display-4 fw-black mb-4">إجراءات سريعة</h2>
             <p class="h5 text-white-75 mb-5">
@@ -794,7 +794,7 @@
 
 <!-- Motivational Quote Section -->
 <section class="py-5 section-bg-pattern dashboard-bg">
-    <div class="container py-5">
+    <div class="container py-5 m-auto">
         <div class="row justify-content-center fade-in-up">
             <div class="col-lg-8">
                 <div class="glass-card rounded-4 p-5 text-center">

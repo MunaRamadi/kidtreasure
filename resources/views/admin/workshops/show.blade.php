@@ -106,7 +106,7 @@
                         <i class="fas fa-calendar me-1"></i>
                         Workshop Events
                     </div>
-                    <a href="#" class="btn btn-success btn-sm">
+                    <a href="{{ route('admin.workshop-events.create', ['workshop_id' => $workshop->id, 'redirect_to' => 'workshop']) }}" class="btn btn-success btn-sm">
                         <i class="fas fa-plus"></i> Add Event
                     </a>
                 </div>
@@ -151,17 +151,9 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <div class="btn-group" role="group">
-                                                    <a href="{{ route('admin.workshops.registrations', $event) }}" class="btn btn-sm btn-info">
-                                                        <i class="fas fa-users"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-sm btn-primary">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <button type="button" class="btn btn-sm btn-danger">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
+                                                <a href="{{ route('admin.workshop-events.show', $event) }}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-eye"></i> Details
+                                                </a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -178,74 +170,6 @@
         </div>
     </div>
 
-    <!-- Recent Registrations -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-users me-1"></i>
-            Recent Registrations
-        </div>
-        <div class="card-body">
-            @if($workshop->events->flatMap->registrations->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Event Date</th>
-                                <th>Attendee Name</th>
-                                <th>Parent Name</th>
-                                <th>Contact</th>
-                                <th>Registration Date</th>
-                                <th>Status</th>
-                                <th>Payment</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($workshop->events->flatMap->registrations->take(10) as $registration)
-                                <tr>
-                                    <td>{{ $registration->event->event_date->format('Y-m-d') }}</td>
-                                    <td>{{ $registration->attendee_name }}</td>
-                                    <td>{{ $registration->parent_name }}</td>
-                                    <td>{{ $registration->parent_contact }}</td>
-                                    <td>{{ $registration->registration_date->format('Y-m-d') }}</td>
-                                    <td>
-                                        @if($registration->status == 'confirmed')
-                                            <span class="badge bg-success">Confirmed</span>
-                                        @elseif($registration->status == 'pending')
-                                            <span class="badge bg-warning text-dark">Pending</span>
-                                        @else
-                                            <span class="badge bg-danger">Cancelled</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($registration->payment_status == 'paid')
-                                            <span class="badge bg-success">Paid</span>
-                                        @elseif($registration->payment_status == 'pending')
-                                            <span class="badge bg-warning text-dark">Pending</span>
-                                        @elseif($registration->payment_status == 'not_applicable')
-                                            <span class="badge bg-secondary">N/A</span>
-                                        @else
-                                            <span class="badge bg-danger">Failed</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                @if($workshop->events->flatMap->registrations->count() > 10)
-                    <div class="text-center mt-3">
-                        <a href="{{ route('admin.workshops.registrations', $workshop) }}" class="btn btn-primary">
-                            View All Registrations
-                        </a>
-                    </div>
-                @endif
-            @else
-                <div class="alert alert-info">
-                    No registrations found for this workshop.
-                </div>
-            @endif
-        </div>
-    </div>
 
     <!-- Delete Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -269,6 +193,36 @@
             </div>
         </div>
     </div>
+
+    <!-- Delete Event Modals -->
+    @foreach($workshop->events as $event)
+    <div class="modal fade" id="deleteEventModal{{ $event->id }}" tabindex="-1" aria-labelledby="deleteEventModalLabel{{ $event->id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteEventModalLabel{{ $event->id }}">Confirm Delete Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete the event scheduled for {{ $event->event_date->format('Y-m-d') }} at {{ $event->event_time->format('H:i') }}?
+                    @if($event->registrations_count > 0)
+                    <div class="alert alert-warning mt-2">
+                        <strong>Warning:</strong> This event has {{ $event->registrations_count }} registrations that will also be deleted.
+                    </div>
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form action="{{ route('admin.workshop-events.destroy', $event) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">Delete Event</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
 </div>
 @endsection
 

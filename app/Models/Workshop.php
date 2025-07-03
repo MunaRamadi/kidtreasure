@@ -29,9 +29,8 @@ class Workshop extends Model
         'description_en',
         'target_age_group',
         'is_active',
-        'image_path',
-        'gallery_images',
-        'featured_image_path',
+        'is_featured',
+        'image',
     ];
 
      /**
@@ -43,7 +42,7 @@ class Workshop extends Model
     {
         return [
             'is_active' => 'boolean',
-            'gallery_images' => 'array',
+            'is_featured' => 'boolean',
         ];
     }
 

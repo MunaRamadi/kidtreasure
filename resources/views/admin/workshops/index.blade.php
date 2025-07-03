@@ -24,7 +24,7 @@
             <!-- Search Form -->
             <form action="{{ route('admin.workshops.index') }}" method="GET" class="mb-4">
                 <div class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="input-group">
                             <input type="text" class="form-control" placeholder="Search workshops..." name="search" value="{{ request('search') }}">
                             <button class="btn btn-outline-secondary" type="submit">
@@ -32,11 +32,14 @@
                             </button>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" placeholder="Age Group" name="age_group" value="{{ request('age_group') }}">
+                    </div>
+                    <div class="col-md-2">
                         <select name="status" class="form-select">
-                            <option value="">All Status</option>
-                            <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Active</option>
-                            <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactive</option>
+                            <option value="all">All Status</option>
+                            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>
                     </div>
                     <div class="col-md-3">

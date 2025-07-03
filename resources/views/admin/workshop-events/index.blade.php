@@ -43,6 +43,15 @@
                     </select>
                 </div>
                 <div class="col-md-2">
+                    <label for="event_status" class="form-label">Event Status</label>
+                    <select class="form-select form-control" id="event_status" name="event_status">
+                        <option value="all" {{ request('event_status') == 'all' ? 'selected' : '' }}>All</option>
+                        <option value="upcoming" {{ request('event_status') == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
+                        <option value="in_progress" {{ request('event_status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                        <option value="completed" {{ request('event_status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
                     <label for="sort" class="form-label">Sort By</label>
                     <select class="form-select form-control" id="sort" name="sort">
                         <option value="date_desc" {{ request('sort') == 'date_desc' ? 'selected' : '' }}>Date (Newest)</option>
@@ -75,7 +84,8 @@
                                 <th>Location</th>
                                 <th>Price (JOD)</th>
                                 <th>Registrations</th>
-                                <th>Status</th>
+                                <th>Event Status</th>
+                                <th>Registration Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -96,11 +106,19 @@
                                         </a>
                                     </td>
                                     <td>
-                                        @if($workshop->is_open_for_registration)
-                                            <span class="badge bg-success text-white">Open</span>
-                                        @else
-                                            <span class="badge bg-danger text-white">Closed</span>
-                                        @endif
+                                        <span class="badge {{ $workshop->status === 'upcoming' ? 'bg-primary' : ($workshop->status === 'in_progress' ? 'bg-warning text-dark' : 'bg-success') }}">
+                                            {{ ucfirst($workshop->status) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('admin.workshop-events.toggle-registration', $workshop) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-sm {{ $workshop->is_open_for_registration ? 'btn-success' : 'btn-danger' }}" 
+                                                data-bs-toggle="tooltip" title="Click to {{ $workshop->is_open_for_registration ? 'close' : 'open' }} registration">
+                                                {{ $workshop->is_open_for_registration ? 'Open' : 'Closed' }}
+                                            </button>
+                                        </form>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
