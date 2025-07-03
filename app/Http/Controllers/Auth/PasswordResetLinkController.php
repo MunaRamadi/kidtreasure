@@ -7,6 +7,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\View\View;
+use App\Models\User; 
+use App\Models\PasswordResetRequest; 
+
 
 class PasswordResetLinkController extends Controller
 {
@@ -40,5 +43,17 @@ class PasswordResetLinkController extends Controller
                     ? back()->with('status', __($status))
                     : back()->withInput($request->only('email'))
                         ->withErrors(['email' => __($status)]);
+                        $user = User::where('email', $request->email)->first();
+
+if ($user) {
+    PasswordResetRequest::create([
+        'user_id' => $user->id,
+        'email' => $request->email,
+        // 'token' => $token, // إذا أردت تخزين التوكن الذي تم إنشاؤه (يتطلب الحصول عليه)
+        'created_at' => now(),
+        'is_resolved' => false, // افتراضيًا هو غير معالج
+    ]);
+}
+
     }
 }

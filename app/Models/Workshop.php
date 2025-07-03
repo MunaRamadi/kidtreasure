@@ -4,18 +4,40 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany; // Import HasMany
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Workshop extends Model
 {
     use HasFactory;
 
     /**
-     * The primary key for the model.
+     * The table associated with the model.
      *
      * @var string
      */
-    protected $primaryKey = 'id';
+    protected $table = 'workshops';
+
+    /**
+     * The primary key for the model.
+     * قم بتغيير هذا إلى اسم المفتاح الأساسي الصحيح في جدولك
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id'; // أو 'workshop_id' إذا كان هذا هو اسم المفتاح الأساسي
+
+    /**
+     * The "type" of the auto-incrementing ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'int';
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = true;
 
     /**
      * The attributes that are mass assignable.
@@ -33,7 +55,7 @@ class Workshop extends Model
         'image',
     ];
 
-     /**
+    /**
      * The attributes that should be cast.
      *
      * @return array<string, string>
@@ -53,7 +75,7 @@ class Workshop extends Model
      */
     public function events(): HasMany
     {
-        return $this->hasMany(WorkshopEvent::class);
+        return $this->hasMany(WorkshopEvent::class, 'workshop_id', $this->primaryKey);
     }
     
     /**
@@ -61,6 +83,6 @@ class Workshop extends Model
      */
     public function images(): HasMany
     {
-        return $this->hasMany(Image::class);
+        return $this->hasMany(Image::class, 'workshop_id', $this->primaryKey);
     }
 }

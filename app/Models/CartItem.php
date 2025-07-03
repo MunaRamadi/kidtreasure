@@ -10,90 +10,47 @@ class CartItem extends Model
     use HasFactory;
 
     protected $fillable = [
-        'cart_id',
-        'product_id',
-        'quantity',
-        'price',
-        'product_name',
-        'product_image',
-        'options',
+        'cart_id', 'product_id', 'quantity', 'price',
+        'product_name', 'product_image', 'options',
     ];
 
     protected $casts = [
-        'options' => 'array',
-        'price' => 'decimal:2',
+        'options' => 'array', 'price' => 'decimal:2',
     ];
 
-    // العلاقة مع السلة
-    public function cart()
-    {
-        return $this->belongsTo(Cart::class);
-    }
+    public function cart() { return $this->belongsTo(Cart::class); }
+    public function product() { return $this->belongsTo(Product::class); }
 
-    // العلاقة مع المنتج
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
-    }
-
-    // حساب السعر الإجمالي للعنصر
+    // حساب السعر الإجمالي للعنصر (الكمية * السعر)
     public function getTotalAttribute()
     {
         return $this->price * $this->quantity;
     }
-
-    // الحصول على السعر الإجمالي المنسق
-    public function getFormattedTotalAttribute()
-    {
-        return number_format($this->total, 2) . ' JOD';
-    }
-
-    // الحصول على السعر المنسق
-    public function getFormattedPriceAttribute()
-    {
-        return number_format($this->price, 2) . ' JOD';
-    }
-
-    // التحقق من توفر المنتج
-    public function getIsAvailableAttribute()
-    {
-        return $this->product && 
-               $this->product->is_active && 
-               $this->product->stock_quantity >= $this->quantity;
-    }
-
-    // الحصول على صورة المنتج الحالية
+    
+    // *** دوال لجلب البيانات المحدثة من المنتج المرتبط *** //
+    
+    // الحصول على صورة المنتج الحالية من نموذج Product
     public function getCurrentProductImageAttribute()
     {
         return $this->product ? $this->product->main_image_url : $this->product_image;
     }
 
-    // الحصول على اسم المنتج الحالي
+    // الحصول على اسم المنتج الحالي من نموذج Product
     public function getCurrentProductNameAttribute()
     {
         return $this->product ? $this->product->name : $this->product_name;
     }
 
-    // الحصول على السعر الحالي للمنتج
+    // الحصول على السعر الحالي للمنتج من نموذج Product
     public function getCurrentProductPriceAttribute()
     {
         return $this->product ? $this->product->price_jod : $this->price;
     }
 
-    // التحقق من تغير السعر
-    public function getHasPriceChangedAttribute()
-    {
-        return $this->product && 
-               $this->product->price_jod != $this->price;
-    }
-
-    // الحصول على الحد الأقصى للكمية المتاحة
-    public function getMaxQuantityAttribute()
-    {
-        return $this->product ? $this->product->stock_quantity : 0;
-    }
-
-    // تحديث بيانات العنصر من المنتج الحالي
+    /**
+     * تحديث بيانات العنصر (الاسم، الصورة، السعر) من المنتج المرتبط به.
+     * هذا يضمن أن البيانات في السلة دائمًا محدثة.
+     */
     public function updateFromProduct()
     {
         if ($this->product) {
@@ -106,38 +63,38 @@ class CartItem extends Model
         return $this;
     }
 
-    // التحقق من صحة العنصر
+    /**
+     * التحقق مما إذا كان العنصر لا يزال صالحًا للشراء.
+     */
     public function validate()
     {
         $errors = [];
-        
         if (!$this->product) {
-            $errors[] = 'المنتج غير موجود';
+            $errors[] = 'المنتج المرتبط بهذا العنصر لم يعد موجوداً.';
         } elseif (!$this->product->is_active) {
-            $errors[] = 'المنتج غير متوفر حاليًا';
+            $errors[] = "منتج '{$this->product_name}' غير متوفر حاليًا.";
         } elseif ($this->product->stock_quantity < $this->quantity) {
-            $errors[] = 'الكمية المطلوبة غير متوفرة';
+            $errors[] = "الكمية المطلوبة لمنتج '{$this->product_name}' غير متوفرة.";
         }
-        
         return $errors;
     }
 
-    // Events
+    /**
+     * يتم استدعاء هذه الأحداث تلقائيًا عند إنشاء أو تحديث أو حذف عنصر.
+     * تقوم بإعادة حساب إجماليات السلة الأم لضمان التناسق.
+     */
     protected static function boot()
     {
         parent::boot();
 
-        // إعادة حساب إجماليات السلة عند إنشاء أو تحديث أو حذف عنصر
-        static::created(function ($cartItem) {
-            $cartItem->cart->calculateTotals();
-        });
+        $recalculateTotals = function ($cartItem) {
+            if ($cartItem->cart) {
+                $cartItem->cart->calculateTotals();
+            }
+        };
 
-        static::updated(function ($cartItem) {
-            $cartItem->cart->calculateTotals();
-        });
-
-        static::deleted(function ($cartItem) {
-            $cartItem->cart->calculateTotals();
-        });
+        static::created($recalculateTotals);
+        static::updated($recalculateTotals);
+        static::deleted($recalculateTotals);
     }
 }

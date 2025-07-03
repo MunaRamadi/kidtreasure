@@ -4,9 +4,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\WorkshopController;
-use App\Http\Controllers\StoryController;
-use App\Http\Controllers\BlogController;
+use App\Http\Controllers\WorkshopController; // For public workshops
+use App\Http\Controllers\StoryController; // For public and user-managed stories
+use App\Http\Controllers\BlogController; // For public blog
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -14,12 +14,12 @@ use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProductsController;
 use App\Http\Controllers\Admin\OrdersController;
-use App\Http\Controllers\Admin\UsersController;
-use App\Http\Controllers\Admin\StoriesController;
-use App\Http\Controllers\Admin\WorkshopManagementController;
-use App\Http\Controllers\Admin\WorkshopsController;
-use App\Http\Controllers\Admin\WorkshopEventsController;
+use App\Http\Controllers\Admin\UsersController; // تم تضمينها بالفعل
+use App\Http\Controllers\Admin\StoriesController; // For admin stories management
+use App\Http\Controllers\Admin\WorkshopsController; // For admin workshop templates management
+use App\Http\Controllers\Admin\WorkshopEventsController; // For admin workshop events management
 use App\Http\Controllers\Admin\ContactMessagesController;
+use App\Http\Controllers\Admin\BlogController as AdminBlogController; // For admin blog
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\UserSettingsController;
@@ -32,8 +32,12 @@ Route::get('/lang/{lang}', [LanguageController::class, 'switchLang'])->name('lan
 // Public Website Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [AboutController::class, 'index'])->name('about');
+
+// Public Product Routes
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+
+// Public Workshop Routes
 Route::get('/workshops', [WorkshopController::class, 'index'])->name('workshops.index');
 Route::get('/workshops/list', [WorkshopController::class, 'listAll'])->name('workshops.list');
 Route::get('/workshops/{event}/register', [WorkshopController::class, 'showRegistrationForm'])->name('workshops.register.form');
@@ -59,7 +63,7 @@ Route::prefix('stories')->name('stories.')->group(function () {
     Route::get('/create', [StoryController::class, 'create'])->name('create');
     Route::post('/', [StoryController::class, 'store'])->name('store');
     Route::get('/{story}', [StoryController::class, 'show'])->name('show');
-    Route::get('/stories/{story}', [StoriesController::class, 'show'])->name('stories.show');
+    // Removed redundant Route::get('/stories/{story}', [StoriesController::class, 'show'])->name('stories.show');
 });
 
 // Blog Routes
@@ -88,7 +92,7 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/failed/{order}', [CheckoutController::class, 'failed'])->name('failed');
 });
 
-// User Dashboard Routes
+// User Dashboard & Profile Routes (requires authentication)
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         if (auth()->user()->is_admin) {
@@ -104,16 +108,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/{story}', [StoryController::class, 'update'])->name('update');
         Route::delete('/{story}', [StoryController::class, 'destroy'])->name('destroy');
     });
-});
 
-// Profile Routes
-Route::middleware('auth')->group(function () {
+    // Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Admin Panel Routes
+
+// Admin Panel Routes (requires authentication and admin role)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
 
     // Main Dashboard
@@ -152,9 +155,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::put('/{user}', 'update')->name('update');
         Route::delete('/{user}', 'destroy')->name('destroy');
         Route::patch('/{user}/toggle-status', 'toggleStatus')->name('toggle-status');
+        // إضافة مسار لمعالجة طلبات إعادة تعيين كلمة المرور
+        Route::patch('password-reset-requests/{passwordResetRequest}/resolve', 'resolvePasswordResetRequest')->name('password-reset-requests.resolve');
     });
 
-    // Admin Stories Management (إدارة القصص للمشرفين)
+    // Admin Stories Management
     Route::prefix('stories')->name('stories.')->controller(StoriesController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
@@ -164,6 +169,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/bulk-action', 'bulkAction')->name('bulk-action');
         Route::post('/{story}/quick-review', 'quickReview')->name('quick-review');
         Route::get('/create-test', 'createTestStory')->name('create-test');
+
 
         // Individual story management routes
         Route::get('/{story}', 'show')->name('show');

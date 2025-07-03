@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany; // Import HasMany
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -21,12 +20,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'phone', // Added
-        'address', // Added
-        'language_preference', // Added
-        'role', // Added
-        'is_active', // Added
-        'is_admin', // Added is_admin field
+        'phone',               // تمت الإضافة: حقل رقم الهاتف
+        'address',             // تمت الإضافة: حقل العنوان
+        'language_preference', // تمت الإضافة: حقل تفضيل اللغة
+        'role',                // تمت الإضافة: حقل الدور (user/admin)
+        'is_active',           // تمت الإضافة: حقل حالة التفعيل/التعطيل
+        'is_admin',            // تمت الإضافة: حقل تحديد ما إذا كان المستخدم مسؤولاً أم لا
     ];
 
     /**
@@ -49,11 +48,12 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_active' => 'boolean', // Added
+            'is_active' => 'boolean', // تم التحويل إلى نوع بيانات منطقي
+            'is_admin' => 'boolean',  // تم التحويل إلى نوع بيانات منطقي
         ];
     }
 
-    // Relationships
+    // العلاقات (Relationships)
 
     /**
      * Get the orders for the user.
@@ -79,11 +79,22 @@ class User extends Authenticatable
         return $this->hasMany(Story::class);
     }
 
-    // If blog posts are authored by users
-    /*
-    public function blogPosts(): HasMany
+    /**
+     * Get the password reset requests for the user.
+     * (إذا كنت تخطط لربط طلبات إعادة تعيين كلمة المرور بالمستخدم)
+     */
+    public function passwordResetRequests(): HasMany
     {
-        return $this->hasMany(BlogPost::class);
+        return $this->hasMany(PasswordResetRequest::class, 'email', 'email');
     }
-    */
+
+    /**
+     * Check if the user is an admin.
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->is_admin;
+    }
 }

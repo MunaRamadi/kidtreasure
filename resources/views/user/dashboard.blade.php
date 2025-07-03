@@ -2,7 +2,6 @@
 
 @section('title', 'لوحة التحكم')
 
-@section('styles')
 <style>
     /* CSS Variables for Colors */
     :root {
@@ -17,12 +16,6 @@
     /* Animated Background Effect */
     .animated-bg {
         background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
-        background-size: 400% 400%;
-        animation: gradientShift 15s ease infinite;
-    }
-
-    .dashboard-bg {
-        background: linear-gradient(-45deg, #f8f9fa, #e9ecef, #dee2e6, #ced4da);
         background-size: 400% 400%;
         animation: gradientShift 15s ease infinite;
     }
@@ -110,27 +103,11 @@
         backdrop-filter: blur(20px);
         border: 1px solid var(--glass-border);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     .glass-card:hover {
         background: rgba(255, 255, 255, 0.15);
         transform: translateY(-10px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Enhanced Card Design */
-    .dashboard-card {
-        background: white;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        transform-style: preserve-3d;
-    }
-
-    .dashboard-card:hover {
-        transform: translateY(-10px) rotateX(5deg);
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     }
 
@@ -213,69 +190,6 @@
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
     }
 
-    /* Stats Card Icons */
-    .stat-icon {
-        width: 80px;
-        height: 80px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 25px;
-        font-size: 32px;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Badge Styles */
-    .status-badge {
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 8px 16px;
-        border-radius: 25px;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    /* Table Styles */
-    .dashboard-table {
-        --bs-table-bg: transparent;
-        --bs-table-striped-bg: rgba(0, 0, 0, 0.02);
-    }
-
-    .dashboard-table thead th {
-        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-        font-weight: 700;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-        backdrop-filter: blur(10px);
-    }
-
-    /* Workshop Card */
-    .workshop-card {
-        transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        overflow: hidden;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .workshop-card:hover {
-        transform: translateY(-10px) rotateX(5deg);
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-    }
-
-    .workshop-card img {
-        transition: transform 0.5s ease;
-        filter: brightness(0.9);
-    }
-
-    .workshop-card:hover img {
-        transform: scale(1.1);
-        filter: brightness(1.1) contrast(1.1);
-    }
-
     /* Section Background Patterns */
     .section-bg-pattern {
         background-image: 
@@ -283,9 +197,9 @@
             radial-gradient(circle at 75% 75%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
     }
 
-    /* Animation Classes */
+    /* Loading and Animation Effects */
     .fade-in-up {
-        animation: fadeInUp 0.8s ease-out;
+        animation: fadeInUp 1s ease-out;
     }
 
     .fade-in-left {
@@ -299,7 +213,7 @@
     @keyframes fadeInUp {
         from {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(50px);
         }
         to {
             opacity: 1;
@@ -329,29 +243,7 @@
         }
     }
 
-    /* Animated Stars Effects */
-    .stars {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-    }
-
-    .star {
-        position: absolute;
-        width: 3px;
-        height: 3px;
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 50%;
-        animation: twinkle 4s infinite ease-in-out;
-    }
-
-    @keyframes twinkle {
-        0%, 100% { opacity: 0; transform: scale(1); }
-        50% { opacity: 1; transform: scale(1.5); }
-    }
-
-    /* Responsive Adjustments */
+    /* Responsive Design for Mobile */
     @media (max-width: 768px) {
         .floating-element {
             width: 40px !important;
@@ -362,18 +254,126 @@
             transform: none;
         }
         
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
+        .dashboard-grid {
+            grid-template-columns: 1fr !important;
         }
     }
-</style>
-@endsection
 
-@section('content')
-<!-- Hero Section with Greeting -->
-<section class="animated-bg min-vh-100 d-flex align-items-center position-relative overflow-hidden">
+    /* Animated Stars Effects */
+    .stars {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+        animation: twinkle 4s infinite ease-in-out;
+    }
+
+    @keyframes twinkle {
+        0%, 100% { opacity: 0; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.5); }
+    }
+
+    /* Dashboard Specific Styles */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .stat-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .progress-bar {
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        height: 8px;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #f093fb, #f5576c);
+        border-radius: 10px;
+        animation: progressGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes progressGlow {
+        0% { box-shadow: 0 0 10px rgba(240, 147, 251, 0.5); }
+        100% { box-shadow: 0 0 20px rgba(245, 87, 108, 0.8); }
+    }
+
+    /* Chart Container Styles */
+    .chart-container {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 2rem;
+    }
+
+    /* Activity Feed Styles */
+    .activity-item {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .activity-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(10px);
+    }
+
+    /* Quick Actions Grid */
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .quick-action-btn {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        padding: 1.5rem;
+        border-radius: 20px;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        color: white;
+        text-decoration: none;
+    }
+
+    .quick-action-btn:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+</style>
+
+<!-- Header Section -->
+<section class="animated-bg py-16 relative overflow-hidden">
     <div class="floating-elements">
         <div class="floating-element"></div>
         <div class="floating-element"></div>
@@ -445,8 +445,8 @@
             <h2 class="display-4 fw-black text-dark mb-4">
                 <span class="text-gradient-advanced">إحصائياتك</span>
             </h2>
-            <div class="d-flex justify-content-center mb-4">
-                <div style="width: 8rem; height: 4px; background: linear-gradient(135deg, #667eea, #764ba2, #f093fb); border-radius: 2px;"></div>
+            <div class="flex justify-center mb-6">
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500 rounded-full"></div>
             </div>
         </div>
 
@@ -465,6 +465,7 @@
                         </small>
                     </div>
                 </div>
+                <p class="text-sm text-gray-600 mt-2">+12% from last month</p>
             </div>
 
             <div class="col-md-6 col-lg-3 fade-in-up" style="animation-delay: 0.2s;">
@@ -481,6 +482,7 @@
                         </small>
                     </div>
                 </div>
+                <p class="text-sm text-gray-600 mt-2">+8% from last month</p>
             </div>
 
             <div class="col-md-6 col-lg-3 fade-in-up" style="animation-delay: 0.3s;">
@@ -497,6 +499,7 @@
                         </small>
                     </div>
                 </div>
+                <p class="text-sm text-gray-600 mt-2">+15% from last month</p>
             </div>
 
             <div class="col-md-6 col-lg-3 fade-in-up" style="animation-delay: 0.4s;">
@@ -513,12 +516,34 @@
                         </small>
                     </div>
                 </div>
+                <p class="text-sm text-gray-600 mt-2">+22% from last month</p>
             </div>
         </div>
     </div>
 </section>
 
+
+
 <!-- Recent Activity Section -->
+<section class="py-16 section-bg-pattern bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
+    <div class="max-w-6xl mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Recent Activity -->
+            <div class="fade-in-left">
+                <h3 class="text-3xl font-bold text-gray-800 mb-8">
+                    <span class="text-gradient-advanced">Recent Activity</span>
+                </h3>
+                <div class="space-y-4">
+                    <div class="activity-item">
+                        <div class="flex items-center">
+                            <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-full w-10 h-10 flex items-center justify-center mr-4">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">New Order Received</h4>
+                                <p class="text-sm text-gray-600">Educational Kit #1234 - 5 minutes ago</p>
+                            </div>
+                        </div>
 <section class="py-5 animated-bg text-white position-relative overflow-hidden">
     <div class="floating-elements m-auto">
         <div class="floating-element"></div>
@@ -579,51 +604,41 @@
                                 <i class="fas fa-store me-2"></i> تصفح المتجر
                             </a>
                         </div>
-                    @endif
-                </div>
-            </div>
-
-            <!-- Recent Stories -->
-            <div class="col-lg-4 fade-in-right">
-                <div class="glass-card card-hover-effect rounded-4 h-100 p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4 class="fw-bold mb-0 text-white">آخر القصص</h4>
-                        <a href="{{ route('stories.index') }}" class="btn btn-sm btn-outline-light rounded-pill">
-                            عرض الكل <i class="fas fa-arrow-left ms-2"></i>
-                        </a>
                     </div>
                     
-                    @if($recentStories->count() > 0)
-                        <div class="list-group list-group-flush">
-                            @foreach($recentStories as $story)
-                            <div class="list-group-item bg-transparent border-0 px-0 py-3 border-bottom border-white-25">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h6 class="mb-0 fw-bold text-white">{{ Str::limit($story->title, 30) }}</h6>
-                                    <span class="status-badge text-white small">
-                                        {{ $story->status }}
-                                    </span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-white-50">
-                                        <i class="far fa-clock me-1"></i>
-                                        {{ $story->created_at->diffForHumans() }}
-                                    </small>
-                                    <a href="#" class="text-warning small">عرض التفاصيل</a>
-                                </div>
+                    <div class="activity-item">
+                        <div class="flex items-center">
+                            <div class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-full w-10 h-10 flex items-center justify-center mr-4">
+                                <i class="fas fa-star text-white text-sm"></i>
                             </div>
-                            @endforeach
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Product Review</h4>
+                                <p class="text-sm text-gray-600">5-star review received - 1 hour ago</p>
+                            </div>
                         </div>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-book-open fa-4x text-white-50 mb-4"></i>
-                            <h5 class="text-white-75">لا توجد قصص حتى الآن</h5>
-                            <a href="{{ route('stories.create') }}" class="btn-professional btn btn-outline-light mt-3 rounded-pill px-4">
-                                <i class="fas fa-plus me-2"></i> أضف قصة جديدة
-                            </a>
-                        </div>
-                    @endif
+                    </div>
                 </div>
             </div>
+            
+            <!-- Performance Chart -->
+            <div class="fade-in-right">
+                <h3 class="text-3xl font-bold text-gray-800 mb-8">
+                    <span class="text-gradient-advanced">Performance Overview</span>
+                </h3>
+                <div class="chart-container">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-white">87%</p>
+                            <p class="text-sm text-white/80">Customer Satisfaction</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-white">156</p>
+                            <p class="text-sm text-white/80">Active Projects</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-white">24/7</p>
+                            <p class="text-sm text-white/80">Support Available</p>
+                        </div>
         </div>
     </div>
 </section>
@@ -703,38 +718,48 @@
                                     </div>
                                 </div>
                             </div>
-                            @endforeach
                         </div>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-chalkboard-teacher fa-4x text-muted mb-4"></i>
-                            <h5 class="text-muted">لا توجد ورش عمل مسجل بها حالياً</h5>
-                            <p class="text-muted mb-4">انضم إلى ورش العمل المثيرة وطور مهاراتك</p>
-                            <a href="{{ route('workshops.index') }}" class="btn-professional btn btn-primary rounded-pill px-4">
-                                <i class="fas fa-search me-2"></i> تصفح الورش المتاحة
-                            </a>
-                        </div>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Quick Actions Section -->
-<section class="py-5 animated-bg text-white position-relative overflow-hidden">
+<!-- Action Panel -->
+<section class="py-16 animated-bg text-white relative overflow-hidden">
     <div class="floating-elements">
         <div class="floating-element"></div>
         <div class="floating-element"></div>
     </div>
     
-    <div class="container py-5 position-relative m-auto" style="z-index: 10;">
-        <div class="text-center mb-5 fade-in-up">
-            <h2 class="display-4 fw-black mb-4">إجراءات سريعة</h2>
-            <p class="h5 text-white-75 mb-5">
-                الوصول السريع للميزات الأساسية
+    <div class="max-w-4xl mx-auto px-6 text-center relative m-auto z-10">
+        <div class="fade-in-up">
+            <h2 class="text-3xl md:text-5xl font-black mb-8">Ready to Take Action?</h2>
+            <p class="text-xl text-white/95 mb-12 leading-relaxed">
+                Explore your management tools and continue building sustainable educational experiences
             </p>
         </div>
+        
+        <div class="flex flex-col sm:flex-row gap-6 justify-center fade-in-up" style="animation-delay: 0.3s;">
+            <a href="/products" class="btn-professional bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-yellow-500 hover:via-orange-600 hover:to-red-600 text-white font-bold py-4 px-10 rounded-3xl text-lg shadow-2xl inline-flex items-center justify-center pulse-advanced">
+                <i class="fas fa-cogs mr-3 text-xl"></i>
+                <span>Manage Products</span>
+            </a>
+            
+         
+        </div>
+        
+        <div class="mt-12 fade-in-up" style="animation-delay: 0.6s;">
+            <div class="glass-card rounded-3xl p-8 max-w-2xl mx-auto">
+                <h3 class="text-2xl font-bold mb-4">Need Help?</h3>
+                <p class="text-white/90 mb-6">Our support team is here to assist you with any questions or technical issues.</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/contact-us" class="btn-professional bg-white/20 hover:bg-white/30 text-white font-semibold py-3 px-6 rounded-2xl inline-flex items-center justify-center">
+                        <i class="fas fa-headset mr-2"></i>
+                        Contact Support
+                    </a>
+                  
 
         <div class="row g-4 fade-in-up" style="animation-delay: 0.2s;">
             <div class="col-md-6 col-lg-3">
@@ -819,18 +844,13 @@
 
 @section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add smooth scrolling to all anchor links
+    // Add smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
         });
     });
 
@@ -840,51 +860,48 @@ document.addEventListener('DOMContentLoaded', function() {
         rootMargin: '0px 0px -50px 0px'
     };
 
-    const observer = new IntersectionObserver(function(entries) {
+    const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+                entry.target.style.animationPlayState = 'running';
             }
         });
     }, observerOptions);
 
-    // Observe all elements with animation classes
+    // Observe all animated elements
     document.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right').forEach(el => {
+        el.style.animationPlayState = 'paused';
         observer.observe(el);
     });
 
-    // Add dynamic time greeting
-    const now = new Date();
-    const hour = now.getHours();
-    let greeting = '';
-    
-    if (hour < 12) {
-        greeting = 'صباح الخير';
-    } else if (hour < 17) {
-        greeting = 'مساء الخير';
-    } else {
-        greeting = 'مساء الخير';
-    }
-    
-    // Update greeting if element exists
-    const greetingElement = document.querySelector('.greeting-text');
-    if (greetingElement) {
-        greetingElement.textContent = greeting;
+    // Add dynamic star generation
+    function createStars() {
+        const starsContainer = document.querySelector('.stars');
+        const numStars = 20;
+        
+        for (let i = 0; i < numStars; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 4 + 's';
+            starsContainer.appendChild(star);
+        }
     }
 
-    // Add card tilt effect for touch devices
-    if ('ontouchstart' in window) {
-        document.querySelectorAll('.card-hover-effect').forEach(card => {
-            card.addEventListener('touchstart', function() {
-                this.style.transform = 'scale(0.98)';
-            });
-            
-            card.addEventListener('touchend', function() {
-                this.style.transform = 'scale(1)';
-            });
+    // Initialize stars on page load
+    document.addEventListener('DOMContentLoaded', createStars);
+
+    // Add tooltip functionality for stat cards
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-15px) scale(1.05)';
         });
-    }
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
 
     // Progress bars animation (if any exist)
     document.querySelectorAll('.progress-bar').forEach(bar => {
@@ -905,33 +922,74 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Re-enable after 2 seconds (adjust as needed)
                 setTimeout(() => {
-                    this.innerHTML = originalText;
-                    this.classList.remove('disabled');
-                }, 2000);
+                    entry.target.style.width = width;
+                    entry.target.style.transition = 'width 2s ease-in-out';
+                }, 100);
             }
         });
     });
-});
 
-// Add window scroll effects
-window.addEventListener('scroll', function() {
-    const scrolled = window.pageYOffset;
-    const parallax = document.querySelectorAll('.floating-element');
-    
-    parallax.forEach(element => {
-        const speed = 0.5;
-        element.style.transform = `translateY(${scrolled * speed}px)`;
+    progressBars.forEach(bar => {
+        progressObserver.observe(bar);
     });
-});
 
-// Performance optimization: Reduce motion for users who prefer it
-if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.documentElement.style.setProperty('--animation-duration', '0.01ms');
-    document.querySelectorAll('*').forEach(el => {
-        el.style.animationDuration = '0.01ms';
-        el.style.animationIterationCount = '1';
-        el.style.transitionDuration = '0.01ms';
+    // Add real-time clock functionality
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', {
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        // If there's a clock element, update it
+        const clockElement = document.getElementById('dashboard-clock');
+        if (clockElement) {
+            clockElement.textContent = timeString;
+        }
+    }
+
+    // Update clock every second
+    setInterval(updateClock, 1000);
+    updateClock(); // Initial call
+
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key) {
+                case '1':
+                    e.preventDefault();
+                    window.location.href = '/products/create';
+                    break;
+                case '2':
+                    e.preventDefault();
+                    window.location.href = '/orders';
+                    break;
+                case '3':
+                    e.preventDefault();
+                    window.location.href = '/users';
+                    break;
+                case '4':
+                    e.preventDefault();
+                    window.location.href = '/analytics';
+                    break;
+            }
+        }
     });
-}
+
+    // Add loading states for quick action buttons
+    document.querySelectorAll('.quick-action-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const icon = this.querySelector('i');
+            const originalClass = icon.className;
+            
+            icon.className = 'fas fa-spinner fa-spin text-white text-2xl';
+            
+            setTimeout(() => {
+                icon.className = originalClass;
+            }, 1000);
+        });
+    });
 </script>
+
 @endsection
