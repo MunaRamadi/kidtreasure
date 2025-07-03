@@ -374,7 +374,7 @@
                             <i class="fas fa-rocket mr-3 text-xl"></i>
                             <span>Explore Our Products</span>
                         </a>
-                        <a href="/contact-us" class="btn-professional glass-card text-white font-bold py-4 px-10 rounded-3xl text-lg border border-white/30 inline-flex items-center justify-center">
+                        <a href="{{ route('contact.create') }}" class="btn-professional glass-card text-white font-bold py-4 px-10 rounded-3xl text-lg border border-white/30 inline-flex items-center justify-center">
                             <i class="fas fa-envelope mr-3 text-xl"></i>
                             <span>Contact Us</span>
                         </a>
@@ -507,13 +507,13 @@ We believe every old toy holds a fresh opportunity for learning and creativity â
                     <div class="relative">
                         <div class="absolute -inset-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur opacity-75"></div>
                         <img src="{{ asset('images/36f9f17c-ea58-4750-8512-ef1401e71ecc.jfif') }}" 
-                             alt="Mona Al-Ramadi" 
+                             alt="Muna Al-Ramadi" 
                              class="relative rounded-full w-32 h-32 mx-auto object-cover border-4 border-white shadow-xl">
                     </div>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Mona<br>Al-Ramadi</h3>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Muna<br>Al-Ramadi</h3>
                 <p class="text-gray-600 text-sm mb-6 leading-relaxed">
-                    Founder and CEO. She holds a Master's degree in Management from Yarmouk University. Mona has experience in administrative work, marketing, and financial collection.
+                    Founder and CEO. She holds a Master's degree in Management from Yarmouk University. Muna has experience in administrative work, marketing, and financial collection.
                 </p>
             </div>
             
@@ -736,7 +736,7 @@ We believe every old toy holds a fresh opportunity for learning and creativity â
                 
                 <div class="flex flex-col sm:flex-row justify-center gap-6">
              
-                    <a href="/contact" class="btn-professional glass-card text-white font-bold py-4 px-10 rounded-3xl text-lg border border-white/30 inline-flex items-center justify-center">
+                    <a href="/contact-us" class="btn-professional glass-card text-white font-bold py-4 px-10 rounded-3xl text-lg border border-white/30 inline-flex items-center justify-center">
                         <i class="fas fa-envelope mr-3 text-xl"></i>
                         <span>Contact Us</span>
                     </a>
@@ -759,32 +759,37 @@ We believe every old toy holds a fresh opportunity for learning and creativity â
         </div>
         
         <div class="glass-card card-hover-effect rounded-3xl p-12 bg-white/10 backdrop-filter backdrop-blur-20 border border-white/20 fade-in-up">
-            <p class="text-gray-700 leading-relaxed mb-12 text-center text-lg max-w-3xl mx-auto">
-                We are proud to work with a range of leading organizations and institutions that share our vision and values in creating a better educational future for children.
-            </p>
-            
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
-                    <img src="{{ asset('https://d2az9qivg16qd4.cloudfront.net/s3fs-public/Ministry%20of%20Education%20Logo-01_0.png') }}" 
-                         alt="Ministry of Education" 
-                         class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
-                </div>
-                <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
-                    <img src="{{ asset('https://grc-jordan.org/wp-content/uploads/2022/08/Ministry-of-Environment.png') }}" 
-                         alt="Ministry of Environment" 
-                         class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
-                </div>
-                <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
-                    <img src="{{ asset('https://amman.clustermappinginitiative.org/sites/default/files/The%20Children%27s%20Museum%20Jordan.png') }}" 
-                         alt="The Children's Museum Jordan" 
-                         class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
-                </div>
-                <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
-                    <img src="{{ asset('https://media.licdn.com/dms/image/v2/D4E0BAQGyMJr7YeYu_Q/company-logo_200_200/B4EZZTBtcgHYAM-/0/1745149681356/orange_jordan_logo?e=1755734400&v=beta&t=Bn81SUJzdbnSYsp-JoJe6v54lX0MAEg3eBvKBFezNDE') }}" 
-                         alt="Orange Platform" 
-                         class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
-                </div>
-            </div>
+    <p class="text-gray-700 leading-relaxed mb-12 text-center text-lg max-w-3xl mx-auto">
+        We are proud to work with a range of leading organizations and institutions that share our vision and values in creating a better educational future for children.
+    </p>
+    <div class="flex flex-wrap items-center justify-center gap-8">
+        <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
+            <img src="{{ asset('https://d2az9qivg16qd4.cloudfront.net/s3fs-public/Ministry%20of%20Education%20Logo-01_0.png') }}"
+                alt="Ministry of Education"
+                class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
+        </div>
+        <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
+            <img src="{{ asset('https://grc-jordan.org/wp-content/uploads/2022/08/Ministry-of-Environment.png') }}"
+                alt="Ministry of Environment"
+                class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
+        </div>
+        <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
+            <img src="{{ asset('https://amman.clustermappinginitiative.org/sites/default/files/The%20Children%27s%20Museum%20Jordan.png') }}"
+                alt="The Children's Museum Jordan"
+                class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
+        </div>
+        <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
+            <img src="{{ asset('https://media.licdn.com/dms/image/v2/D4E0BAQGyMJr7YeYu_Q/company-logo_200_200/B4EZZTBtcgHYAM-/0/1745149681356/orange_jordan_logo?e=1755734400&v=beta&t=Bn81SUJzdbnSYsp-JoJe6v54lX0MAEg3eBvKBFezNDE') }}"
+                alt="Orange Platform"
+                class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
+        </div>
+        <div class="glass-card card-hover-effect rounded-2xl p-6 flex items-center justify-center bg-white/50 border border-white/30">
+            <img src="{{ asset('https://modee.gov.jo/MoDEE_Ar.png') }} "
+                alt="MODEE"
+                class="max-h-16 w-auto grayscale hover:grayscale-0 transition duration-500 image-hover-effect">
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </section>

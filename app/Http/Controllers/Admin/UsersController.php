@@ -1,8 +1,12 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\PasswordResetRequest; // إضافة هذا السطر لاستيراد النموذج الجديد
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash; // إضافة هذا السطر لاستخدام التشفير
 
 class UsersController extends Controller
 {
@@ -31,7 +35,13 @@ class UsersController extends Controller
 
         $users = $query->latest()->paginate(20)->withQueryString();
 
-        return view('admin.users.index', compact('users'));
+        // جلب طلبات إعادة تعيين كلمة المرور المعلقة
+        $passwordResetRequests = PasswordResetRequest::with('user') // جلب بيانات المستخدم المرتبطة
+                                    ->where('is_resolved', false) // فقط الطلبات غير المعالجة
+                                    ->latest()
+                                    ->paginate(10, ['*'], 'password_reset_page'); // اسم صفحة مختلف لتجنب التعارض
+
+        return view('admin.users.index', compact('users', 'passwordResetRequests'));
     }
 
     public function show(User $user)
@@ -47,14 +57,27 @@ class UsersController extends Controller
 
     public function update(Request $request, User $user)
     {
+        // تحديث قواعد التحقق من الصحة مع إضافة حقول كلمة المرور والحقول الأخرى
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20', // أضفتها بناءً على نموذجك
+            'address' => 'nullable|string|max:255', // أضفتها بناءً على نموذجك
+            'language_preference' => 'nullable|string|max:50', // أضفتها بناءً على نموذجك
             'role' => 'required|in:user,admin',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'password' => 'nullable|string|min:8|confirmed', // إضافة التحقق من كلمة المرور
         ]);
 
-        $user->update($request->all());
+        // الحصول على جميع البيانات ما عدا حقول كلمة المرور
+        $userData = $request->except('password', 'password_confirmation');
+
+        // إذا تم إدخال كلمة مرور جديدة، قم بتشفيرها
+        if ($request->filled('password')) {
+            $userData['password'] = Hash::make($request->password);
+        }
+
+        $user->update($userData); // تحديث المستخدم بالبيانات الجديدة
 
         return redirect()->route('admin.users.index')
             ->with('success', 'تم تحديث المستخدم بنجاح');
@@ -79,5 +102,12 @@ class UsersController extends Controller
         
         $status = $user->is_active ? 'مفعل' : 'معطل';
         return back()->with('success', "تم تغيير حالة المستخدم إلى {$status}");
+    }
+
+    // دالة جديدة لمعالجة طلب إعادة تعيين كلمة المرور (وضع علامة كـ "معالج")
+    public function resolvePasswordResetRequest(PasswordResetRequest $request)
+    {
+        $request->update(['is_resolved' => true]);
+        return back()->with('success', 'تم وضع علامة على الطلب كتمت معالجته بنجاح.');
     }
 }

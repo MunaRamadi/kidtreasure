@@ -4,6 +4,7 @@
 <div class="container">
     <h2>User Management</h2>
 
+    {{-- قسم الفلترة والبحث الحالي --}}
     <div class="card mb-3">
         <div class="card-header">
             Filter and Search
@@ -31,63 +32,119 @@
             {{ session('success') }}
         </div>
     @endif
-
     @if (session('error'))
         <div class="alert alert-danger">
             {{ session('error') }}
         </div>
     @endif
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($users as $user)
-                <tr>
-                    <td>{{ $user->id }}</td>
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ ucfirst($user->role) }}</td>
-                    <td>
-                        <span class="badge {{ $user->is_active ? 'badge-success' : 'badge-danger' }}">
-                            {{ $user->is_active ? 'Active' : 'Inactive' }}
-                        </span>
-                    </td>
-                    <td>
-                        <a href="{{ route('admin.users.show', $user) }}" class="btn btn-info btn-sm">View</a>
-                        <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-warning btn-sm">Edit</a>
-                        
-                        <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST" style="display:inline-block;">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="btn {{ $user->is_active ? 'btn-danger' : 'btn-success' }} btn-sm">
-                                {{ $user->is_active ? 'Deactivate' : 'Activate' }}
-                            </button>
-                        </form>
+    {{-- قسم جديد لعرض طلبات إعادة تعيين كلمة المرور --}}
+    <div class="card mb-4">
+        <div class="card-header">
+            Pending Password Reset Requests
+        </div>
+        <div class="card-body">
+            @if ($passwordResetRequests->count() > 0)
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>User Name</th>
+                            <th>User Email</th>
+                            <th>Requested At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($passwordResetRequests as $request)
+                            <tr>
+                                <td>{{ $request->user->name ?? 'N/A' }}</td>
+                                <td>{{ $request->email }}</td>
+                                <td>{{ $request->created_at->format('M d, Y H:i A') }}</td>
+                                <td>
+                                    {{-- التأكد من وجود user_id قبل استخدامه أو البحث عن المستخدم بالبريد الإلكتروني --}}
+                                    @php
+                                        $targetUserId = $request->user_id ?? \App\Models\User::where('email', $request->email)->first()->id ?? null;
+                                    @endphp
+                                    @if ($targetUserId)
+                                        <a href="{{ route('admin.users.edit', $targetUserId) }}" class="btn btn-info btn-sm">Edit User's Password</a>
+                                    @else
+                                        <span class="text-danger">User not found</span>
+                                    @endif
 
-                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this user?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="text-center">No users found.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+                                    <form action="{{ route('admin.password-reset-requests.resolve', $request) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to mark this request as resolved?');">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn btn-success btn-sm">Mark as Resolved</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                {{ $passwordResetRequests->links() }}
+            @else
+                <p class="text-center">No pending password reset requests.</p>
+            @endif
+        </div>
+    </div>
 
-    {{ $users->links() }}
+    {{-- قسم إدارة المستخدمين الحالي --}}
+    <div class="card mb-3">
+        <div class="card-header">
+            All Users
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($users as $user)
+                        <tr>
+                            <td>{{ $user->id }}</td>
+                            <td>{{ $user->name }}</td>
+                            <td>{{ $user->email }}</td>
+                            <td>{{ ucfirst($user->role) }}</td>
+                            <td>
+                                <span class="badge {{ $user->is_active ? 'badge-success' : 'badge-danger' }}">
+                                    {{ $user->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.users.show', $user) }}" class="btn btn-info btn-sm">View</a>
+                                <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-warning btn-sm">Edit</a>
+
+                                <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST" style="display:inline-block;">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn {{ $user->is_active ? 'btn-danger' : 'btn-success' }} btn-sm">
+                                        {{ $user->is_active ? 'Deactivate' : 'Activate' }}
+                                    </button>
+                                </form>
+
+                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center">No users found.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+            {{ $users->links() }}
+        </div>
+    </div>
 </div>
 @endsection

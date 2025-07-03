@@ -51,13 +51,13 @@
                                 <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                                     <i class="fas fa-phone text-xs"></i>
                                 </div>
-                                <span class="text-sm">+962-XXX-XXXX</span>
+                                <span class="text-sm">+962 7 9779 3944</span>
                             </div>
                             <div class="flex items-center space-x-3 text-white/90">
                                 <div class="w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-teal-600 flex items-center justify-center">
                                     <i class="fas fa-envelope text-xs"></i>
                                 </div>
-                                <span class="text-sm">info@childrenstreasures.jo</span>
+                                <span class="text-sm">munaramadi@yahoo.com</span>
                             </div>
                             <div class="flex items-center space-x-3 text-white/90">
                                 <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center">
