@@ -64,14 +64,6 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/mini', [CartController::class, 'miniCart'])->name('mini');
 });
 
-// Checkout Routes
-Route::prefix('checkout')->name('checkout.')->group(function () {
-    Route::get('/', [CheckoutController::class, 'index'])->name('index');
-    Route::post('/process', [CheckoutController::class, 'process'])->name('process');
-    Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
-    Route::get('/failed/{order}', [CheckoutController::class, 'failed'])->name('failed');
-});
-
 // User Dashboard Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
@@ -216,6 +208,24 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::prefix('settings')->name('settings.')->controller(AdminController::class)->group(function () {
         Route::get('/', 'settingsIndex')->name('index');
     });
+});
+
+// Checkout Routes
+Route::middleware(['auth'])->group(function () {
+    // صفحة الشحن
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    // تأكيد بيانات الطلب والانتقال لصفحة الدفع
+    Route::post('/checkout/confirm', [CheckoutController::class, 'confirm'])->name('checkout.confirm');
+    // صفحة اختيار طريقة الدفع
+    Route::get('/checkout/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
+    // معالجة اختيار طريقة الدفع
+    Route::post('/checkout/payment/process', [CheckoutController::class, 'processPayment'])->name('checkout.payment.process');
+    // صفحة الدفع بالبطاقة الائتمانية
+    Route::get('/checkout/credit-card', [CheckoutController::class, 'creditCard'])->name('checkout.credit-card');
+    // صفحة الدفع عبر CliQ
+    Route::get('/checkout/cliq', [CheckoutController::class, 'cliq'])->name('checkout.cliq');
+    // صفحة نجاح الطلب
+    Route::get('/checkout/success/{orderId}', [CheckoutController::class, 'success'])->name('checkout.success');
 });
 
 require __DIR__.'/auth.php';

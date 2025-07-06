@@ -19,10 +19,10 @@ class CartController extends Controller
     {
         try {
             $cart = $this->getOrCreateCart();
-            
+
             // تنظيف العناصر غير الصالحة قبل العرض
             $cart->cleanInvalidItems();
-            
+
             return view('pages.cart.index', compact('cart'));
         } catch (Exception $e) {
             Log::error('Cart index error: ' . $e->getMessage());
@@ -34,7 +34,7 @@ class CartController extends Controller
     public function addItem(Request $request)
     {
         DB::beginTransaction();
-        
+
         try {
             $validated = $request->validate([
                 'product_id' => 'required|exists:products,id',
@@ -65,8 +65,8 @@ class CartController extends Controller
             // إضافة العنصر للسلة
             // هذه الدالة (addItem) يجب أن تكون معرفة في نموذج Cart.php
             $cart->addItem(
-                $validated['product_id'], 
-                $validated['quantity'], 
+                $validated['product_id'],
+                $validated['quantity'],
                 $product->price_jod
             );
 
@@ -90,14 +90,14 @@ class CartController extends Controller
     public function update(Request $request, $productId) // تم تغيير الاسم من updateItem إلى update وتغيير itemId إلى productId
     {
         DB::beginTransaction();
-        
+
         try {
             $validated = $request->validate([
                 'quantity' => 'required|integer|min:0|max:100', // min:0 للسماح بالحذف عن طريق تعيين الكمية إلى صفر
             ]);
 
             $cart = $this->getOrCreateCart();
-            
+
             // نبحث عن عنصر السلة باستخدام product_id الخاص به
             $cartItem = $cart->items()->where('product_id', $productId)->first();
 
@@ -117,7 +117,7 @@ class CartController extends Controller
                 ];
                 return $this->returnResponse($request, true, 'تم إزالة المنتج من سلة التسوق', $cartData);
             }
-            
+
             // التحقق من توفر المنتج بالكمية المطلوبة
             $product = Product::findOrFail($cartItem->product_id); // المنتج مرتبط بـ cartItem
 
@@ -128,7 +128,7 @@ class CartController extends Controller
             if ($product->stock_quantity < $validated['quantity']) {
                 throw new Exception("الكمية المطلوبة غير متوفرة في المخزون. الكمية المتوفرة هي: " . $product->stock_quantity);
             }
-            
+
             // هذه الدالة (updateItemQuantity) يجب أن تكون معرفة في نموذج Cart.php
             $cart->updateItemQuantity($cartItem->id, $validated['quantity']); // استخدم معرف عنصر السلة هنا
 
@@ -162,10 +162,10 @@ class CartController extends Controller
     public function remove($productId) // تم تغيير الاسم من removeItem إلى remove وتغيير itemId إلى productId
     {
         DB::beginTransaction();
-        
+
         try {
             $cart = $this->getOrCreateCart();
-            
+
             // البحث عن عنصر السلة باستخدام product_id الخاص به
             $cartItem = $cart->items()->where('product_id', $productId)->first();
 
@@ -175,7 +175,7 @@ class CartController extends Controller
 
             // هذه الدالة (removeItem) يجب أن تكون معرفة في نموذج Cart.php
             $cart->removeItem($cartItem->id); // استخدم معرف عنصر السلة هنا
-            
+
             DB::commit();
 
             $cartData = [
@@ -196,12 +196,12 @@ class CartController extends Controller
     public function clearCart()
     {
         DB::beginTransaction();
-        
+
         try {
             $cart = $this->getOrCreateCart();
             // هذه الدالة (clearItems) يجب أن تكون معرفة في نموذج Cart.php
             $cart->clearItems();
-            
+
             DB::commit();
 
             $cartData = [
@@ -219,29 +219,29 @@ class CartController extends Controller
     }
 
     // الحصول على السلة الحالية أو إنشاء سلة جديدة
-    protected function getOrCreateCart()
+    public function getOrCreateCart()
     {
         try {
             // استخدام معرف المستخدم إذا كان مسجلاً، وإلا استخدام معرف الجلسة
             $userId = Auth::id();
             $sessionId = Session::getId();
-            
+
             $cart = null;
-            
+
             if ($userId) {
                 // البحث عن سلة نشطة للمستخدم المسجل
                 $cart = Cart::with('items.product')
                     ->where('user_id', $userId)
                     ->where('status', 'active')
                     ->first();
-                    
+
                 if (!$cart) {
                     // البحث عن سلة مرتبطة بمعرف الجلسة الحالية وتحديثها
                     $sessionCart = Cart::with('items.product')
                         ->where('session_id', $sessionId)
                         ->where('status', 'active')
                         ->first();
-                    
+
                     if ($sessionCart) {
                         $sessionCart->update(['user_id' => $userId]);
                         $cart = $sessionCart;
@@ -254,7 +254,7 @@ class CartController extends Controller
                     ->where('status', 'active')
                     ->first();
             }
-            
+
             // إنشاء سلة جديدة إذا لم يتم العثور على أي سلة
             if (!$cart) {
                 $cart = Cart::create([
@@ -269,7 +269,7 @@ class CartController extends Controller
                 // تحديث آخر نشاط للسلة الموجودة
                 $cart->update(['last_activity' => now()]);
             }
-            
+
             return $cart;
 
         } catch (Exception $e) {
@@ -291,7 +291,7 @@ class CartController extends Controller
     {
         try {
             $cart = $this->getOrCreateCart();
-            
+
             return response()->json([
                 'success' => true,
                 'total_items' => $cart->total_items,
@@ -325,19 +325,19 @@ class CartController extends Controller
             'success' => $success,
             'message' => $message
         ];
-        
+
         if ($success && !empty($data)) {
             $response['cart'] = $data;
-            
+
             // إضافة بيانات العنصر إذا كانت موجودة (خاصة بالتحديث)
             if (isset($data['item'])) {
                 $response['item'] = $data['item'];
             }
         }
-        
+
         if ($request->ajax()) {
             // حالة 422 (Unprocessable Entity) لرسائل الخطأ
-            return response()->json($response, $success ? 200 : 422); 
+            return response()->json($response, $success ? 200 : 422);
         }
 
         $sessionKey = $success ? 'success' : 'error';

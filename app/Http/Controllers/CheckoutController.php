@@ -2,216 +2,254 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cart;
-use App\Models\Order;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Session;
 
 class CheckoutController extends Controller
 {
-    // عرض صفحة الدفع
+    /**
+     * عرض صفحة إتمام الطلب
+     */
     public function index()
     {
-        // التحقق من وجود عناصر في السلة
-        $cart = app(CartController::class)->getOrCreateCart();
-        
-        if ($cart->total_items == 0) {
-            return redirect()->route('cart.index')->with('error', 'سلة التسوق فارغة');
+        $cart = app(\App\Http\Controllers\CartController::class)->getOrCreateCart();
+        if (!$cart || $cart->items->count() == 0) {
+            return redirect()->route('cart.index')->with('error', 'السلة فارغة');
         }
-        
-        // عرض صفحة الدفع
         return view('pages.checkout.index', compact('cart'));
     }
 
-    // معالجة عملية الدفع
-    public function process(Request $request)
+    /**
+     * تأكيد الطلب والانتقال لصفحة اختيار الدفع
+     */
+    public function confirm(Request $request)
     {
-        // التحقق من صحة بيانات الطلب
-        $validator = Validator::make($request->all(), [
+        // التحقق من صحة البيانات
+        $validatedData = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
-            'address' => 'required|string|max:255',
-            'city' => 'required|string|max:100',
+            'address' => 'required|string|max:500',
+            'city' => 'required|string|max:255',
             'postal_code' => 'nullable|string|max:20',
-            'country' => 'required|string|max:100',
-            'payment_method' => 'required|string|in:cash_on_delivery,credit_card,paypal,bank_transfer',
-            'notes' => 'nullable|string',
+            'country' => 'required|string',
+            'shipping_method' => 'required|in:standard,express',
+            'discount_code' => 'nullable|string',
+            'notes' => 'nullable|string|max:1000',
+            'terms_accepted' => 'required|accepted',
         ]);
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+        $cart = app(\App\Http\Controllers\CartController::class)->getOrCreateCart();
+        if (!$cart || $cart->items->count() == 0) {
+            return redirect()->route('cart.index')->with('error', 'السلة فارغة');
         }
 
-        // جلب السلة الحالية
-        $cart = app(CartController::class)->getOrCreateCart();
-        
-        // التحقق من وجود عناصر في السلة
-        if ($cart->total_items == 0) {
-            return redirect()->route('cart.index')->with('error', 'سلة التسوق فارغة');
+        // حساب التكاليف
+        $subtotal = $cart->total_price;
+        $shippingCost = $validatedData['shipping_method'] === 'express' ? 15.00 : 5.00;
+        $tax = $subtotal * 0.10; // 10% ضريبة
+        $discount = 0;
+
+        // التحقق من كود الخصم
+        if (!empty($validatedData['discount_code'])) {
+            $discount = $this->calculateDiscount($validatedData['discount_code'], $subtotal);
         }
 
-        // تجهيز بيانات الطلب
+        $total = $subtotal + $shippingCost + $tax - $discount;
+
+        // حفظ بيانات الطلب في الجلسة
         $orderData = [
-            'shipping_address' => [
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'city' => $request->city,
-                'postal_code' => $request->postal_code,
-                'country' => $request->country,
+            'customer_info' => [
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
+                'email' => $validatedData['email'],
+                'phone' => $validatedData['phone'],
+                'address' => $validatedData['address'],
+                'city' => $validatedData['city'],
+                'postal_code' => $validatedData['postal_code'],
+                'country' => $validatedData['country'],
             ],
-            'payment_method' => $request->payment_method,
-            'notes' => $request->notes,
-            'shipping_method' => $request->shipping_method ?? 'standard',
-            'shipping_cost' => $this->calculateShippingCost($request->shipping_method ?? 'standard'),
+            'shipping_method' => $validatedData['shipping_method'],
+            'discount_code' => $validatedData['discount_code'] ?? null,
+            'notes' => $validatedData['notes'],
+            'subtotal' => $subtotal,
+            'shipping_cost' => $shippingCost,
+            'tax' => $tax,
+            'discount' => $discount,
+            'total' => $total,
         ];
-        
-        // تطبيق كود الخصم إذا كان موجوداً
-        if ($request->has('discount_code') && !empty($request->discount_code)) {
-            $discountAmount = $this->applyDiscountCode($request->discount_code, $cart->total_price);
-            $orderData['discount_code'] = $request->discount_code;
-            $orderData['discount_amount'] = $discountAmount;
+
+        Session::put('order_data', $orderData);
+
+        // الانتقال لصفحة اختيار طريقة الدفع
+        return redirect()->route('checkout.payment');
+    }
+
+    /**
+     * عرض صفحة اختيار طريقة الدفع
+     */
+    public function payment()
+    {
+        // التأكد من وجود بيانات الطلب
+        $orderData = Session::get('order_data');
+        if (!$orderData) {
+            return redirect()->route('checkout.index')->with('error', 'يرجى إكمال معلومات الطلب أولاً');
         }
 
-        // إنشاء الطلب من السلة
-        try {
-            $order = Order::createFromCart($cart, $orderData);
-            
-            // معالجة الدفع حسب طريقة الدفع المختارة
-            $paymentResult = $this->processPayment($order, $request->payment_method);
-            
-            if ($paymentResult['success']) {
-                // تحديث حالة الدفع إذا نجحت عملية الدفع
-                if ($request->payment_method != 'cash_on_delivery') {
-                    $order->update([
-                        'payment_status' => 'paid',
-                        'status' => 'processing',
-                    ]);
-                }
-                
-                // إعادة التوجيه إلى صفحة التأكيد
-                return redirect()->route('checkout.success', ['order' => $order->id]);
-            } else {
-                // إعادة التوجيه في حالة فشل الدفع
-                return redirect()->route('checkout.failed', ['order' => $order->id])
-                                 ->with('error', $paymentResult['message']);
-            }
-        } catch (\Exception $e) {
-            // معالجة الأخطاء
-            return back()->with('error', 'حدث خطأ أثناء معالجة الطلب: ' . $e->getMessage())->withInput();
+        $cart = app(\App\Http\Controllers\CartController::class)->getOrCreateCart();
+        if (!$cart || $cart->items->count() == 0) {
+            return redirect()->route('cart.index')->with('error', 'السلة فارغة');
+        }
+
+        return view('pages.checkout.payment', compact('orderData', 'cart'));
+    }
+
+    /**
+     * معالجة اختيار طريقة الدفع
+     */
+    public function processPayment(Request $request)
+    {
+        $request->validate([
+            'payment_method' => 'required|in:cash_on_delivery,credit_card,cliq'
+        ]);
+
+        $orderData = Session::get('order_data');
+        if (!$orderData) {
+            return redirect()->route('checkout.index')->with('error', 'انتهت صلاحية الجلسة');
+        }
+
+        // إضافة طريقة الدفع لبيانات الطلب
+        $orderData['payment_method'] = $request->payment_method;
+        Session::put('order_data', $orderData);
+
+        // توجيه حسب طريقة الدفع المختارة
+        switch ($request->payment_method) {
+            case 'cash_on_delivery':
+                return $this->processCashOnDelivery();
+            case 'credit_card':
+                return $this->processCreditCard();
+            case 'cliq':
+                return $this->processCliq();
+            default:
+                return redirect()->back()->with('error', 'طريقة دفع غير صحيحة');
         }
     }
 
-    // صفحة نجاح الطلب
-    public function success(Order $order)
+    /**
+     * معالجة الدفع عند التوصيل
+     */
+    private function processCashOnDelivery()
     {
-        // التحقق من ملكية الطلب
-        if (Auth::check() && $order->user_id != Auth::id()) {
-            abort(403);
+        // إنشاء الطلب مباشرة
+        $order = $this->createOrder('cash_on_delivery', 'pending');
+
+        // تنظيف الجلسة
+        Session::forget(['cart', 'order_data']);
+
+        return redirect()->route('checkout.success', $order->id)
+            ->with('success', 'تم إنشاء طلبك بنجاح! سيتم التواصل معك قريباً.');
+    }
+
+    /**
+     * معالجة الدفع بالبطاقة الائتمانية
+     */
+    private function processCreditCard()
+    {
+        // توجيه لصفحة إدخال بيانات البطاقة
+        return redirect()->route('checkout.credit-card');
+    }
+
+    /**
+     * معالجة الدفع عبر CliQ
+     */
+    private function processCliq()
+    {
+        // توجيه لصفحة CliQ
+        return redirect()->route('checkout.cliq');
+    }
+
+    /**
+     * إنشاء الطلب في قاعدة البيانات
+     */
+    private function createOrder($paymentMethod, $status = 'pending')
+    {
+        $orderData = Session::get('order_data');
+        $cart = app(\App\Http\Controllers\CartController::class)->getOrCreateCart();
+
+        // هنا يجب إنشاء الطلب في قاعدة البيانات
+        // هذا مثال مبسط - يجب تعديله حسب نموذج البيانات الخاص بك
+
+        /*
+        $order = Order::create([
+            'user_id' => auth()->id(),
+            'first_name' => $orderData['customer_info']['first_name'],
+            'last_name' => $orderData['customer_info']['last_name'],
+            'email' => $orderData['customer_info']['email'],
+            'phone' => $orderData['customer_info']['phone'],
+            'address' => $orderData['customer_info']['address'],
+            'city' => $orderData['customer_info']['city'],
+            'postal_code' => $orderData['customer_info']['postal_code'],
+            'country' => $orderData['customer_info']['country'],
+            'shipping_method' => $orderData['shipping_method'],
+            'payment_method' => $paymentMethod,
+            'subtotal' => $orderData['subtotal'],
+            'shipping_cost' => $orderData['shipping_cost'],
+            'tax' => $orderData['tax'],
+            'discount' => $orderData['discount'],
+            'total' => $orderData['total'],
+            'status' => $status,
+            'notes' => $orderData['notes'],
+        ]);
+
+        // إضافة منتجات الطلب
+        foreach ($cart->items as $item) {
+            $order->items()->create([
+                'product_id' => $item->product->id,
+                'quantity' => $item->quantity,
+                'price' => $item->product->price,
+                'total' => $item->product->price * $item->quantity,
+            ]);
         }
-        
-        return view('pages.checkout.success', compact('order'));
+
+        return $order;
+        */
+
+        // للاختبار - إرجاع كائن وهمي
+        return (object) ['id' => 'ORDER_' . time()];
     }
 
-    // صفحة فشل الطلب
-    public function failed(Order $order)
+    /**
+     * حساب قيمة الخصم
+     */
+    private function calculateDiscount($discountCode, $subtotal)
     {
-        // التحقق من ملكية الطلب
-        if (Auth::check() && $order->user_id != Auth::id()) {
-            abort(403);
-        }
-        
-        return view('pages.checkout.failed', compact('order'));
-    }
-
-    // حساب تكلفة الشحن
-    protected function calculateShippingCost($shippingMethod)
-    {
-        // يمكنك تخصيص هذه الدالة حسب احتياجات موقعك
-        $shippingCosts = [
-            'standard' => 5.00,
-            'express' => 15.00,
-            'free' => 0.00,
-        ];
-        
-        return $shippingCosts[$shippingMethod] ?? 5.00;
-    }
-
-    // تطبيق كود الخصم
-    protected function applyDiscountCode($code, $totalPrice)
-    {
-        // هذه مجرد دالة توضيحية. يجب تنفيذ منطق حقيقي للتعامل مع أكواد الخصم
-        // مثلاً، التحقق من قاعدة البيانات، صلاحية الكود، إلخ.
         $discountCodes = [
             'WELCOME10' => ['type' => 'percentage', 'value' => 10],
             'SUMMER20' => ['type' => 'percentage', 'value' => 20],
             'FREESHIP' => ['type' => 'fixed', 'value' => 5],
         ];
-        
-        if (isset($discountCodes[strtoupper($code)])) {
-            $discount = $discountCodes[strtoupper($code)];
-            
-            if ($discount['type'] == 'percentage') {
-                return ($totalPrice * $discount['value']) / 100;
+
+        $code = strtoupper($discountCode);
+
+        if (!isset($discountCodes[$code])) {
+            return 0;
+        }
+
+        $discount = $discountCodes[$code];
+
+        if ($discount['type'] === 'percentage') {
+            return ($subtotal * $discount['value']) / 100;
             } else {
                 return $discount['value'];
             }
         }
-        
-        return 0;
-    }
 
-    // معالجة الدفع
-    protected function processPayment($order, $paymentMethod)
+    /**
+     * صفحة نجاح الطلب
+     */
+    public function success($orderId)
     {
-        // هذه دالة توضيحية. يجب تنفيذ منطق حقيقي للتعامل مع بوابات الدفع
-        switch ($paymentMethod) {
-            case 'cash_on_delivery':
-                // لا حاجة لمعالجة الدفع في حالة الدفع عند الاستلام
-                return [
-                    'success' => true,
-                    'message' => 'تم تأكيد الطلب. سيتم الدفع عند الاستلام.',
-                    'transaction_id' => null
-                ];
-                
-            case 'credit_card':
-                // هنا يتم الاتصال ببوابة دفع حقيقية مثل Stripe أو PayTabs
-                // هذا مجرد مثال توضيحي
-                $transactionId = 'CC-' . uniqid();
-                return [
-                    'success' => true,
-                    'message' => 'تمت عملية الدفع بنجاح',
-                    'transaction_id' => $transactionId
-                ];
-                
-            case 'paypal':
-                // هنا يتم الاتصال ببوابة PayPal
-                $transactionId = 'PP-' . uniqid();
-                return [
-                    'success' => true,
-                    'message' => 'تمت عملية الدفع بنجاح عبر PayPal',
-                    'transaction_id' => $transactionId
-                ];
-                
-            case 'bank_transfer':
-                // في حالة التحويل البنكي، يتم تأكيد الطلب ويتم التحقق من التحويل لاحقاً
-                return [
-                    'success' => true,
-                    'message' => 'تم تأكيد الطلب. يرجى إكمال التحويل البنكي وإرسال إيصال الدفع.',
-                    'transaction_id' => 'BT-' . uniqid()
-                ];
-                
-            default:
-                return [
-                    'success' => false,
-                    'message' => 'طريقة الدفع غير مدعومة',
-                    'transaction_id' => null
-                ];
-        }
+        return view('pages.checkout.success', compact('orderId'));
     }
 }
