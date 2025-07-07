@@ -222,6 +222,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checkout/payment/process', [CheckoutController::class, 'processPayment'])->name('checkout.payment.process');
     // صفحة الدفع بالبطاقة الائتمانية
     Route::get('/checkout/credit-card', [CheckoutController::class, 'creditCard'])->name('checkout.credit-card');
+    // معالجة الدفع عبر Stripe
+    Route::post('/checkout/stripe', [CheckoutController::class, 'handleStripePayment'])->name('checkout.stripe');
+    // حفظ البطاقة
+    Route::post('/checkout/save-card', [CheckoutController::class, 'saveCard'])->name('checkout.save-card');
+    // الدفع بالبطاقة المحفوظة
+    Route::post('/checkout/pay-with-saved-card', [CheckoutController::class, 'payWithSavedCard'])->name('checkout.pay-with-saved-card');
     // صفحة الدفع عبر CliQ
     Route::get('/checkout/cliq', [CheckoutController::class, 'cliq'])->name('checkout.cliq');
     // صفحة نجاح الطلب

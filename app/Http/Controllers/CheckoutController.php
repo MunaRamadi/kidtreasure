@@ -252,4 +252,144 @@ class CheckoutController extends Controller
     {
         return view('pages.checkout.success', compact('orderId'));
     }
+
+    /**
+     * عرض صفحة الدفع بالبطاقة الائتمانية
+     */
+    public function creditCard()
+    {
+        $orderData = session('order_data');
+        if (!$orderData) {
+            return redirect()->route('checkout.index')->with('error', 'يرجى إكمال معلومات الطلب أولاً');
+        }
+        return view('pages.checkout.credit-card', compact('orderData'));
+    }
+
+    /**
+     * معالجة الدفع عبر Stripe
+     */
+    public function handleStripePayment(Request $request)
+    {
+        $request->validate([
+            'stripeToken' => 'required',
+        ]);
+
+        $orderData = session('order_data');
+        if (!$orderData) {
+            return redirect()->route('checkout.index')->with('error', 'انتهت صلاحية الجلسة');
+        }
+
+        $amount = $orderData['total'] ?? 0;
+        if ($amount <= 0) {
+            return redirect()->route('checkout.index')->with('error', 'المبلغ غير صحيح');
+        }
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+        try {
+            $charge = \Stripe\Charge::create([
+                'amount' => intval($amount * 100), // Stripe uses cents
+                'currency' => 'usd',
+                'description' => 'Order Payment',
+                'source' => $request->stripeToken,
+                'metadata' => [
+                    'email' => $orderData['customer_info']['email'] ?? '',
+                ],
+            ]);
+
+            // هنا يمكنك إنشاء الطلب في قاعدة البيانات
+            $order = $this->createOrder('credit_card', 'paid');
+
+            // تنظيف الجلسة
+            Session::forget(['cart', 'order_data']);
+
+            return redirect()->route('checkout.success', $order->id)->with('success', 'تم الدفع بنجاح!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'فشل الدفع: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * حفظ البطاقة كـ Payment Method
+     */
+    public function saveCard(Request $request)
+    {
+        $request->validate([
+            'stripeToken' => 'required',
+        ]);
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+        try {
+            // إنشاء Payment Method
+            $paymentMethod = \Stripe\PaymentMethod::create([
+                'type' => 'card',
+                'card' => [
+                    'token' => $request->stripeToken,
+                ],
+            ]);
+
+            // ربط البطاقة بالعميل (Customer)
+            $customer = \Stripe\Customer::create([
+                'email' => auth()->user()->email,
+                'payment_method' => $paymentMethod->id,
+            ]);
+
+            // حفظ معرف البطاقة في قاعدة البيانات
+            auth()->user()->update([
+                'stripe_customer_id' => $customer->id,
+                'stripe_payment_method_id' => $paymentMethod->id,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حفظ البطاقة بنجاح',
+                'payment_method_id' => $paymentMethod->id,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في حفظ البطاقة: ' . $e->getMessage(),
+            ], 400);
+        }
+    }
+
+    /**
+     * استخدام البطاقة المحفوظة للدفع
+     */
+    public function payWithSavedCard(Request $request)
+    {
+        $request->validate([
+            'payment_method_id' => 'required',
+        ]);
+
+        $orderData = session('order_data');
+        if (!$orderData) {
+            return redirect()->route('checkout.index')->with('error', 'انتهت صلاحية الجلسة');
+        }
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+        try {
+            // إنشاء Payment Intent مع البطاقة المحفوظة
+            $paymentIntent = \Stripe\PaymentIntent::create([
+                'amount' => intval($orderData['total'] * 100),
+                'currency' => 'usd',
+                'customer' => auth()->user()->stripe_customer_id,
+                'payment_method' => $request->payment_method_id,
+                'confirm' => true,
+                'return_url' => route('checkout.success', 'temp'),
+            ]);
+
+            if ($paymentIntent->status === 'succeeded') {
+                $order = $this->createOrder('credit_card', 'paid');
+                Session::forget(['cart', 'order_data']);
+                return redirect()->route('checkout.success', $order->id)->with('success', 'تم الدفع بنجاح!');
+            }
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'فشل الدفع: ' . $e->getMessage());
+        }
+    }
 }
