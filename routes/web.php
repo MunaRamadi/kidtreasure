@@ -20,7 +20,6 @@ use App\Http\Controllers\Admin\WorkshopsController; // For admin workshop templa
 use App\Http\Controllers\Admin\WorkshopEventsController; // For admin workshop events management
 use App\Http\Controllers\Admin\ContactMessagesController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController; // For admin blog
-use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\UserSettingsController;
 use App\Http\Controllers\UserSecurityController;
@@ -81,7 +80,7 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::patch('/{productId}', [CartController::class, 'update'])->name('update');
     Route::delete('/{productId}', [CartController::class, 'remove'])->name('remove');
     Route::post('/clear', [CartController::class, 'clearCart'])->name('clear');
-    Route::get('/mini', [CartController::class, 'miniCart'])->name('mini');
+    Route::post('/apply-coupon', [CartController::class, 'applyCoupon'])->name('apply_coupon');
 });
 
 // Checkout Routes
@@ -90,6 +89,7 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::post('/process', [CheckoutController::class, 'process'])->name('process');
     Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
     Route::get('/failed/{order}', [CheckoutController::class, 'failed'])->name('failed');
+    Route::get('/payment/{order}', [CheckoutController::class, 'payment'])->name('payment');
 });
 
 // User Dashboard & Profile Routes (requires authentication)
@@ -150,6 +150,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // User Management
     Route::prefix('users')->name('users.')->controller(UsersController::class)->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
         Route::get('/{user}', 'show')->name('show');
         Route::get('/{user}/edit', 'edit')->name('edit');
         Route::put('/{user}', 'update')->name('update');
