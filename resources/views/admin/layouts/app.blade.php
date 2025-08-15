@@ -236,13 +236,6 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.images.*') ? 'active' : '' }}" href="{{ url('/admin/images') }}">
-                        <i class="fas fa-fw fa-image"></i>
-                        <span>Images</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.blog.*') ? 'active' : '' }}" href="{{ route('admin.blog.index') }}">
                         <i class="fas fa-fw fa-blog"></i>
                         <span>Blog</span>
@@ -258,12 +251,6 @@
 
                 <hr class="sidebar-divider" style="border-color: rgba(255,255,255,.15);">
 
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}">
-                        <i class="fas fa-fw fa-cog"></i>
-                        <span>Settings</span>
-                    </a>
-                </li>
             </ul>
         </nav>
         <div class="content-wrapper">
@@ -273,6 +260,22 @@
                 </button>
 
                 <ul class="navbar-nav ms-auto"> 
+                    <li>
+                        <a href="{{ route('home') }}" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            Go to Website
+                        </a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <div class="nav-link d-flex align-items-center">
+                            <i class="fas fa-language me-1"></i>
+                            @if(app()->getLocale() == 'en')
+                                <a href="{{ route('lang.switch', 'ar') }}" class="text-decoration-none text-gray-600 hover-text-primary">العربية</a>
+                            @else
+                                <a href="{{ route('lang.switch', 'en') }}" class="text-decoration-none text-gray-600 hover-text-primary">English</a>
+                            @endif
+                        </div>
+                    </li>
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

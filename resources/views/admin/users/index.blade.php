@@ -90,8 +90,11 @@
 
     {{-- قسم إدارة المستخدمين الحالي --}}
     <div class="card mb-3">
-        <div class="card-header">
-            All Users
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>All Users</span>
+            <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> Create User
+            </a>
         </div>
         <div class="card-body">
             <table class="table table-bordered table-striped">
@@ -111,9 +114,15 @@
                             <td>{{ $user->id }}</td>
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
-                            <td>{{ ucfirst($user->role) }}</td>
                             <td>
-                                <span class="badge {{ $user->is_active ? 'badge-success' : 'badge-danger' }}">
+                                @if($user->is_admin)
+                                    <span class="badge bg-primary text-white">Admin</span>
+                                @else
+                                    <span class="badge bg-secondary text-white">User</span>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ $user->is_active ? 'success' : 'danger' }} text-white">
                                     {{ $user->is_active ? 'Active' : 'Inactive' }}
                                 </span>
                             </td>

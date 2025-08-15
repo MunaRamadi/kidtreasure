@@ -99,9 +99,53 @@ class UsersController extends Controller
     public function toggleStatus(User $user)
     {
         $user->update(['is_active' => !$user->is_active]);
+
+        return redirect()->route('admin.users.index')
+            ->with('success', $user->is_active ? 'تم تفعيل المستخدم بنجاح' : 'تم إلغاء تفعيل المستخدم بنجاح');
+    }
+
+    /**
+     * Show the form for creating a new user.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('admin.users.create');
+    }
+
+    /**
+     * Store a newly created user in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'language_preference' => 'nullable|string|max:50',
+            'is_admin' => 'boolean',
+            'is_active' => 'boolean',
+        ]);
+
+        $userData = $request->except('password', 'password_confirmation');
+        $userData['password'] = Hash::make($request->password);
         
-        $status = $user->is_active ? 'مفعل' : 'معطل';
-        return back()->with('success', "تم تغيير حالة المستخدم إلى {$status}");
+        // Set default role as 'user'
+        $userData['role'] = 'user';
+        
+        // Handle is_admin field (convert checkbox to boolean)
+        $userData['is_admin'] = $request->has('is_admin');
+        
+        User::create($userData);
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User created successfully');
     }
 
     // دالة جديدة لمعالجة طلب إعادة تعيين كلمة المرور (وضع علامة كـ "معالج")

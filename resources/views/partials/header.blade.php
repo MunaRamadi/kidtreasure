@@ -153,6 +153,9 @@
                     <a href="/" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_home">
                         <i class="fas fa-home mr-2"></i>Home
                     </a>
+                    <a href="/about" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_about">
+                        <i class="fas fa-info-circle mr-2"></i><span class="whitespace-nowrap">AboutUs</span>
+                    </a>
                     <a href="/products" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_products">
                         <i class="fas fa-box mr-2"></i>Products
                     </a>
@@ -165,10 +168,7 @@
                     <a href="/blog" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_blog">
                         <i class="fas fa-blog mr-2"></i>Blog
                     </a>
-                    <a href="/about" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_about">
-                        <i class="fas fa-info-circle mr-2"></i><span class="whitespace-nowrap">About Us</span>
-                    </a>
-                    <a href="/contact" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_contact">
+                    <a href="/contact-us" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_contact">
                         <i class="fas fa-envelope mr-2"></i><span class="whitespace-nowrap">Contact Us</span>
                     </a>
                 </nav>
@@ -177,17 +177,17 @@
                  
                     
                     @guest
-                    <a href="/login" class="flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-white font-medium px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 text-sm" data-translate="login_button">
+                    <a href="/login" class="flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-indigo-700 font-medium px-4 py-2 rounded-lg transition-all duration-300 text-sm" data-translate="login_button">
                         <i class="fas fa-user"></i>
                         <span>{{ app()->getLocale() == 'en' ? 'Login' : 'تسجيل الدخول' }}</span>
                     </a>
-                    <a href="/register" class="flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-white font-medium px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 text-sm" data-translate="register_button">
+                    <a href="/register" class="flex items-center space-x-2 ltr:space-x-reverse text-purple-600 hover:text-purple-700 font-medium px-4 py-2 rounded-lg transition-all duration-300 text-sm" data-translate="register_button">
                         <i class="fas fa-user-plus"></i>
                         <span>{{ app()->getLocale() == 'en' ? 'Register' : 'إنشاء حساب' }}</span>
                     </a>
                     @else
                     <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-4 ltr:space-x-reverse text-indigo-600 hover:text-white font-medium px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 text-sm">
+                        <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-2 ltr:space-x-reverse text-purple-600 px-3 py-2 rounded-lg font-medium hover:text-purple-700 transition-colors duration-300 text-sm">
                             <i class="fas fa-user-circle"></i>
                             <span>{{ Auth::user()->name }}</span>
                             <i class="fas fa-chevron-down text-xs ml-1"></i>
@@ -202,11 +202,16 @@
                              class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50"
                              style="display: none;">
                             <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="profile_option">
-                                <i class="fas fa-user-circle mr-2"></i> Profile
+                                <i class="fas fa-user-circle mr-2 text-indigo-500"></i> Profile
                             </a>
                             <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="orders_option">
-                                <i class="fas fa-shopping-bag mr-2"></i> Orders
+                                <i class="fas fa-shopping-bag mr-2 text-indigo-500"></i> Orders
                             </a>
+                            @if(Auth::user()->is_admin)
+                            <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800" data-translate="admin_panel_option">
+                                <i class="fas fa-user-shield mr-2"></i> Admin Panel
+                            </a>
+                            @endif
                             <div class="border-t border-gray-100 my-1"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -216,11 +221,6 @@
                             </form>
                         </div>
                     </div>
-                    <a href="/cart" class="relative flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-white font-medium px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105 text-sm" data-translate="cart_button">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Cart</span>
-                        <span class="cart-badge absolute -top-2 -right-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg">3</span>
-                    </a>
                     @endguest
                        <div id="desktop-language-switcher" class="language-switcher flex items-center space-x-1 ltr:space-x-reverse text-gray-600 hover:text-indigo-600 cursor-pointer">
                         <i class="fas fa-language text-lg"></i>
@@ -230,9 +230,11 @@
                             <a href="{{ route('lang.switch', 'en') }}" class="text-sm font-medium">English</a>
                         @endif
                     </div>
-                   <a href="/cart" class="relative flex items-center bg-purple-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors duration-300 flex-1 justify-center text-sm">
+                   <a href="{{ route('cart.index') }}" class="relative flex items-center text-purple-600 px-3 py-2 rounded-lg font-medium hover:text-purple-700 transition-colors duration-300 text-sm">
                        <i class="fas fa-shopping-cart"></i>
-                       <span id="desktop-cart-badge" class="cart-badge absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold hidden">0</span>
+                       <span id="desktop-cart-badge" class="cart-badge absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold {{ isset($cart) && $cart->total_items > 0 ? '' : 'hidden' }}">
+                           {{ isset($cart) ? $cart->total_items : '0' }}
+                       </span>
                   </a>
                 </div>
                 <div class="lg:hidden">
@@ -285,7 +287,7 @@
                             <i class="fas fa-info-circle text-sm w-5"></i>
                             <span class="font-medium text-sm whitespace-nowrap">About Us</span>
                         </a>
-                        <a href="/contact" class="flex items-center space-x-3 ltr:space-x-reverse text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 p-3 rounded-lg transition-all duration-300">
+                        <a href="/contact-us" class="flex items-center space-x-3 ltr:space-x-reverse text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 p-3 rounded-lg transition-all duration-300">
                             <i class="fas fa-envelope text-sm w-5"></i>
                             <span class="font-medium text-sm whitespace-nowrap">Contact Us</span>
                         </a>
@@ -309,37 +311,42 @@
                     <div class="flex items-center justify-center space-x-3 ltr:space-x-reverse">
                         @guest
                         <a href="/login" class="flex items-center space-x-2 ltr:space-x-reverse bg-indigo-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 flex-1 justify-center text-sm" data-translate="login_button">
-                            <i class="fas fa-user"></i>
+                            <i class="fas fa-user text-indigo-200"></i>
                             <span>Login</span>
                         </a>
                         <a href="/register" class="flex items-center space-x-2 ltr:space-x-reverse bg-purple-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors duration-300 flex-1 justify-center text-sm" data-translate="register_button">
-                            <i class="fas fa-user-plus"></i>
+                            <i class="fas fa-user-plus text-purple-200"></i>
                             <span>Register</span>
                         </a>
                         @else
                         <div class="grid grid-cols-2 gap-2 w-full">
                             <a href="{{ route('user.dashboard') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="profile_option">
-                                <i class="fas fa-user-circle"></i>
+                                <i class="fas fa-user-circle text-indigo-200"></i>
                                 <span>Profile</span>
                             </a>
                             <a href="{{ route('user.dashboard') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="settings_option">
-                                <i class="fas fa-cog"></i>
+                                <i class="fas fa-cog text-indigo-200"></i>
                                 <span>Settings</span>
                             </a>
                             <a href="{{ route('user.dashboard') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="orders_option">
-                                <i class="fas fa-shopping-bag"></i>
+                                <i class="fas fa-shopping-bag text-indigo-200"></i>
                                 <span>Orders</span>
                             </a>
+                            @if(Auth::user()->is_admin)
+                            <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="admin_panel_option">
+                                <span>Admin Panel</span>
+                            </a>
+                            @endif
                             <form method="POST" action="{{ route('logout') }}" class="flex-1">
                                 @csrf
                                 <button type="submit" class="w-full flex items-center space-x-1 ltr:space-x-reverse bg-red-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors duration-300 justify-center text-sm" data-translate="logout_option">
-                                    <i class="fas fa-sign-out-alt"></i>
+                                    <i class="fas fa-sign-out-alt text-red-200"></i>
                                     <span>Logout</span>
                                 </button>
                             </form>
                         </div>
                         <a href="/cart" class="relative flex items-center space-x-2 ltr:space-x-reverse bg-purple-600 text-white px-3 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors duration-300 flex-1 justify-center text-sm" data-translate="cart_button">
-                            <i class="fas fa-shopping-cart"></i>
+                            <i class="fas fa-shopping-cart text-purple-200"></i>
                             <span>Cart</span>
                             <span id="mobile-cart-badge" class="cart-badge absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold hidden">0</span>
                         </a>
@@ -358,43 +365,355 @@
 
     // Function to update cart badge display
     function updateCartBadge() {
-        const desktopBadge = document.getElementById('desktop-cart-badge');
-        const mobileBadge = document.getElementById('mobile-cart-badge');
-        
-        if (cartCount > 0) {
-            desktopBadge.textContent = cartCount;
-            mobileBadge.textContent = cartCount;
-            desktopBadge.classList.remove('hidden');
-            mobileBadge.classList.remove('hidden');
-            desktopBadge.classList.add('show');
-            mobileBadge.classList.add('show');
-        } else {
-            desktopBadge.classList.add('hidden');
-            mobileBadge.classList.add('hidden');
-            desktopBadge.classList.remove('show');
-            mobileBadge.classList.remove('show');
-        }
+        fetch('/cart/mini')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const totalItems = data.total_items;
+                    const desktopBadge = document.getElementById('desktop-cart-badge');
+                    const mobileBadge = document.getElementById('mobile-cart-badge');
+                    
+                    if (totalItems > 0) {
+                        // Update desktop badge
+                        if (desktopBadge) {
+                            desktopBadge.textContent = totalItems;
+                            desktopBadge.classList.remove('hidden');
+                            desktopBadge.classList.add('show');
+                        }
+                        
+                        // Update mobile badge
+                        if (mobileBadge) {
+                            mobileBadge.textContent = totalItems;
+                            mobileBadge.classList.remove('hidden');
+                            mobileBadge.classList.add('show');
+                        }
+                        
+                        // Add a little animation feedback
+                        const badges = document.querySelectorAll('.cart-badge');
+                        badges.forEach(badge => {
+                            badge.style.animation = 'none';
+                            badge.offsetHeight; // Trigger reflow
+                            badge.style.animation = 'pulse 0.6s ease-in-out';
+                        });
+                    } else {
+                        // Hide badges if cart is empty
+                        if (desktopBadge) {
+                            desktopBadge.classList.add('hidden');
+                            desktopBadge.classList.remove('show');
+                        }
+                        if (mobileBadge) {
+                            mobileBadge.classList.add('hidden');
+                            mobileBadge.classList.remove('show');
+                        }
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching cart data:', error));
     }
 
+
     // Function to add item to cart
-    function addToCart() {
-        cartCount++;
-        updateCartBadge();
+    function addToCart(productId, quantity = 1) {
+        const formData = new FormData();
+        formData.append('product_id', productId);
+        formData.append('quantity', quantity);
         
-        // Add a little animation feedback
-        const badges = document.querySelectorAll('.cart-badge');
-        badges.forEach(badge => {
-            badge.style.animation = 'none';
-            badge.offsetHeight; // Trigger reflow
-            badge.style.animation = 'pulse 0.6s ease-in-out';
+        fetch('/cart/add', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message if available
+                if (typeof showToast === 'function') {
+                    showToast('Success', data.message, 'success');
+                } else {
+                    console.log('Success:', data.message);
+                }
+                
+                // Update cart badge
+                updateCartBadge();
+            } else {
+                if (typeof showToast === 'function') {
+                    showToast('Error', data.message, 'error');
+                } else {
+                    console.error('Error:', data.message);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error adding to cart:', error);
+            if (typeof showToast === 'function') {
+                showToast('Error', 'Failed to add item to cart', 'error');
+            }
         });
     }
 
-    // Function to clear cart
-    function clearCart() {
-        cartCount = 0;
-        updateCartBadge();
+    // Function to update cart item quantity
+    function updateCartItem(productId, quantity) {
+        fetch(`/cart/${productId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ quantity: quantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message if available
+                if (typeof showToast === 'function') {
+                    showToast('Success', data.message, 'success');
+                } else {
+                    console.log('Success:', data.message);
+                }
+                
+                // Update cart badge
+                updateCartBadge();
+                
+                // If we're on the cart page, update the item subtotal and cart total
+                if (document.querySelector('.cart-page')) {
+                    const itemRow = document.querySelector(`[data-product-id="${productId}"]`);
+                    if (itemRow) {
+                        const subtotalElement = itemRow.querySelector('.item-subtotal');
+                        if (subtotalElement && data.item_subtotal) {
+                            subtotalElement.textContent = data.item_subtotal;
+                        }
+                    }
+                    
+                    const cartTotalElement = document.querySelector('.cart-total');
+                    if (cartTotalElement && data.cart_total) {
+                        cartTotalElement.textContent = data.cart_total;
+                    }
+                }
+            } else {
+                if (typeof showToast === 'function') {
+                    showToast('Error', data.message, 'error');
+                } else {
+                    console.error('Error:', data.message);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error updating cart item:', error);
+            if (typeof showToast === 'function') {
+                showToast('Error', 'Failed to update item quantity', 'error');
+            }
+        });
     }
+
+       // Function to remove item from cart
+       function removeCartItem(productId) {
+        fetch(`/cart/${productId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message if available
+                if (typeof showToast === 'function') {
+                    showToast('Success', data.message, 'success');
+                } else {
+                    console.log('Success:', data.message);
+                }
+                
+                // Update cart badge
+                updateCartBadge();
+                
+                // If we're on the cart page, remove the item row
+                if (document.querySelector('.cart-page')) {
+                    const itemRow = document.querySelector(`[data-product-id="${productId}"]`);
+                    if (itemRow) {
+                        itemRow.remove();
+                    }
+                    
+                    // Update cart total
+                    const cartTotalElement = document.querySelector('.cart-total');
+                    if (cartTotalElement && data.cart_total) {
+                        cartTotalElement.textContent = data.cart_total;
+                    }
+                    
+                    // If cart is empty, show empty cart message
+                    if (data.total_items === 0) {
+                        const cartTable = document.querySelector('.cart-table');
+                        if (cartTable) {
+                            cartTable.innerHTML = '<tr><td colspan="6" class="text-center py-4">Your cart is empty</td></tr>';
+                        }
+                    }
+                }
+            } else {
+                if (typeof showToast === 'function') {
+                    showToast('Error', data.message, 'error');
+                } else {
+                    console.error('Error:', data.message);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error removing cart item:', error);
+            if (typeof showToast === 'function') {
+                showToast('Error', 'Failed to remove item from cart', 'error');
+            }
+        });
+    }
+     // Function to clear cart
+     function clearCart() {
+        fetch('/cart/clear', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message if available
+                if (typeof showToast === 'function') {
+                    showToast('Success', data.message, 'success');
+                } else {
+                    console.log('Success:', data.message);
+                }
+                
+                // Update cart badge
+                updateCartBadge();
+                
+                // If we're on the cart page, show empty cart message
+                if (document.querySelector('.cart-page')) {
+                    const cartTable = document.querySelector('.cart-table');
+                    if (cartTable) {
+                        cartTable.innerHTML = '<tr><td colspan="6" class="text-center py-4">Your cart is empty</td></tr>';
+                    }
+                    
+                    // Update cart total
+                    const cartTotalElement = document.querySelector('.cart-total');
+                    if (cartTotalElement) {
+                        cartTotalElement.textContent = '0.00';
+                    }
+                }
+            } else {
+                if (typeof showToast === 'function') {
+                    showToast('Error', data.message, 'error');
+                } else {
+                    console.error('Error:', data.message);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error clearing cart:', error);
+            if (typeof showToast === 'function') {
+                showToast('Error', 'Failed to clear cart', 'error');
+            }
+        });
+    }
+
+    // Apply coupon code
+    function applyCoupon(couponCode) {
+        fetch('/cart/apply-coupon', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ coupon_code: couponCode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message if available
+                if (typeof showToast === 'function') {
+                    showToast('Success', data.message, 'success');
+                } else {
+                    console.log('Success:', data.message);
+                }
+                
+                // Update cart total and discount if we're on the cart page
+                if (document.querySelector('.cart-page')) {
+                    const cartTotalElement = document.querySelector('.cart-total');
+                    if (cartTotalElement && data.cart_total) {
+                        cartTotalElement.textContent = data.cart_total;
+                    }
+                    
+                    const discountElement = document.querySelector('.discount-amount');
+                    if (discountElement && data.discount) {
+                        discountElement.textContent = data.discount;
+                        discountElement.closest('.discount-row').classList.remove('hidden');
+                    }
+                }
+            } else {
+                if (typeof showToast === 'function') {
+                    showToast('Error', data.message, 'error');
+                } else {
+                    console.error('Error:', data.message);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error applying coupon:', error);
+            if (typeof showToast === 'function') {
+                showToast('Error', 'Failed to apply coupon', 'error');
+            }
+        });
+    }
+
+    // Initialize cart on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartBadge();
+        
+        // Add event listeners for quantity inputs on cart page
+        if (document.querySelector('.cart-page')) {
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    const productId = this.closest('[data-product-id]').dataset.productId;
+                    const quantity = parseInt(this.value);
+                    if (quantity > 0) {
+                        updateCartItem(productId, quantity);
+                    } else {
+                        removeCartItem(productId);
+                    }
+                });
+            });
+            
+            // Add event listeners for remove buttons
+            document.querySelectorAll('.remove-item-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.closest('[data-product-id]').dataset.productId;
+                    removeCartItem(productId);
+                });
+            });
+            
+            // Add event listener for coupon form
+            const couponForm = document.querySelector('#coupon-form');
+            if (couponForm) {
+                couponForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const couponCode = this.querySelector('input[name="coupon_code"]').value;
+                    if (couponCode) {
+                        applyCoupon(couponCode);
+                    }
+                });
+            }
+            
+            // Add event listener for clear cart button
+            const clearCartBtn = document.querySelector('.clear-cart-btn');
+            if (clearCartBtn) {
+                clearCartBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to clear your cart?')) {
+                        clearCart();
+                    }
+                });
+            }
+        }
+    });
 
     // Initialize cart on page load
     document.addEventListener('DOMContentLoaded', function() {

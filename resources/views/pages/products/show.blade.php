@@ -447,7 +447,7 @@
 
                     {{-- Add to Cart Form / Out of Stock Button --}}
                     @if($product->is_active && ($product->stock_quantity > 0))
-                        <form action="{{ route('cart.add') }}" method="POST" id="add-to-cart-form" class="mt-auto">
+                        <form id="add-to-cart-form" method="POST" action="javascript:void(0);" onsubmit="return false;">
                             @csrf
                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                             <div class="flex flex-col sm:flex-row items-center gap-4">
@@ -499,8 +499,6 @@
         </div>
     </div>
 </section>
-
----
 
 {{-- Related Products Section --}}
 @if(isset($relatedProducts) && $relatedProducts->count() > 0)
@@ -624,11 +622,117 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup image zoom functionality
     setupImageZoom();
     
-    // Setup form validation
-    setupFormValidation();
-    
-    // Setup quantity controls
-    setupQuantityControls();
+    // Handle form validation and submission
+    document.getElementById('add-to-cart-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate quantity
+        const quantityInput = document.getElementById('quantity');
+        const submitBtn = this.querySelector('button[type="submit"]');
+        
+        if (!quantityInput || !submitBtn) return;
+        
+        const quantity = parseInt(quantityInput.value);
+        const maxQuantity = parseInt(quantityInput.max);
+        
+        if (quantity < 1 || quantity > maxQuantity) {
+            alert(`الكمية يجب أن تكون بين 1 و ${maxQuantity}`);
+            return;
+        }
+        
+        const formData = new FormData(this);
+        
+        // Disable button and show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i> جاري الإضافة...';
+        
+        fetch('{{ route('cart.add') }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                alert('تمت إضافة المنتج إلى السلة بنجاح');
+                
+                // Update cart badge count if it exists
+                const cartBadge = document.querySelector('#desktop-cart-badge');
+                if (cartBadge && data.cart && data.cart.total_items) {
+                    cartBadge.textContent = data.cart.total_items;
+                    cartBadge.classList.remove('hidden');
+                    
+                    // Add animation to cart badge
+                    cartBadge.classList.add('animate-bounce');
+                    setTimeout(() => {
+                        cartBadge.classList.remove('animate-bounce');
+                    }, 1000);
+                }
+            } else {
+                // Show error message
+                alert(data.message || 'حدث خطأ أثناء إضافة المنتج للسلة');
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            alert('حدث خطأ أثناء إضافة المنتج للسلة');
+        })
+        .finally(() => {
+            // Re-enable button and restore original text
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-shopping-cart mr-3 text-xl"></i><span class="text-lg">أضف إلى السلة</span>';
+        });
+        
+        // Reset button after a delay if form doesn't submit successfully
+        setTimeout(() => {
+            if (!submitBtn.disabled) return;
+            submitBtn.innerHTML = '<i class="fas fa-shopping-cart mr-3 text-xl"></i><span class="text-lg">أضف إلى السلة</span>';
+            submitBtn.disabled = false;
+        }, 5000);
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Add intersection observer for fade animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0) translateX(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe all fade elements
+    document.querySelectorAll('.fade-in-up, .fade-in-right').forEach(el => {
+        el.style.opacity = '0';
+        if (el.classList.contains('fade-in-up')) {
+            el.style.transform = 'translateY(50px)';
+        } else if (el.classList.contains('fade-in-right')) {
+            el.style.transform = 'translateX(50px)';
+        }
+        observer.observe(el);
+    });
 });
 
 function generateStars() {
@@ -746,131 +850,5 @@ function decreaseQuantity() {
         quantityInput.dispatchEvent(new Event('change'));
     }
 }
-
-function setupFormValidation() {
-    const form = document.getElementById('add-to-cart-form');
-    if (!form) return;
-    
-    form.addEventListener('submit', function(e) {
-        const quantityInput = document.getElementById('quantity');
-        const submitBtn = form.querySelector('button[type="submit"]');
-        
-        if (!quantityInput || !submitBtn) return;
-        
-        const quantity = parseInt(quantityInput.value);
-        const maxQuantity = parseInt(quantityInput.max);
-        
-        if (quantity < 1 || quantity > maxQuantity) {
-            e.preventDefault();
-            alert(`الكمية يجب أن تكون بين 1 و ${maxQuantity}`);
-            return;
-        }
-        
-        // Show loading state
-        const originalContent = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i>جاري الإضافة...';
-        submitBtn.disabled = true;
-        
-        // Reset button after a delay if form doesn't submit successfully
-        setTimeout(() => {
-            if (!submitBtn.disabled) return;
-            submitBtn.innerHTML = originalContent;
-            submitBtn.disabled = false;
-        }, 3000);
-    });
-}
-
-// Handle successful cart addition (if using AJAX)
-function handleCartSuccess(response) {
-    const submitBtn = document.querySelector('#add-to-cart-form button[type="submit"]');
-    if (submitBtn) {
-        submitBtn.innerHTML = '<i class="fas fa-check mr-3"></i>تمت الإضافة!';
-        submitBtn.classList.remove('from-blue-600', 'to-purple-700');
-        submitBtn.classList.add('from-green-500', 'to-green-600');
-        
-        setTimeout(() => {
-            submitBtn.innerHTML = '<i class="fas fa-shopping-cart mr-3"></i>أضف إلى السلة';
-            submitBtn.classList.remove('from-green-500', 'to-green-600');
-            submitBtn.classList.add('from-blue-600', 'to-purple-700');
-            submitBtn.disabled = false;
-        }, 2000);
-    }
-    
-    // Show success message (you can customize this)
-    showNotification('تم إضافة المنتج إلى السلة بنجاح!', 'success');
-}
-
-// Simple notification function
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full`;
-    notification.innerHTML = `
-        <div class="flex items-center">
-            <i class="fas fa-${type === 'success' ? 'check-circle text-green-500' : 'info-circle text-blue-500'} mr-3"></i>
-            <span class="text-white font-medium">${message}</span>
-        </div>
-    `;
-    
-    if (type === 'success') {
-        notification.classList.add('bg-green-600');
-    } else {
-        notification.classList.add('bg-blue-600');
-    }
-    
-    document.body.appendChild(notification);
-    
-    // Animate in
-    setTimeout(() => {
-        notification.classList.remove('translate-x-full');
-    }, 100);
-    
-    // Auto hide after 3 seconds
-    setTimeout(() => {
-        notification.classList.add('translate-x-full');
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
-}
-
-// Smooth scrolling for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
-// Add intersection observer for fade animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver(function(entries) {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0) translateX(0)';
-        }
-    });
-}, observerOptions);
-
-// Observe all fade elements
-document.querySelectorAll('.fade-in-up, .fade-in-right').forEach(el => {
-    el.style.opacity = '0';
-    if (el.classList.contains('fade-in-up')) {
-        el.style.transform = 'translateY(50px)';
-    } else if (el.classList.contains('fade-in-right')) {
-        el.style.transform = 'translateX(50px)';
-    }
-    observer.observe(el);
-});
 </script>
 @endpush
