@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Children's Treasures - Login</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-</head>
-<body>
+@extends('layouts.app')
 
+@section('title', 'Login - Children\'s Treasures')
+
+@section('content')
 <style>
     /* CSS Variables for Colors */
     :root {
@@ -355,7 +349,7 @@
                 <div class="glass-card rounded-3xl p-8 md:p-12 max-w-md mx-auto lg:mx-0 pulse-advanced">
                     <div class="text-center mb-8">
                         <h1 class="text-4xl md:text-5xl font-black mb-4">
-                            <span class="text-gradient-advanced">Welcome Back!</span>
+                            <span class="text-white">Welcome Back!</span>
                         </h1>
                         <p class="text-white/90 text-lg">
                             Log in to your account to continue
@@ -365,7 +359,6 @@
                         </div>
                     </div>
 
-                    {{-- <x-auth-session-status class="mb-4" :status="session('status')" /> --}}
                     @if (session('status'))
                         <div class="status-message text-green-300 mb-4">{{ session('status') }}</div>
                     @endif
@@ -386,21 +379,7 @@
                                     autofocus
                                     autocomplete="username"
                                     placeholder="Enter your email" />
-
-                                <span class="absolute inset-y-0 left-0 grid place-content-center px-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 text-gray-500"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                                    </svg>
-                                </span>
                             </div>
-                            {{-- <x-input-error :messages="$errors->get('email')" class="mt-2 text-red-300" /> --}}
                             @error('email')
                                 <div class="text-red-300 mt-2 text-sm">{{ $message }}</div>
                             @enderror
@@ -416,25 +395,7 @@
                                     required
                                     autocomplete="current-password"
                                     placeholder="Enter your password" />
-
-                                <span class="absolute inset-y-0 left-0 grid place-content-center px-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 text-gray-500"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </span>
                             </div>
-                            {{-- <x-input-error :messages="$errors->get('password')" class="mt-2 text-red-300" /> --}}
                             @error('password')
                                 <div class="text-red-300 mt-2 text-sm">{{ $message }}</div>
                             @enderror
@@ -459,10 +420,6 @@
                         </div>
 
                         <div class="space-y-4">
-                            {{-- <x-primary-button class="btn-professional w-full justify-center bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-yellow-500 hover:via-orange-600 hover:to-red-600 text-white font-bold py-4 px-8 rounded-2xl text-lg shadow-2xl border-0">
-                                <i class="fas fa-sign-in-alt ml-2"></i>
-                                Log in
-                            </x-primary-button> --}}
                             <button type="submit" class="btn-professional w-full justify-center bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-yellow-500 hover:via-orange-600 hover:to-red-600 text-white font-bold py-4 px-8 rounded-2xl text-lg shadow-2xl border-0 flex items-center">
                                 <i class="fas fa-sign-in-alt mr-2"></i>
                                 Log in
@@ -518,6 +475,4 @@
         </div>
     </div>
 </section>
-
-</body>
-</html>
+@endsection

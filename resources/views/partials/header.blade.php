@@ -249,10 +249,72 @@
                         <span>{{ app()->getLocale() == 'en' ? 'Register' : 'إنشاء حساب' }}</span>
                     </a>
                     @else
+                    <!-- Notification Button -->
+                    <div class="relative" x-data="{ openNotifications: false }">
+                        <button @click="openNotifications = !openNotifications" @click.away="openNotifications = false" class="flex items-center justify-center text-purple-600 px-3 py-2 rounded-lg font-medium hover:text-purple-700 transition-colors duration-300 text-sm relative">
+                            <i class="fa-solid fa-bell"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
+                        </button>
+                        <div x-show="openNotifications" 
+                             x-transition:enter="transition ease-out duration-200" 
+                             x-transition:enter-start="opacity-0 scale-95" 
+                             x-transition:enter-end="opacity-100 scale-100" 
+                             x-transition:leave="transition ease-in duration-150" 
+                             x-transition:leave-start="opacity-100 scale-100" 
+                             x-transition:leave-end="opacity-0 scale-95" 
+                             class="absolute right-[-250px] mt-2 w-72 bg-white rounded-lg shadow-lg py-1 z-50"
+                             style="display: none;">
+                            <div class="px-4 py-2 border-b border-gray-100">
+                                <h3 class="font-medium text-gray-800" data-translate="notifications_title">Notifications</h3>
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 bg-blue-100 rounded-full p-1">
+                                            <i class="fa-solid fa-tag text-blue-500 text-sm"></i>
+                                        </div>
+                                        <div class="ml-3 w-0 flex-1">
+                                            <p class="text-sm font-medium text-gray-800">New discount available</p>
+                                            <p class="text-xs text-gray-500">Use code SUMMER20 for 20% off</p>
+                                            <p class="text-xs text-gray-400 mt-1">2 hours ago</p>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 bg-green-100 rounded-full p-1">
+                                            <i class="fa-solid fa-check text-green-500 text-sm"></i>
+                                        </div>
+                                        <div class="ml-3 w-0 flex-1">
+                                            <p class="text-sm font-medium text-gray-800">Order #12345 shipped</p>
+                                            <p class="text-xs text-gray-500">Your order has been shipped and is on its way</p>
+                                            <p class="text-xs text-gray-400 mt-1">1 day ago</p>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a href="#" class="block px-4 py-3 hover:bg-gray-50">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 bg-purple-100 rounded-full p-1">
+                                            <i class="fa-solid fa-gift text-purple-500 text-sm"></i>
+                                        </div>
+                                        <div class="ml-3 w-0 flex-1">
+                                            <p class="text-sm font-medium text-gray-800">New items in your wishlist are on sale</p>
+                                            <p class="text-xs text-gray-500">3 items from your wishlist are now on sale</p>
+                                            <p class="text-xs text-gray-400 mt-1">3 days ago</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="px-4 py-2 border-t border-gray-100 text-center">
+                                <a href="#" class="text-sm text-purple-600 hover:text-purple-800 font-medium" data-translate="view_all_notifications">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- User Profile Dropdown -->
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-2 ltr:space-x-reverse text-purple-600 px-3 py-2 rounded-lg font-medium hover:text-purple-700 transition-colors duration-300 text-sm">
-                            <span>{{ Auth::user()->name }}</span>
-                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        <i class="fa-solid fa-user mr-2"></i>    
+                        <span>{{ Auth::user()->name }}</span>
                         </button>
                         <div x-show="open" 
                              x-transition:enter="transition ease-out duration-200" 
@@ -261,30 +323,31 @@
                              x-transition:leave="transition ease-in duration-150" 
                              x-transition:leave-start="opacity-100 scale-100" 
                              x-transition:leave-end="opacity-0 scale-95" 
-                             class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50"
-                             style="display: none;">
-                            <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="profile_option">
-                                <i class="fas fa-user-circle mr-2 text-indigo-500"></i> Profile
+                             class="absolute right-[-110px] mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50"
+                             style="">
+                             <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
+                                <i class="fa-solid fa-user-circle mr-1"></i> 
+                                <span data-translate="profile_option">Profile</span>
                             </a>
-                            <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="orders_option">
-                                <i class="fas fa-shopping-bag mr-2 text-indigo-500"></i> Orders
+                            <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
+                                <i class="fa-solid fa-clipboard-list mr-2"></i> <span data-translate="orders_option">Orders</span>
                             </a>
                             @if(Auth::user()->is_admin)
-                            <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800" data-translate="admin_panel_option">
-                                <i class="fas fa-user-shield mr-2"></i> Admin Panel
+                            <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
+                                <i class="fa-solid fa-user-shield mr-1"></i> <span data-translate="admin_panel_option">Admin Panel</span>
                             </a>
                             @endif
-                            <div class="border-t border-gray-100 my-1"></div>
+                            <div class="border-t border-gray-100 my-1">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" data-translate="logout_option">
-                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Logout
                                 </button>
                             </form>
+                            </div>
                         </div>
                     </div>
-                    @endguest
-                       <div id="desktop-language-switcher" class="language-switcher flex items-center space-x-1 ltr:space-x-reverse text-gray-600 hover:text-indigo-600 cursor-pointer">
+                    <div id="desktop-language-switcher" class="language-switcher flex items-center space-x-1 ltr:space-x-reverse text-gray-600 hover:text-indigo-600 cursor-pointer">
                         <i class="fas fa-language text-lg"></i>
                         @if(app()->getLocale() == 'en')
                             <a href="{{ route('lang.switch', 'ar') }}" class="text-sm font-medium">العربية</a>
@@ -298,6 +361,7 @@
                            {{ isset($cart) ? $cart->total_items : '0' }}
                        </span>
                   </a>
+                  @endguest
                 </div>
                 <div class="lg:hidden">
                     <button id="mobile-menu-button" class="relative p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-indigo-200">
