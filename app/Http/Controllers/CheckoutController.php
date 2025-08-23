@@ -14,7 +14,8 @@ class CheckoutController extends Controller
     public function index()
     {
         // التحقق من وجود عناصر في السلة
-        $cart = app(CartController::class)->getOrCreateCart();
+        $cartController = new \App\Http\Controllers\CartController();
+        $cart = $cartController->getOrCreateCart();
         
         if ($cart->total_items == 0) {
             return redirect()->route('cart.index')->with('error', 'سلة التسوق فارغة');
@@ -46,7 +47,8 @@ class CheckoutController extends Controller
         }
 
         // جلب السلة الحالية
-        $cart = app(CartController::class)->getOrCreateCart();
+        $cartController = new \App\Http\Controllers\CartController();
+        $cart = $cartController->getOrCreateCart();
         
         // التحقق من وجود عناصر في السلة
         if ($cart->total_items == 0) {

@@ -71,9 +71,9 @@ class CartController extends Controller
     }
 
     /**
-     * تحديث كمية منتج في السلة باستخدام معرف المنتج.
+     * تحديث كمية منتج في السلة باستخدام معرف العنصر.
      */
-    public function update(Request $request, $productId)
+    public function update(Request $request, $itemId)
     {
         $validated = $request->validate([
             'quantity' => 'required|integer|min:0|max:100', // min:0 للسماح بالحذف
@@ -82,7 +82,7 @@ class CartController extends Controller
         DB::beginTransaction();
         try {
             $cart = $this->getOrCreateCart();
-            $cartItem = $cart->items()->where('product_id', $productId)->firstOrFail();
+            $cartItem = $cart->items()->where('id', $itemId)->firstOrFail();
 
             if ($validated['quantity'] === 0) {
                 // إذا كانت الكمية صفر، يتم حذف العنصر
@@ -101,7 +101,8 @@ class CartController extends Controller
 
             // تجهيز بيانات الاستجابة
             $responseData = $this->getCartData($cart);
-            $updatedItem = $cart->items()->where('product_id', $productId)->first();
+            $responseData['item_id'] = $cartItem->id; // Add item ID to response
+            $updatedItem = $cart->items()->where('id', $itemId)->first();
             if ($updatedItem) {
                 $responseData['item_subtotal'] = number_format($updatedItem->total, 2);
             } else {
@@ -119,20 +120,26 @@ class CartController extends Controller
     }
 
     /**
-     * حذف منتج من السلة باستخدام معرف المنتج.
+     * حذف منتج من السلة باستخدام معرف العنصر.
      */
-    public function remove(Request $request, $productId)
+    public function remove(Request $request, $itemId)
     {
         DB::beginTransaction();
         try {
             $cart = $this->getOrCreateCart();
-            $cartItem = $cart->items()->where('product_id', $productId)->firstOrFail();
+            $cartItem = $cart->items()->where('id', $itemId)->firstOrFail();
+            
+            // Add item ID to response data
+            $itemId = $cartItem->id;
             
             $cart->removeItem($cartItem->id);
             
             DB::commit();
+            
+            $responseData = $this->getCartData($cart);
+            $responseData['item_id'] = $itemId; // Include the item ID in response
 
-            return $this->returnResponse($request, true, 'تم حذف المنتج من سلة التسوق.', $this->getCartData($cart));
+            return $this->returnResponse($request, true, 'تم حذف المنتج من سلة التسوق.', $responseData);
 
         } catch (Exception $e) {
             DB::rollBack();
@@ -142,22 +149,58 @@ class CartController extends Controller
     }
 
     /**
-     * تفريغ السلة بالكامل.
+     * حذف جميع منتجات السلة.
      */
     public function clearCart(Request $request)
     {
         DB::beginTransaction();
         try {
             $cart = $this->getOrCreateCart();
-            $cart->clearItems();
+            
+            // Delete all items from the cart
+            $cart->items()->delete();
+            
+            // Reset cart totals
+            $cart->update([
+                'total_price' => 0,
+                'total_items' => 0
+            ]);
+            
             DB::commit();
-
-            return $this->returnResponse($request, true, 'تم تفريغ سلة التسوق بالكامل.', $this->getCartData($cart));
+            
+            return $this->returnResponse($request, true, 'تم تفريغ السلة بنجاح.', $this->getCartData($cart));
 
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Clear cart error: ' . $e->getMessage());
             return $this->returnResponse($request, false, $e->getMessage());
+        }
+    }
+
+    /**
+     * تطبيق كوبون خصم على السلة
+     */
+    public function applyCoupon(Request $request)
+    {
+        $validated = $request->validate([
+            'promo_code' => 'required|string|max:50',
+        ]);
+
+        try {
+            $cart = $this->getOrCreateCart();
+            $promoCode = $validated['promo_code'];
+            
+            // هنا يمكن إضافة منطق التحقق من الكوبون والخصم
+            // مثال: التحقق من وجود الكوبون في قاعدة البيانات وصلاحيته
+            
+            // حالياً سنعيد رسالة بأن نظام الكوبونات غير مفعل بعد
+            $message = 'نظام الكوبونات غير مفعل حالياً. سيتم تفعيله قريباً.';
+            
+            return $this->returnResponse($request, true, $message, $this->getCartData($cart));
+            
+        } catch (Exception $e) {
+            Log::error('Apply coupon error: ' . $e->getMessage());
+            return $this->returnResponse($request, false, 'حدث خطأ أثناء تطبيق الكوبون: ' . $e->getMessage());
         }
     }
 
@@ -200,7 +243,7 @@ class CartController extends Controller
      * الحصول على السلة الحالية أو إنشاء واحدة جديدة.
      * يعالج حالات المستخدمين المسجلين والزوار ويدمج السلات عند تسجيل الدخول.
      */
-    protected function getOrCreateCart()
+    public function getOrCreateCart()
     {
         $sessionId = Session::getId();
         $user = Auth::user();
@@ -250,8 +293,23 @@ class CartController extends Controller
     {
         $cart->refresh(); // التأكد من أن البيانات محدثة
         return [
+            'id' => $cart->id,
             'total_items' => $cart->total_items,
             'total_price' => number_format($cart->total_price, 2),
+            'subtotal' => number_format($cart->total_price, 2),
+            'tax' => number_format(0, 2),
+            'total' => number_format($cart->total_price, 2),
+            'items' => $cart->items->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'product_id' => $item->product_id,
+                    'quantity' => $item->quantity,
+                    'price' => number_format($item->price, 2),
+                    'total' => number_format($item->total, 2),
+                    'name' => $item->current_product_name,
+                    'image' => $item->current_product_image
+                ];
+            })
         ];
     }
     
@@ -265,13 +323,13 @@ class CartController extends Controller
                 'success' => $success,
                 'message' => $message,
             ];
-            if ($success && !empty($data)) {
+            if (!empty($data)) {
                 $response['cart'] = $data;
             }
-            return response()->json($response, $success ? 200 : 422); 
+            return response()->json($response, $success ? 200 : 400);
         }
 
         $sessionKey = $success ? 'success' : 'error';
-        return back()->with($sessionKey, $message)->withInput();
+        return redirect()->route('cart.index')->with($sessionKey, $message);
     }
 }
