@@ -15,8 +15,13 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
+        // Check if there's a redirect parameter for checkout
+        if ($request->has('redirect') && $request->redirect === 'checkout') {
+            session(['redirect_to_checkout' => true]);
+        }
+        
         return view('auth.login');
     }
 
@@ -32,6 +37,12 @@ class AuthenticatedSessionController extends Controller
         // التحقق من كون المستخدم admin وتوجيهه للوحة الإدارة
         if (auth()->user()->is_admin) {
             return redirect()->route('admin.dashboard');
+        }
+
+        // Check if user should be redirected to checkout
+        if (session('redirect_to_checkout')) {
+            session()->forget('redirect_to_checkout');
+            return redirect()->route('checkout.index');
         }
 
         // توجيه المستخدمين العاديين للصفحة المقصودة أو الرئيسية

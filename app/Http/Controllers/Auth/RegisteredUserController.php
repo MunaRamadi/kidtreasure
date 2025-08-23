@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -17,8 +18,13 @@ class RegisteredUserController extends Controller
     /**
      * Display the registration view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
+        // Check if there's a redirect parameter for checkout
+        if ($request->has('redirect') && $request->redirect === 'checkout') {
+            session(['redirect_to_checkout' => true]);
+        }
+        
         return view('auth.register');
     }
 
@@ -44,6 +50,12 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        // Check if user should be redirected to checkout
+        if (session('redirect_to_checkout')) {
+            session()->forget('redirect_to_checkout');
+            return redirect()->route('checkout.index');
+        }
 
         return redirect(route('dashboard', absolute: false));
     }
