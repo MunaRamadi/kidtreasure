@@ -239,18 +239,18 @@
                 </nav>
 
                 <div class="hidden lg:flex items-center space-x-4 ltr:space-x-reverse">
-                 
+                   
                     
                     @guest
-                    <a href="/login" class="flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-indigo-700 font-medium px-4 py-2 rounded-lg transition-all duration-300 text-sm" data-translate="login_button"> 
+                    <a href="/login" class="flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-indigo-700 font-medium py-2 rounded-lg transition-all duration-300 text-sm mx-2" data-translate="login_button"> 
                         <span>{{ app()->getLocale() == 'en' ? 'Login' : 'تسجيل الدخول' }}</span>
                     </a>
-                    <a href="/register" class="flex items-center space-x-2 ltr:space-x-reverse text-purple-600 hover:text-purple-700 font-medium px-4 py-2 rounded-lg transition-all duration-300 text-sm" data-translate="register_button">
+                    <a href="/register" class="flex items-center space-x-2 ltr:space-x-reverse text-purple-600 hover:text-purple-700 font-medium ps-3 py-2 rounded-lg transition-all duration-300 text-sm mx-2" data-translate="register_button">
                         <span>{{ app()->getLocale() == 'en' ? 'Register' : 'إنشاء حساب' }}</span>
                     </a>
                     @else
                     <!-- Notification Button -->
-                    <div class="relative" x-data="{ openNotifications: false }">
+                    <div class="relative mx-2" x-data="{ openNotifications: false }">
                         <button @click="openNotifications = !openNotifications" @click.away="openNotifications = false" class="flex items-center justify-center text-purple-600 px-3 py-2 rounded-lg font-medium hover:text-purple-700 transition-colors duration-300 text-sm relative">
                             <i class="fa-solid fa-bell"></i>
                             <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
@@ -306,14 +306,14 @@
                                 </a>
                             </div>
                             <div class="px-4 py-2 border-t border-gray-100 text-center">
-                                <a href="#" class="text-sm text-purple-600 hover:text-purple-800 font-medium" data-translate="view_all_notifications">View all notifications</a>
+                                <a href="#" class="text-sm mx-2 text-purple-600 hover:text-purple-800 font-medium" data-translate="view_all_notifications">View all notifications</a>
                             </div>
                         </div>
                     </div>
                     <!-- User Profile Dropdown -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-2 ltr:space-x-reverse text-purple-600 px-3 py-2 rounded-lg font-medium hover:text-purple-700 transition-colors duration-300 text-sm">
-                        <i class="fa-solid fa-user mr-2"></i>    
+                    <div class="relative mx-2" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-1 ltr:space-x-reverse text-purple-600 px-2 py-2 rounded-lg font-medium hover:text-purple-700 transition-colors duration-300 text-sm">
+                        <i class="fa-solid fa-user"></i>    
                         <span>{{ Auth::user()->name }}</span>
                         </button>
                         <div x-show="open" 
@@ -323,8 +323,8 @@
                              x-transition:leave="transition ease-in duration-150" 
                              x-transition:leave-start="opacity-100 scale-100" 
                              x-transition:leave-end="opacity-0 scale-95" 
-                             class="absolute right-[-110px] mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50"
-                             style="">
+                             class="absolute right-[-130px] mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50"
+                             style="display: none;">
                              <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
                                 <i class="fa-solid fa-user-circle mr-1"></i> 
                                 <span data-translate="profile_option">Profile</span>
@@ -341,13 +341,14 @@
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Logout
-                                </button>
+                                <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> 
+                                <span data-translate="logout_option">Logout</span>
+                            </button>
                             </form>
                             </div>
                         </div>
                     </div>
-                    <div id="desktop-language-switcher" class="language-switcher flex items-center space-x-1 ltr:space-x-reverse text-gray-600 hover:text-indigo-600 cursor-pointer">
+                    <div id="desktop-language-switcher" class="language-switcher flex items-center mx-2 space-x-2 ltr:space-x-reverse text-gray-600 hover:text-indigo-600 cursor-pointer">
                         <i class="fas fa-language text-lg"></i>
                         @if(app()->getLocale() == 'en')
                             <a href="{{ route('lang.switch', 'ar') }}" class="text-sm font-medium">العربية</a>
@@ -355,13 +356,13 @@
                             <a href="{{ route('lang.switch', 'en') }}" class="text-sm font-medium">English</a>
                         @endif
                     </div>
-                   <a href="{{ route('cart.index') }}" class="relative flex items-center text-purple-600 px-3 py-2 rounded-lg font-medium hover:text-purple-700 transition-colors duration-300 text-sm">
-                       <i class="fas fa-shopping-cart"></i>
-                       <span id="desktop-cart-badge" class="cart-badge absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold {{ isset($cart) && $cart->total_items > 0 ? '' : 'hidden' }}">
-                           {{ isset($cart) ? $cart->total_items : '0' }}
-                       </span>
-                  </a>
-                  @endguest
+                   @endguest
+                   <a href="{{ route('cart.index') }}" class="relative flex items-center text-purple-600 py-2 px-3 mx-2 rounded-lg font-medium hover:text-purple-700 transition-colors duration-300 text-sm">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="desktop-cart-badge" class="cart-badge absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold {{ isset($cart) && $cart->total_items > 0 ? '' : 'hidden' }}">
+                            {{ isset($cart) ? $cart->total_items : '0' }}
+                        </span>
+                    </a>
                 </div>
                 <div class="lg:hidden">
                     <button id="mobile-menu-button" class="relative p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-indigo-200">
@@ -1043,4 +1044,4 @@
 </html>
 
 <!-- Add Alpine.js for dropdown functionality -->
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
