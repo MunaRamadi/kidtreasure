@@ -26,11 +26,83 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'سلة التسوق فارغة');
         }
         
+        // Check if shipping info exists in session
+        if (!session()->has('shipping_info')) {
+            return redirect()->route('checkout.shipping')->with('info', 'Please provide your shipping information first');
+        }
+        
+        // Get shipping info from session
+        $shippingInfo = session('shipping_info');
+        
         // عرض صفحة الدفع
-        return view('pages.checkout.index', compact('cart'));
+        return view('pages.checkout.index', compact('cart', 'shippingInfo'));
     }
 
-    
+    // Show shipping information page
+    public function shipping()
+    {
+        // Check if user is logged in
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'You must be logged in to proceed with checkout');
+        }
+        
+        // Check if cart has items
+        $cartController = new \App\Http\Controllers\CartController();
+        $cart = $cartController->getOrCreateCart();
+        
+        if ($cart->total_items == 0) {
+            return redirect()->route('cart.index')->with('error', 'Your shopping cart is empty');
+        }
+        
+        // Get user's previous shipping info if available
+        $user = Auth::user();
+        $shippingInfo = session('shipping_info', [
+            'first_name' => $user->name ?? '',
+            'last_name' => '',
+            'email' => $user->email ?? '',
+            'phone' => $user->phone ?? '',
+            'address' => '',
+            'city' => '',
+            'postal_code' => '',
+        ]);
+        
+        // Show shipping info page
+        return view('pages.checkout.shipping', compact('cart', 'shippingInfo'));
+    }
+
+    // Store shipping information
+    public function storeShipping(Request $request)
+    {
+        // Validate shipping information
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:255',
+            'city' => 'required|string|max:100',
+            'postal_code' => 'nullable|string|max:20',
+            'shipping_method' => 'required|string|in:standard,express,free',
+            'notes' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        // Store shipping info in session
+        $shippingInfo = $request->only([
+            'first_name', 'last_name', 'email', 'phone',
+            'address', 'city', 'postal_code',
+            'shipping_method', 'notes'
+        ]);
+        
+        session(['shipping_info' => $shippingInfo]);
+        
+        // Redirect to payment page
+        return redirect()->route('checkout.index');
+    }
+
     // معالجة عملية الدفع
     public function process(Request $request)
     {
@@ -48,7 +120,6 @@ class CheckoutController extends Controller
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:100',
             'postal_code' => 'nullable|string|max:20',
-            'country' => 'required|string|max:100',
             'payment_method' => 'required|string|in:cash_on_delivery,credit_card,paypal,bank_transfer',
             'notes' => 'nullable|string',
         ]);
@@ -66,22 +137,23 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'سلة التسوق فارغة');
         }
 
+        $shippingInfo = session('shipping_info');
+
         // تجهيز بيانات الطلب
         $orderData = [
             'shipping_address' => [
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'city' => $request->city,
-                'postal_code' => $request->postal_code,
-                'country' => $request->country,
+                'first_name' => $shippingInfo['first_name'],
+                'last_name' => $shippingInfo['last_name'],
+                'email' => $shippingInfo['email'],
+                'phone' => $shippingInfo['phone'],
+                'address' => $shippingInfo['address'],
+                'city' => $shippingInfo['city'],
+                'postal_code' => $shippingInfo['postal_code'],
             ],
             'payment_method' => $request->payment_method,
-            'notes' => $request->notes,
-            'shipping_method' => $request->shipping_method ?? 'standard',
-            'shipping_cost' => $this->calculateShippingCost($request->shipping_method ?? 'standard'),
+            'notes' => $request->notes ?? $shippingInfo['notes'] ?? '',
+            'shipping_method' => $shippingInfo['shipping_method'] ?? 'standard',
+            'shipping_cost' => $this->calculateShippingCost($shippingInfo['shipping_method'] ?? 'standard'),
         ];
         
         // تطبيق كود الخصم إذا كان موجوداً
