@@ -3,7 +3,12 @@
 @section('title', 'الدفع')
 
 @section('content')
-<div class="container mx-auto py-8 px-4 max-w-6xl mt-10">
+<div class="container mx-auto px-4 max-w-6xl mt-10">
+    <div class="relative">
+        <a href="#" id="cancel-checkout" class="absolute top-0 left-0 btn btn-danger font-semibold py-2 px-4 border border-gray-400 rounded shadow flex items-center">
+            Cancel
+        </a>
+    </div>
     <h1 class="text-3xl font-bold text-center mb-4">Choose Payment Method</h1>
     <p class="text-center text-gray-600 mb-8">Select the most convenient way to complete your purchase</p>
     
@@ -169,6 +174,35 @@
                     </div>
                 </div>
                 
+                <!-- Shipping Information Summary -->
+                <div class="mt-6 pt-6 border-t">
+                    <h3 class="font-bold flex items-center mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Shipping Information
+                    </h3>
+                    <div class="text-sm space-y-2">
+                        <p><span class="font-medium">Name:</span> {{ $shippingInfo['first_name'] }} {{ $shippingInfo['last_name'] }}</p>
+                        <p><span class="font-medium">Email:</span> {{ $shippingInfo['email'] }}</p>
+                        <p><span class="font-medium">Phone:</span> {{ $shippingInfo['phone'] }}</p>
+                        <p><span class="font-medium">Address:</span> {{ $shippingInfo['address'] }}</p>
+                        <p><span class="font-medium">City:</span> {{ $shippingInfo['city'] }}</p>
+                        @if(!empty($shippingInfo['postal_code']))
+                            <p><span class="font-medium">Postal Code:</span> {{ $shippingInfo['postal_code'] }}</p>
+                        @endif
+                        <div class="mt-2">
+                            <a href="{{ route('checkout.shipping') }}" class="text-blue-500 hover:text-blue-700 text-sm flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                                Edit Shipping Information
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Security Features -->
                 <div class="mt-6 pt-6 border-t">
                     <h3 class="font-bold flex items-center mb-3">
@@ -203,6 +237,18 @@
     </div>
 </div>
 
+<!-- Confirmation Modal -->
+<div id="cancelModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+        <h3 class="text-lg font-bold mb-4">Cancel Checkout</h3>
+        <p class="mb-6">Are you sure you want to cancel the checkout process? Your order will not be processed.</p>
+        <div class="flex justify-end space-x-4">
+            <button id="cancelNo" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">No, continue</button>
+            <a href="{{ route('cart.index') }}" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Yes, cancel order</a>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -226,6 +272,22 @@
                 this.classList.add('border-blue-500');
             });
         });
+        
+        // Cancel checkout functionality
+        const cancelBtn = document.getElementById('cancel-checkout');
+        const cancelModal = document.getElementById('cancelModal');
+        const cancelNoBtn = document.getElementById('cancelNo');
+        
+        if (cancelBtn && cancelModal && cancelNoBtn) {
+            cancelBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                cancelModal.classList.remove('hidden');
+            });
+            
+            cancelNoBtn.addEventListener('click', function() {
+                cancelModal.classList.add('hidden');
+            });
+        }
     });
 </script>
 @endpush

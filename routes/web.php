@@ -86,6 +86,8 @@ Route::prefix('cart')->name('cart.')->group(function () {
 
 // Checkout Routes
 Route::prefix('checkout')->name('checkout.')->group(function () {
+    Route::get('/shipping', [CheckoutController::class, 'shipping'])->name('shipping');
+    Route::post('/shipping', [CheckoutController::class, 'storeShipping'])->name('shipping.store');
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/process', [CheckoutController::class, 'process'])->name('process');
     Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
