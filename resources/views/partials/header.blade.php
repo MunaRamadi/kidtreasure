@@ -130,10 +130,75 @@
             margin-right: initial;
             margin-left: 0.5rem;
         }
+        
+        /* Snackbar styles */
+        .snackbar {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            bottom: 30px;
+            font-size: 14px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            transition: transform 0.3s, visibility 0.3s;
+        }
+        
+        .snackbar.show {
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .snackbar.success {
+            background-color: #4CAF50;
+        }
+        
+        .snackbar.error {
+            background-color: #F44336;
+        }
+        
+        .snackbar-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .snackbar-message {
+            flex-grow: 1;
+            text-align: left;
+            margin-right: 10px;
+        }
+        
+        .snackbar-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 5px;
+        }
     </style>
     
 </head>
 <body class="bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 min-h-screen">
+    <!-- Snackbar element -->
+    <div id="snackbar" class="snackbar">
+        <div class="snackbar-content">
+            <div class="snackbar-message">
+                <strong id="snackbar-title">Message</strong>
+                <div id="snackbar-text"></div>
+            </div>
+            <button class="snackbar-close" onclick="hideSnackbar()">&times;</button>
+        </div>
+    </div>
+    
     <header class="sticky top-0 z-50 glass-effect shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
@@ -151,25 +216,25 @@
 
                 <nav class="hidden lg:flex items-center space-x-1 ltr:space-x-reverse">
                     <a href="/" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_home">
-                        <i class="fas fa-home mr-2"></i>Home
+                        Home
                     </a>
                     <a href="/about" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_about">
-                        <i class="fas fa-info-circle mr-2"></i><span class="whitespace-nowrap">AboutUs</span>
+                        AboutUs
                     </a>
                     <a href="/products" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_products">
-                        <i class="fas fa-box mr-2"></i>Products
+                        Products
                     </a>
                     <a href="/workshops" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_workshops">
-                        <i class="fas fa-users mr-2"></i>Workshops
+                        Workshops
                     </a>
                     <a href="/stories" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_stories">
-                        <i class="fas fa-book mr-2"></i>Stories
+                        Stories
                     </a>
                     <a href="/blog" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_blog">
-                        <i class="fas fa-blog mr-2"></i>Blog
+                        Blog
                     </a>
                     <a href="/contact-us" class="nav-link px-4 py-2 rounded-lg font-medium text-sm" data-translate="nav_contact">
-                        <i class="fas fa-envelope mr-2"></i><span class="whitespace-nowrap">Contact Us</span>
+                        Contact Us
                     </a>
                 </nav>
 
@@ -177,18 +242,15 @@
                  
                     
                     @guest
-                    <a href="/login" class="flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-indigo-700 font-medium px-4 py-2 rounded-lg transition-all duration-300 text-sm" data-translate="login_button">
-                        <i class="fas fa-user"></i>
+                    <a href="/login" class="flex items-center space-x-2 ltr:space-x-reverse text-indigo-600 hover:text-indigo-700 font-medium px-4 py-2 rounded-lg transition-all duration-300 text-sm" data-translate="login_button"> 
                         <span>{{ app()->getLocale() == 'en' ? 'Login' : 'تسجيل الدخول' }}</span>
                     </a>
                     <a href="/register" class="flex items-center space-x-2 ltr:space-x-reverse text-purple-600 hover:text-purple-700 font-medium px-4 py-2 rounded-lg transition-all duration-300 text-sm" data-translate="register_button">
-                        <i class="fas fa-user-plus"></i>
                         <span>{{ app()->getLocale() == 'en' ? 'Register' : 'إنشاء حساب' }}</span>
                     </a>
                     @else
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-2 ltr:space-x-reverse text-purple-600 px-3 py-2 rounded-lg font-medium hover:text-purple-700 transition-colors duration-300 text-sm">
-                            <i class="fas fa-user-circle"></i>
                             <span>{{ Auth::user()->name }}</span>
                             <i class="fas fa-chevron-down text-xs ml-1"></i>
                         </button>
@@ -663,9 +725,69 @@
         });
     }
 
-    // Initialize cart on page load
+    // Initialize cart and other functionality on page load
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize cart
         updateCartBadge();
+        
+        // Load cart count from storage if you want persistence
+        const savedCartCount = parseInt(localStorage.getItem('cartCount') || '0');
+        cartCount = savedCartCount;
+        
+        // Initialize language
+        const storedLang = localStorage.getItem('preferredLang') || 'en';
+        applyTranslations(storedLang);
+
+        // Highlight active nav link
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active-nav', 'text-indigo-600');
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active-nav');
+                link.classList.add('text-indigo-600');
+            }
+        });
+
+        // --- Mobile Menu Toggle ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMobileMenuButton = document.getElementById('close-mobile-menu');
+
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('active');
+            
+            // Transform hamburger icon to close icon
+            document.getElementById('line1').classList.toggle('rotate-45');
+            document.getElementById('line1').classList.toggle('translate-y-2');
+            document.getElementById('line2').classList.toggle('opacity-0');
+            document.getElementById('line3').classList.toggle('-rotate-45');
+            document.getElementById('line3').classList.toggle('-translate-y-2');
+        });
+
+        closeMobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.remove('active');
+            mobileMenu.classList.add('hidden');
+            
+            // Transform close icon back to hamburger icon
+            document.getElementById('line1').classList.remove('rotate-45', 'translate-y-2');
+            document.getElementById('line2').classList.remove('opacity-0');
+            document.getElementById('line3').classList.remove('-rotate-45', '-translate-y-2');
+        });
+
+        // --- Language Switcher Click Handlers ---
+        const desktopLanguageSwitcher = document.getElementById('desktop-language-switcher');
+        const mobileLanguageSwitcher = document.getElementById('mobile-language-switcher');
+        
+        [desktopLanguageSwitcher, mobileLanguageSwitcher].forEach(switcher => {
+            switcher.addEventListener('click', function() {
+                const currentLang = localStorage.getItem('preferredLang') || 'en';
+                const newLang = currentLang === 'en' ? 'ar' : 'en';
+                
+                localStorage.setItem('preferredLang', newLang);
+                window.location.reload();
+            });
+        });
         
         // Add event listeners for quantity inputs on cart page
         if (document.querySelector('.cart-page')) {
@@ -715,14 +837,6 @@
         }
     });
 
-    // Initialize cart on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        // Load cart count from storage if you want persistence
-        const savedCartCount = parseInt(localStorage.getItem('cartCount') || '0');
-        cartCount = savedCartCount;
-        updateCartBadge();
-    });
-
     // Save cart count to storage whenever it changes
     function saveCartCount() {
         localStorage.setItem('cartCount', cartCount.toString());
@@ -741,6 +855,35 @@
         originalClearCart();
         saveCartCount();
     };
+
+    // Snackbar functions
+    function showToast(title, message, type = 'success') {
+        const snackbar = document.getElementById('snackbar');
+        const snackbarTitle = document.getElementById('snackbar-title');
+        const snackbarText = document.getElementById('snackbar-text');
+        
+        // Set content
+        snackbarTitle.textContent = title;
+        snackbarText.textContent = message;
+        
+        // Remove previous classes
+        snackbar.classList.remove('success', 'error');
+        
+        // Add appropriate class based on type
+        snackbar.classList.add(type);
+        
+        // Show the snackbar
+        snackbar.classList.add('show');
+        
+        // Hide after 3 seconds
+        setTimeout(hideSnackbar, 3000);
+    }
+    
+    function hideSnackbar() {
+        const snackbar = document.getElementById('snackbar');
+        snackbar.classList.remove('show');
+    }
+    
     
     // --- Translations Object ---
     const translations = {
@@ -831,60 +974,6 @@
             logoLink.classList.remove('space-x-reverse');
         }
     }
-
-    // Initialize language and other functionality on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        const storedLang = localStorage.getItem('preferredLang') || 'en';
-        applyTranslations(storedLang);
-
-        // Highlight active nav link
-        const currentPath = window.location.pathname;
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active-nav', 'text-indigo-600');
-            if (link.getAttribute('href') === currentPath) {
-                link.classList.add('active-nav');
-                link.classList.add('text-indigo-600');
-            }
-        });
-
-        // --- Mobile Menu Toggle ---
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const closeMobileMenuButton = document.getElementById('close-mobile-menu');
-
-        mobileMenuButton.addEventListener('click', function() {
-            mobileMenu.classList.toggle('hidden');
-            mobileMenu.classList.toggle('active');
-            
-            // Transform hamburger icon to close icon
-            document.getElementById('line1').classList.toggle('rotate-45');
-            document.getElementById('line1').classList.toggle('translate-y-2');
-            document.getElementById('line2').classList.toggle('opacity-0');
-            document.getElementById('line3').classList.toggle('-rotate-45');
-            document.getElementById('line3').classList.toggle('-translate-y-2');
-        });
-
-        closeMobileMenuButton.addEventListener('click', function() {
-            mobileMenu.classList.remove('active');
-            mobileMenu.classList.add('hidden');
-            
-            // Transform close icon back to hamburger icon
-            document.getElementById('line1').classList.remove('rotate-45', 'translate-y-2');
-            document.getElementById('line2').classList.remove('opacity-0');
-            document.getElementById('line3').classList.remove('-rotate-45', '-translate-y-2');
-        });
-
-        // --- Language Switcher Click Handlers ---
-        [desktopLanguageSwitcher, mobileLanguageSwitcher].forEach(switcher => {
-            switcher.addEventListener('click', function() {
-                const currentLang = localStorage.getItem('preferredLang') || 'en';
-                const newLang = currentLang === 'en' ? 'ar' : 'en';
-                
-                localStorage.setItem('preferredLang', newLang);
-                window.location.reload();
-            });
-        });
-    });
 </script>
 </body>
 </html>

@@ -389,7 +389,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const discountCode = document.querySelector('input[name="discount_code"]').value.trim();
         
         if (!discountCode) {
-            alert('يرجى إدخال كود الخصم');
+            if (typeof showToast === 'function') {
+                showToast('تنبيه', 'يرجى إدخال كود الخصم', 'error');
+            } else {
+                console.error('Error: Please enter a discount code');
+            }
             return;
         }
         
@@ -417,8 +421,18 @@ document.addEventListener('DOMContentLoaded', function() {
             this.textContent = 'تم التطبيق';
             this.classList.remove('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
             this.classList.add('bg-green-100', 'text-green-700');
+            
+            if (typeof showToast === 'function') {
+                showToast('نجاح', 'تم تطبيق كود الخصم بنجاح', 'success');
+            } else {
+                console.log('Success: Discount code applied');
+            }
         } else {
-            alert('كود الخصم غير صحيح');
+            if (typeof showToast === 'function') {
+                showToast('خطأ', 'كود الخصم غير صحيح', 'error');
+            } else {
+                console.error('Error: Invalid discount code');
+            }
         }
     });
     

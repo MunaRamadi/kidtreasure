@@ -636,7 +636,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const maxQuantity = parseInt(quantityInput.max);
         
         if (quantity < 1 || quantity > maxQuantity) {
-            alert(`الكمية يجب أن تكون بين 1 و ${maxQuantity}`);
+            if (typeof showToast === 'function') {
+                showToast('خطأ', `الكمية يجب أن تكون بين 1 و ${maxQuantity}`, 'error');
+            } else {
+                console.log('Error:', `Quantity must be between 1 and ${maxQuantity}`);
+            }
             return;
         }
         
@@ -650,14 +654,24 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Server returned ' + response.status + ' ' + response.statusText);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                // Show success message
-                alert('تمت إضافة المنتج إلى السلة بنجاح');
+                // Show success message with snackbar
+                if (typeof showToast === 'function') {
+                    showToast('نجاح', 'تمت إضافة المنتج إلى السلة بنجاح', 'success');
+                } else {
+                    console.log('Success:', data.message);
+                }
                 
                 // Update cart badge count if it exists
                 const cartBadge = document.querySelector('#desktop-cart-badge');
@@ -672,13 +686,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     }, 1000);
                 }
             } else {
-                // Show error message
-                alert(data.message || 'حدث خطأ أثناء إضافة المنتج للسلة');
+                // Show error message with snackbar
+                if (typeof showToast === 'function') {
+                    showToast('خطأ', data.message || 'حدث خطأ أثناء إضافة المنتج للسلة', 'error');
+                } else {
+                    console.error('Error:', data.message);
+                }
             }
         })
         .catch(error => {
             console.error(error);
-            alert('حدث خطأ أثناء إضافة المنتج للسلة');
+            // Show error message with snackbar
+            if (typeof showToast === 'function') {
+                showToast('خطأ', 'حدث خطأ أثناء إضافة المنتج للسلة', 'error');
+            } else {
+                console.error('Error adding to cart:', error);
+            }
         })
         .finally(() => {
             // Re-enable button and restore original text

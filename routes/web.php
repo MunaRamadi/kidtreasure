@@ -77,10 +77,11 @@ Route::post('/contact-us', [ContactController::class, 'store'])->name('contact.s
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
     Route::post('/add', [CartController::class, 'addItem'])->name('add');
-    Route::patch('/{productId}', [CartController::class, 'update'])->name('update');
-    Route::delete('/{productId}', [CartController::class, 'remove'])->name('remove');
+    Route::patch('/{itemId}', [CartController::class, 'update'])->name('update');
+    Route::delete('/{itemId}', [CartController::class, 'remove'])->name('remove');
     Route::post('/clear', [CartController::class, 'clearCart'])->name('clear');
     Route::post('/apply-coupon', [CartController::class, 'applyCoupon'])->name('apply_coupon');
+    Route::get('/mini', [CartController::class, 'miniCart'])->name('mini');
 });
 
 // Checkout Routes
