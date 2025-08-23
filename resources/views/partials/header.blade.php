@@ -251,8 +251,8 @@
                     @else
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-2 ltr:space-x-reverse text-purple-600 px-3 py-2 rounded-lg font-medium hover:text-purple-700 transition-colors duration-300 text-sm">
-                            <span>{{ Auth::user()->name }}</span>
-                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        <i class="fa-solid fa-user mr-2"></i>    
+                        <span>{{ Auth::user()->name }}</span>
                         </button>
                         <div x-show="open" 
                              x-transition:enter="transition ease-out duration-200" 
@@ -261,26 +261,28 @@
                              x-transition:leave="transition ease-in duration-150" 
                              x-transition:leave-start="opacity-100 scale-100" 
                              x-transition:leave-end="opacity-0 scale-95" 
-                             class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50"
-                             style="display: none;">
-                            <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="profile_option">
-                                <i class="fas fa-user-circle mr-2 text-indigo-500"></i> Profile
+                             class="absolute right-[-110px] mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50"
+                             style="">
+                             <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
+                                <i class="fa-solid fa-user-circle mr-1"></i> 
+                                <span data-translate="profile_option">Profile</span>
                             </a>
-                            <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" data-translate="orders_option">
-                                <i class="fas fa-shopping-bag mr-2 text-indigo-500"></i> Orders
+                            <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
+                                <i class="fa-solid fa-clipboard-list mr-2"></i> <span data-translate="orders_option">Orders</span>
                             </a>
                             @if(Auth::user()->is_admin)
-                            <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800" data-translate="admin_panel_option">
-                                <i class="fas fa-user-shield mr-2"></i> Admin Panel
+                            <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
+                                <i class="fa-solid fa-user-shield mr-1"></i> <span data-translate="admin_panel_option">Admin Panel</span>
                             </a>
                             @endif
-                            <div class="border-t border-gray-100 my-1"></div>
+                            <div class="border-t border-gray-100 my-1">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" data-translate="logout_option">
-                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Logout
                                 </button>
                             </form>
+                            </div>
                         </div>
                     </div>
                     @endguest

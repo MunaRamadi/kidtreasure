@@ -39,29 +39,31 @@
                             <p class="text-gray-600">{{ $item->product->sku ?? '' }}</p>
                         @endif
                     </div>
-                    <div class="flex items-center">
-                        <span class="font-bold mr-2" id="item-subtotal-{{ $item->id }}">{{ number_format($item->price, 2) }} JOD</span>
-                        <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-500 ml-2 p-1 rounded-full">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </form>
-                    </div>
+                   
                     <div class="flex items-center justify-end mt-4 mb-6">
+                    <span class="font-bold mr-2" id="item-subtotal-{{ $item->id }}">{{ number_format($item->price, 2) }} JOD</span>
                         <form action="{{ route('cart.update', $item->id) }}" method="POST" class="flex items-center">
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="quantity" value="{{ max(1, $item->quantity - 1) }}">
-                            <button type="submit" class="border rounded-lg px-3 py-1 mr-2">-</button>
+                            <button type="submit" class="border rounded-lg px-3 py-1 ml-2 {{ $item->quantity <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}" {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button>
                         </form>
                         <span class="mx-3 w-8 text-center">{{ $item->quantity }}</span>
                         <form action="{{ route('cart.update', $item->id) }}" method="POST" class="flex items-center">
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="quantity" value="{{ $item->quantity + 1 }}">
-                            <button type="submit" class="border rounded-lg px-3 py-1 ml-2">+</button>
+                            <button type="submit" class="border rounded-lg px-3 py-1 mr-2">+</button>
+                        </form>
+                    </div>
+                    <div class="flex items-center">
+                        
+                        <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="border rounded-lg px-3 py-1 btn btn-danger mx-3">
+                            <i class="fa-solid fa-trash-can"></i>
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -132,14 +134,7 @@
                         Clear Cart
                     </button>
                 </form>
-                
-                <div class="flex justify-center space-x-2">
-                    <div class="bg-blue-900 text-white rounded px-3 py-1">VISA</div>
-                    <div class="bg-red-600 text-white rounded px-3 py-1">MC</div>
-                    <div class="bg-blue-500 text-white rounded px-3 py-1">PP</div>
-                    <div class="bg-gray-800 text-white rounded px-3 py-1">PAY</div>
-                    <div class="bg-blue-400 text-white rounded px-3 py-1">OP</div>
-                </div>
+
                 @endif
             </div>
         </div>
