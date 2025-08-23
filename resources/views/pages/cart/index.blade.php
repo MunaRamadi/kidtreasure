@@ -122,8 +122,8 @@
                 </form>
                 
                 @if($cart->items->count() > 0)
-                <a href="{{ route('checkout.index') }}" class="block w-full bg-indigo-600 text-white rounded-lg py-3 mb-4 text-center">
-                    Proceed to Checkout
+                <a href="{{ Auth::check() ? route('checkout.index') : route('login', ['redirect' => 'checkout']) }}" class="block w-full bg-indigo-600 text-white rounded-lg py-3 mb-4 text-center">
+                    {{ Auth::check() ? 'Proceed to Checkout' : 'Login to Checkout' }}
                 </a>
                 
                 <form action="{{ route('cart.clear') }}" method="POST" class="mb-4">

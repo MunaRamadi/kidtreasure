@@ -13,6 +13,11 @@ class CheckoutController extends Controller
     // عرض صفحة الدفع
     public function index()
     {
+        // التحقق من تسجيل دخول المستخدم
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'يجب تسجيل الدخول أو إنشاء حساب لإتمام عملية الشراء');
+        }
+        
         // التحقق من وجود عناصر في السلة
         $cartController = new \App\Http\Controllers\CartController();
         $cart = $cartController->getOrCreateCart();
@@ -25,9 +30,15 @@ class CheckoutController extends Controller
         return view('pages.checkout.index', compact('cart'));
     }
 
+    
     // معالجة عملية الدفع
     public function process(Request $request)
     {
+        // التحقق من تسجيل دخول المستخدم
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'يجب تسجيل الدخول أو إنشاء حساب لإتمام عملية الشراء');
+        }
+        
         // التحقق من صحة بيانات الطلب
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
