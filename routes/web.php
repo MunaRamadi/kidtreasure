@@ -93,6 +93,8 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
     Route::get('/failed/{order}', [CheckoutController::class, 'failed'])->name('failed');
     Route::get('/payment/{order}', [CheckoutController::class, 'payment'])->name('payment');
+    Route::get('/confirm-cod/{order}', [CheckoutController::class, 'confirmCashOnDelivery'])->name('confirm-cod');
+    Route::post('/confirm-cod/{order}', [CheckoutController::class, 'processCashOnDelivery'])->name('process-cod');
 });
 
 // User Dashboard & Profile Routes (requires authentication)
@@ -146,6 +148,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::prefix('orders')->name('orders.')->controller(OrdersController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{order}', 'show')->name('show');
+        Route::get('/{order}/edit', 'edit')->name('edit');
         Route::patch('/{order}/status', 'updateStatus')->name('update-status');
         Route::patch('/{order}/payment-status', 'updatePaymentStatus')->name('update-payment-status');
     });

@@ -20,10 +20,12 @@ class Order extends Model
         'order_date',
         'total_amount_jod',
         'payment_method',
-        'payment_status', // pending, paid, failed
-        'order_status', // pending, processing, shipped, delivered, cancelled
+        'payment_status', 
+        'order_status', 
         'shipping_method',
         'shipping_cost',
+        'shipping_carrier',
+        'tracking_number',
         'discount_code',
         'discount_amount',
         'notes',
@@ -33,7 +35,39 @@ class Order extends Model
         'shipping_address' => 'array',
         'billing_address' => 'array',
         'order_date' => 'datetime',
+        'paid_at' => 'datetime',
+        'order_status' => 'string',
+        'payment_status' => 'string',
     ];
+
+    // Status constants
+    const STATUS_PENDING = 'pending';
+    const STATUS_COMPLETED = 'completed';
+    const STATUS_CANCELED = 'canceled';
+    const STATUS_REFUNDED = 'refunded';
+
+    // Get all available statuses
+    public static function getStatuses()
+    {
+        return [
+            self::STATUS_PENDING => 'قيد الانتظار',
+            self::STATUS_COMPLETED => 'تم',
+            self::STATUS_CANCELED => 'ملغي',
+            self::STATUS_REFUNDED => 'مسترجع',
+        ];
+    }
+
+    // Get Arabic status name
+    public function getStatusNameAttribute()
+    {
+        return self::getStatuses()[$this->order_status] ?? $this->order_status;
+    }
+
+    // Get Arabic payment status name
+    public function getPaymentStatusNameAttribute()
+    {
+        return self::getStatuses()[$this->payment_status] ?? $this->payment_status;
+    }
 
     // العلاقة مع المستخدم
     public function user()
@@ -69,10 +103,12 @@ class Order extends Model
             'order_date' => now(),
             'total_amount_jod' => $cart->total_price + $shippingCost - $discountAmount,
             'payment_method' => $orderData['payment_method'],
-            'payment_status' => 'pending',
-            'order_status' => 'pending',
+            'payment_status' => self::STATUS_PENDING,
+            'order_status' => self::STATUS_PENDING,
             'shipping_method' => $orderData['shipping_method'] ?? 'standard',
             'shipping_cost' => $shippingCost,
+            'shipping_carrier' => $orderData['shipping_carrier'] ?? null,
+            'tracking_number' => $orderData['tracking_number'] ?? null,
             'discount_code' => $orderData['discount_code'] ?? null,
             'discount_amount' => $discountAmount,
             'notes' => $orderData['notes'] ?? null,

@@ -32,7 +32,7 @@ class AdminController extends Controller
             'workshops' => WorkshopEvent::count(),
             'blog_posts' => BlogPost::count(),
             'pending_stories' => Story::where('status', 'pending')->count(),
-            'pending_orders' => Order::where('status', 'pending')->count(),
+            'pending_orders' => Order::where('order_status', 'pending')->count(),
             'unread_messages' => ContactMessage::where('is_read', false)->count(),
         ];
 

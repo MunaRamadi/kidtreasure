@@ -30,7 +30,7 @@ class OrdersController extends Controller
 
         // التصفية حسب الحالة
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $query->where('order_status', $request->status);
         }
 
         // التصفية حسب حالة الدفع
@@ -57,28 +57,59 @@ class OrdersController extends Controller
         $order->load(['user', 'items.product']);
         return view('admin.orders.show', compact('order'));
     }
+    
+    public function edit(Order $order)
+    {
+        $order->load(['user', 'items.product']);
+        return view('admin.orders.edit', compact('order'));
+    }
 
     public function updateStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
-            'notes' => 'nullable|string'
+            'status' => 'required|in:pending,completed,canceled,refunded',
+            'payment_status' => 'nullable|in:pending,completed,canceled,refunded',
+            'shipping_carrier' => 'nullable|string|max:255',
+            'tracking_number' => 'nullable|string|max:255',
         ]);
 
-        $order->update([
-            'status' => $request->status,
-            'notes' => $request->notes
-        ]);
+        $updateData = [
+            'order_status' => $request->status,
+        ];
+
+        if ($request->has('payment_status')) {
+            $updateData['payment_status'] = $request->payment_status;
+            
+            // If payment is completed, set paid_at timestamp
+            if ($request->payment_status == Order::STATUS_COMPLETED && !$order->paid_at) {
+                $updateData['paid_at'] = now();
+            }
+            
+            // If payment is canceled or refunded, clear paid_at timestamp
+            if (in_array($request->payment_status, [Order::STATUS_CANCELED, Order::STATUS_REFUNDED])) {
+                $updateData['paid_at'] = null;
+            }
+        }
+
+        if ($request->has('shipping_carrier')) {
+            $updateData['shipping_carrier'] = $request->shipping_carrier;
+        }
+        
+        if ($request->has('tracking_number')) {
+            $updateData['tracking_number'] = $request->tracking_number;
+        }
+
+        $order->update($updateData);
 
         // إرسال إشعار للعميل (يمكن إضافة هذه الوظيفة لاحقاً)
 
-        return back()->with('success', 'تم تحديث حالة الطلب بنجاح');
+        return back()->with('success', 'تم تحديث معلومات الطلب بنجاح');
     }
 
     public function updatePaymentStatus(Request $request, Order $order)
     {
         $request->validate([
-            'payment_status' => 'required|in:pending,paid,failed,refunded'
+            'payment_status' => 'required|in:pending,completed,canceled,refunded'
         ]);
 
         $order->update(['payment_status' => $request->payment_status]);

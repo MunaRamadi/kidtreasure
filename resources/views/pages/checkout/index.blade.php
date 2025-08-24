@@ -95,32 +95,6 @@
                         </div>
                     </div>
                     
-                    <!-- Cliq Option -->
-                    <div class="border rounded-lg p-4 mb-4 hover:border-blue-500 cursor-pointer payment-option">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <div class="flex-grow">
-                                <h3 class="font-bold">CliQ</h3>
-                                <p class="text-sm text-gray-600">Fast and secure payment via CliQ</p>
-                            </div>
-                            <div>
-                                <input type="radio" name="payment_method" value="cliq" class="h-5 w-5 text-blue-500">
-                            </div>
-                        </div>
-                        <div class="mt-2 ml-16">
-                            <span class="text-xs text-purple-500 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
-                                Instant Transfer
-                            </span>
-                        </div>
-                    </div>
-                    
                     <div class="mt-8">
                         <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg flex items-center justify-center">
                             <span class="mr-2">Continue Payment</span>

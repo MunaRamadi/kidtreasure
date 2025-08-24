@@ -47,7 +47,7 @@
                             <tr>
                                 <td>{{ $order->id }}</td>
                                 <td>${{ number_format($order->total, 2) }}</td>
-                                <td>{{ ucfirst($order->status) }}</td>
+                                <td>{{ ucfirst($order->order_status) }}</td>
                                 <td>{{ $order->created_at->format('M d, Y') }}</td>
                                 <td>
                                     <a href="{{-- route('admin.orders.show', $order) --}}" class="btn btn-info btn-sm">View Order</a> {{-- You'll need to define this route if not already --}}

@@ -168,12 +168,40 @@ class CartController extends Controller
             
             DB::commit();
             
-            return $this->returnResponse($request, true, 'تم تفريغ السلة بنجاح.', $this->getCartData($cart));
-
+            return redirect()->back()->with('success', 'تم تفريغ السلة بنجاح');
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Clear cart error: ' . $e->getMessage());
-            return $this->returnResponse($request, false, $e->getMessage());
+            Log::error('Error clearing cart: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تفريغ السلة');
+        }
+    }
+    
+    /**
+     * Clear the cart programmatically (for use by other controllers)
+     * 
+     * @return bool Success status
+     */
+    public function clearCartProgrammatically()
+    {
+        DB::beginTransaction();
+        try {
+            $cart = $this->getOrCreateCart();
+            
+            // Delete all items from the cart
+            $cart->items()->delete();
+            
+            // Reset cart totals
+            $cart->update([
+                'total_price' => 0,
+                'total_items' => 0
+            ]);
+            
+            DB::commit();
+            return true;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error clearing cart programmatically: ' . $e->getMessage());
+            return false;
         }
     }
 
