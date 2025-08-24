@@ -113,15 +113,7 @@ class CheckoutController extends Controller
         
         // التحقق من صحة بيانات الطلب
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'address' => 'required|string|max:255',
-            'city' => 'required|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
             'payment_method' => 'required|string|in:cash_on_delivery,credit_card,paypal,bank_transfer',
-            'notes' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -137,6 +129,11 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'سلة التسوق فارغة');
         }
 
+        // التحقق من وجود معلومات الشحن
+        if (!session()->has('shipping_info')) {
+            return redirect()->route('checkout.shipping')->with('error', 'يرجى إدخال معلومات الشحن أولاً');
+        }
+
         $shippingInfo = session('shipping_info');
 
         // تجهيز بيانات الطلب
@@ -148,10 +145,10 @@ class CheckoutController extends Controller
                 'phone' => $shippingInfo['phone'],
                 'address' => $shippingInfo['address'],
                 'city' => $shippingInfo['city'],
-                'postal_code' => $shippingInfo['postal_code'],
+                'postal_code' => $shippingInfo['postal_code'] ?? null,
             ],
             'payment_method' => $request->payment_method,
-            'notes' => $request->notes ?? $shippingInfo['notes'] ?? '',
+            'notes' => $shippingInfo['notes'] ?? '',
             'shipping_method' => $shippingInfo['shipping_method'] ?? 'standard',
             'shipping_cost' => $this->calculateShippingCost($shippingInfo['shipping_method'] ?? 'standard'),
         ];
@@ -167,6 +164,11 @@ class CheckoutController extends Controller
         try {
             $order = Order::createFromCart($cart, $orderData);
             
+            // For cash on delivery, redirect to confirmation page
+            if ($request->payment_method === 'cash_on_delivery') {
+                return redirect()->route('checkout.confirm-cod', ['order' => $order->id]);
+            }
+            
             // معالجة الدفع حسب طريقة الدفع المختارة
             $paymentResult = $this->processPayment($order, $request->payment_method);
             
@@ -175,7 +177,7 @@ class CheckoutController extends Controller
                 if ($request->payment_method != 'cash_on_delivery') {
                     $order->update([
                         'payment_status' => 'paid',
-                        'status' => 'processing',
+                        'order_status' => 'processing',
                     ]);
                 }
                 
@@ -187,15 +189,15 @@ class CheckoutController extends Controller
                                  ->with('error', $paymentResult['message']);
             }
         } catch (\Exception $e) {
-            // معالجة الأخطاء
-            return back()->with('error', 'حدث خطأ أثناء معالجة الطلب: ' . $e->getMessage())->withInput();
+            return redirect()->route('checkout.index')
+                             ->with('error', 'حدث خطأ أثناء معالجة طلبك: ' . $e->getMessage());
         }
     }
 
     // صفحة نجاح الطلب
     public function success(Order $order)
     {
-        // التحقق من ملكية الطلب
+        // التحقق من أن الطلب يخص المستخدم الحالي
         if (Auth::check() && $order->user_id != Auth::id()) {
             abort(403);
         }
@@ -206,12 +208,65 @@ class CheckoutController extends Controller
     // صفحة فشل الطلب
     public function failed(Order $order)
     {
-        // التحقق من ملكية الطلب
+        // التحقق من أن الطلب يخص المستخدم الحالي
         if (Auth::check() && $order->user_id != Auth::id()) {
             abort(403);
         }
         
         return view('pages.checkout.failed', compact('order'));
+    }
+
+    /**
+     * Show the cash on delivery confirmation page
+     */
+    public function confirmCashOnDelivery(Order $order)
+    {
+        // Check if the order belongs to the authenticated user
+        if (Auth::check() && $order->user_id != Auth::id()) {
+            abort(403);
+        }
+        
+        // Check if the order is already confirmed
+        if ($order->order_status != 'pending') {
+            return redirect()->route('checkout.success', ['order' => $order->id])
+                             ->with('info', 'This order has already been confirmed.');
+        }
+        
+        return view('pages.checkout.confirm-cod', compact('order'));
+    }
+    
+    /**
+     * Process the cash on delivery confirmation
+     */
+    public function processCashOnDelivery(Request $request, Order $order)
+    {
+        // Check if the order belongs to the authenticated user
+        if (Auth::check() && $order->user_id != Auth::id()) {
+            abort(403);
+        }
+        
+        // Check if the order is already confirmed
+        if ($order->order_status != 'pending') {
+            return redirect()->route('cart.index')
+                             ->with('info', 'This order has already been confirmed.');
+        }
+        
+        // Update order status
+        $order->update([
+            'order_status' => 'processing',
+            'payment_status' => 'pending', // Payment will be collected upon delivery
+        ]);
+        
+        // Clear cart
+        $cartController = new \App\Http\Controllers\CartController();
+        $cartController->clearCartProgrammatically();
+        
+        // Clear shipping info from session
+        session()->forget('shipping_info');
+        
+        // Redirect to cart page with success message
+        return redirect()->route('cart.index')
+                         ->with('success', 'Your order has been confirmed! You will pay upon delivery. Thank you for shopping with us.');
     }
 
     // حساب تكلفة الشحن

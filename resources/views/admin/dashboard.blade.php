@@ -185,8 +185,8 @@
                                     <td>#{{ $order->id }}</td>
                                     <td>{{ $order->user->name }}</td>
                                     <td>
-                                        <span class="badge badge-{{ $order->status == 'completed' ? 'success' : ($order->status == 'pending' ? 'warning' : 'secondary') }}">
-                                            {{ $order->status }}
+                                        <span class="badge badge-{{ $order->order_status == 'completed' ? 'success' : ($order->order_status == 'pending' ? 'warning' : 'secondary') }}">
+                                            {{ $order->order_status }}
                                         </span>
                                     </td>
                                     <td>{{ $order->created_at->format('Y-m-d') }}</td>
@@ -281,4 +281,3 @@
         console.log('Admin Dashboard loaded');
     });
 </script>
-@endblade
