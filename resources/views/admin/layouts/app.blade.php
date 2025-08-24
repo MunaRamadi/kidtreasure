@@ -173,6 +173,39 @@
         .mobile-sidebar-toggle {
             display: none;
         }
+        
+        /* Snackbar styles */
+        .snackbar {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #4e73df;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1100;
+            left: 50%;
+            bottom: 30px;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .snackbar.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+
+        @keyframes fadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
     </style>
 
     @yield('styles')
@@ -183,9 +216,6 @@
         <nav class="sidebar" id="sidebar">
             <a class="sidebar-brand d-flex align-items-center justify-content-center"
                 href="{{ route('admin.dashboard') }}">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-laugh-wink"></i>
-                </div>
                 <div class="sidebar-brand-text mx-3">Admin Panel</div>
             </a>
 
@@ -282,18 +312,82 @@
                             Go to Website
                         </a>
                     </li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
 
+                </ul>
+
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown mx-3 mt-1">
+                        <a class="nav-link" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-bell fa-fw"></i>
+                            <span
+                                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                                3
+                            </span>
+                        </a>
+                        <!-- Dropdown - Alerts -->
+                        <div class="dropdown-list dropdown-menu dropdown-menu-end shadow animated--grow-in ps-4"
+                            style="width: 320px;"
+                            aria-labelledby="alertsDropdown">
+                            <div class="px-4 py-2 border-b border-gray-100">
+                                <h3 class="font-medium text-gray-800">Notifications</h3>
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
+                                    <div class="d-flex align-items-start">
+                                        <div class="flex-shrink-0 rounded-circle p-1"
+                                            style="background-color: #EBF5FF;">
+                                            <i class="fas fa-file-alt text-primary"></i>
+                                        </div>
+                                        <div class="ms-3 flex-grow-1">
+                                            <p class="text-sm font-medium text-gray-800">A new monthly report is ready
+                                                to download!</p>
+                                            <p class="text-xs text-gray-500">December 12, 2023</p>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
+                                    <div class="d-flex align-items-start">
+                                        <div class="flex-shrink-0 rounded-circle p-1"
+                                            style="background-color: #ECFDF5;">
+                                            <i class="fas fa-shopping-cart text-success"></i>
+                                        </div>
+                                        <div class="ms-3 flex-grow-1">
+                                            <p class="text-sm font-medium text-gray-800">New order received from Ahmad
+                                                Khalid</p>
+                                            <p class="text-xs text-gray-500">December 7, 2023</p>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a href="#" class="block px-4 py-3 hover:bg-gray-50">
+                                    <div class="d-flex align-items-start">
+                                        <div class="flex-shrink-0 rounded-circle p-1"
+                                            style="background-color: #FEF3C7;">
+                                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                                        </div>
+                                        <div class="ms-3 flex-grow-1">
+                                            <p class="text-sm font-medium text-gray-800">Low inventory alert:
+                                                Educational Box #5</p>
+                                            <p class="text-xs text-gray-500">December 2, 2023</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="px-4 py-2 border-t border-gray-100 text-center">
+                                <a href="#" class="text-sm text-purple-600 hover:text-purple-800 font-medium">View all
+                                    notifications</a>
+                            </div>
+                        </div>
+                    </li>
                     <li class="nav-item me-3">
                         <div class="nav-link d-flex align-items-center">
                             <i class="fas fa-language me-1"></i>
                             @if(app()->getLocale() == 'en')
                                 <a href="{{ route('lang.switch', 'ar') }}"
-                                    class="text-decoration-none text-gray-600 hover-text-primary">العربية</a>
+                                    class="text-decoration-none text-gray-600 hover:text-primary">العربية</a>
                             @else
                                 <a href="{{ route('lang.switch', 'en') }}"
-                                    class="text-decoration-none text-gray-600 hover-text-primary">English</a>
+                                    class="text-decoration-none text-gray-600 hover:text-primary">English</a>
                             @endif
                         </div>
                     </li>
@@ -366,5 +460,21 @@
 
     @yield('scripts')
 </body>
+
+<!-- Snackbar for welcome message -->
+@if(session('welcome'))
+<div id="welcomeSnackbar" class="snackbar">
+    <i class="fas fa-user-check me-2"></i> مرحباً {{ session('welcome') }}! تم تسجيل الدخول بنجاح.
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var snackbar = document.getElementById("welcomeSnackbar");
+        snackbar.className = "snackbar show";
+        setTimeout(function(){ 
+            snackbar.className = snackbar.className.replace("show", ""); 
+        }, 3000);
+    });
+</script>
+@endif
 
 </html>
