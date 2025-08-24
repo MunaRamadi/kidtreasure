@@ -34,6 +34,9 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Add welcome message with user's name
+        $request->session()->flash('welcome', auth()->user()->name);
+
         // التحقق من كون المستخدم admin وتوجيهه للوحة الإدارة
         if (auth()->user()->is_admin) {
             return redirect()->route('admin.dashboard');

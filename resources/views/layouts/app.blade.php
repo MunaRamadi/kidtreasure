@@ -10,6 +10,40 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Snackbar styles */
+        .snackbar {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #4e73df;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1100;
+            left: 50%;
+            bottom: 30px;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .snackbar.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+
+        @keyframes fadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+    </style>
     @stack('styles')
 </head>
 <body class="bg-gray-50 {{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }} flex flex-col min-h-screen">
@@ -40,5 +74,21 @@
     </script>
     
     @stack('scripts') 
+    
+    <!-- Snackbar for welcome message -->
+    @if(session('welcome'))
+    <div id="welcomeSnackbar" class="snackbar">
+        <i class="fas fa-user-check me-2"></i> مرحباً {{ session('welcome') }}! تم تسجيل الدخول بنجاح.
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var snackbar = document.getElementById("welcomeSnackbar");
+            snackbar.className = "snackbar show";
+            setTimeout(function(){ 
+                snackbar.className = snackbar.className.replace("show", ""); 
+            }, 3000);
+        });
+    </script>
+    @endif
 </body>
 </html>
