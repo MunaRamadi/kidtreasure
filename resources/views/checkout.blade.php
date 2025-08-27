@@ -36,10 +36,11 @@
                         <h2 class="text-xl font-semibold text-gray-900 mb-6">معلومات الشحن</h2>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            @guest
                             <div>
                                 <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">الاسم الأول *</label>
                                 <input type="text" id="first_name" name="first_name" 
-                                       value="{{ old('first_name', auth()->user()->first_name ?? '') }}"
+                                       value="{{ old('first_name') }}"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                        required>
                                 @error('first_name')
@@ -50,7 +51,7 @@
                             <div>
                                 <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">الاسم الأخير *</label>
                                 <input type="text" id="last_name" name="last_name" 
-                                       value="{{ old('last_name', auth()->user()->last_name ?? '') }}"
+                                       value="{{ old('last_name') }}"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                        required>
                                 @error('last_name')
@@ -61,15 +62,21 @@
                             <div>
                                 <label for="email" class="block text-sm font-medium text-gray-700 mb-2">البريد الإلكتروني *</label>
                                 <input type="email" id="email" name="email" 
-                                       value="{{ old('email', auth()->user()->email ?? '') }}"
+                                       value="{{ old('email') }}"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                        required>
                                 @error('email')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
+                            @else
+                            <!-- Hidden fields for logged-in users -->
+                            <input type="hidden" name="first_name" value="{{ auth()->user()->first_name ?? auth()->user()->name }}">
+                            <input type="hidden" name="last_name" value="{{ auth()->user()->last_name ?? '' }}">
+                            <input type="hidden" name="email" value="{{ auth()->user()->email }}">
+                            @endguest
                             
-                            <div>
+                            <div class="{{ auth()->check() ? 'md:col-span-2' : '' }}">
                                 <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">رقم الهاتف *</label>
                                 <input type="tel" id="phone" name="phone" 
                                        value="{{ old('phone', auth()->user()->phone ?? '') }}"

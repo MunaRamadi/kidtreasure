@@ -91,13 +91,16 @@ class Order extends Model
         $shippingCost = $orderData['shipping_cost'] ?? 0;
         $discountAmount = $orderData['discount_amount'] ?? 0;
         
+        // Get user data if the user is logged in
+        $user = $cart->user;
+        
         // إنشاء الطلب
         $order = self::create([
             'user_id' => $cart->user_id,
             'order_number' => $orderNumber,
-            'customer_name' => $orderData['shipping_address']['first_name'] . ' ' . $orderData['shipping_address']['last_name'],
-            'customer_email' => $orderData['shipping_address']['email'],
-            'customer_phone' => $orderData['shipping_address']['phone'],
+            'customer_name' => $user ? $user->name : $orderData['shipping_address']['first_name'] . ' ' . $orderData['shipping_address']['last_name'],
+            'customer_email' => $user ? $user->email : $orderData['shipping_address']['email'],
+            'customer_phone' => $user ? $user->phone : $orderData['shipping_address']['phone'],
             'shipping_address' => $orderData['shipping_address'],
             'billing_address' => $orderData['billing_address'] ?? $orderData['shipping_address'],
             'order_date' => now(),

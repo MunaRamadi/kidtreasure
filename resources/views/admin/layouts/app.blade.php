@@ -379,18 +379,6 @@
                             </div>
                         </div>
                     </li>
-                    <li class="nav-item me-3">
-                        <div class="nav-link d-flex align-items-center">
-                            <i class="fas fa-language me-1"></i>
-                            @if(app()->getLocale() == 'en')
-                                <a href="{{ route('lang.switch', 'ar') }}"
-                                    class="text-decoration-none text-gray-600 hover:text-primary">العربية</a>
-                            @else
-                                <a href="{{ route('lang.switch', 'en') }}"
-                                    class="text-decoration-none text-gray-600 hover:text-primary">English</a>
-                            @endif
-                        </div>
-                    </li>
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
