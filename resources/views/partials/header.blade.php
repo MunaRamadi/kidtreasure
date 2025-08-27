@@ -325,12 +325,15 @@
                              x-transition:leave-end="opacity-0 scale-95" 
                              class="absolute right-[-130px] mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50"
                              style="display: none;">
-                             <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
+                             <a href="{{ route('profile.account') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
                                 <i class="fa-solid fa-user-circle mr-1"></i> 
-                                <span data-translate="profile_option">Profile</span>
+                                <span data-translate="account-settings">My Account</span>
                             </a>
-                            <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
+                            <a href="{{ route('profile.orders') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
                                 <i class="fa-solid fa-clipboard-list mr-2"></i> <span data-translate="orders_option">Orders</span>
+                            </a>
+                            <a href="{{ route('profile.activities') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
+                            <i class="fa-regular fa-share-from-square mr-2"></i><span data-translate="activities_option">My Activities</span>
                             </a>
                             @if(Auth::user()->is_admin)
                             <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800">
@@ -447,17 +450,17 @@
                         </a>
                         @else
                         <div class="grid grid-cols-2 gap-2 w-full">
-                            <a href="{{ route('user.dashboard') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="profile_option">
+                            <a href="{{ route('profile.account') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="profile_option">
                                 <i class="fas fa-user-circle text-indigo-200"></i>
-                                <span>Profile</span>
+                                <span>My Account</span>
                             </a>
-                            <a href="{{ route('user.dashboard') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="settings_option">
-                                <i class="fas fa-cog text-indigo-200"></i>
-                                <span>Settings</span>
-                            </a>
-                            <a href="{{ route('user.dashboard') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="orders_option">
+                            <a href="{{ route('profile.orders') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="orders_option">
                                 <i class="fas fa-shopping-bag text-indigo-200"></i>
-                                <span>Orders</span>
+                                <span>My Orders</span>
+                            </a>
+                            <a href="{{ route('profile.activities') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="activities_option">
+                                <i class="fa-regular fa-share-from-square text-indigo-200"></i>
+                                <span>My Activities</span>
                             </a>
                             @if(Auth::user()->is_admin)
                             <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-1 ltr:space-x-reverse bg-indigo-600 text-white px-2 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-300 justify-center text-sm" data-translate="admin_panel_option">

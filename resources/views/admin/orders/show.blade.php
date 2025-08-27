@@ -89,7 +89,7 @@
                 </div>
                 <div class="card-body text-right">
                     @if($order->user)
-                        <p class=""><strong>الاسم:</strong> {{ $order->user->name }}</p>
+                        <p class=""><strong>الاسم:</strong> {{ $order->user->first_name }} {{ $order->user->last_name }}</p>
                         <p class=""><strong>البريد الإلكتروني:</strong> {{ $order->user->email }}</p>
                         <p class=""><strong>رقم الهاتف:</strong> {{ $order->user->phone ?? 'غير متوفر' }}</p>
                         <p class=""><strong>العنوان:</strong> 

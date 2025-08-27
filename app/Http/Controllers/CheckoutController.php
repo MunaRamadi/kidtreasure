@@ -73,18 +73,27 @@ class CheckoutController extends Controller
     // Store shipping information
     public function storeShipping(Request $request)
     {
-        // Validate shipping information
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+        // Define base validation rules
+        $rules = [
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'shipping_method' => 'required|string|in:standard,express,free',
             'notes' => 'nullable|string',
-        ]);
+        ];
+        
+        // Add first_name, last_name, and email validation only for guests
+        if (!Auth::check()) {
+            $rules = array_merge($rules, [
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+            ]);
+        }
+        
+        // Validate shipping information
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -92,10 +101,22 @@ class CheckoutController extends Controller
 
         // Store shipping info in session
         $shippingInfo = $request->only([
-            'first_name', 'last_name', 'email', 'phone',
-            'address', 'city', 'postal_code',
+            'phone', 'address', 'city', 'postal_code',
             'shipping_method', 'notes'
         ]);
+        
+        // For logged-in users, get name and email from user object
+        if (Auth::check()) {
+            $user = Auth::user();
+            $shippingInfo['first_name'] = $request->input('first_name', $user->first_name ?? $user->name);
+            $shippingInfo['last_name'] = $request->input('last_name', $user->last_name ?? '');
+            $shippingInfo['email'] = $request->input('email', $user->email);
+        } else {
+            // For guests, get from request
+            $shippingInfo['first_name'] = $request->input('first_name');
+            $shippingInfo['last_name'] = $request->input('last_name');
+            $shippingInfo['email'] = $request->input('email');
+        }
         
         session(['shipping_info' => $shippingInfo]);
         
@@ -177,9 +198,15 @@ class CheckoutController extends Controller
                 if ($request->payment_method != 'cash_on_delivery') {
                     $order->update([
                         'payment_status' => 'paid',
-                        'order_status' => 'processing',
+                        'order_status' => 'pending',
                     ]);
                 }
+                
+                // Clear cart after successful order
+                $cartController->clearCartProgrammatically();
+                
+                // Clear shipping info from session
+                session()->forget('shipping_info');
                 
                 // إعادة التوجيه إلى صفحة التأكيد
                 return redirect()->route('checkout.success', ['order' => $order->id]);
@@ -193,6 +220,7 @@ class CheckoutController extends Controller
                              ->with('error', 'حدث خطأ أثناء معالجة طلبك: ' . $e->getMessage());
         }
     }
+
 
     // صفحة نجاح الطلب
     public function success(Order $order)
@@ -235,7 +263,7 @@ class CheckoutController extends Controller
         return view('pages.checkout.confirm-cod', compact('order'));
     }
     
-    /**
+     /**
      * Process the cash on delivery confirmation
      */
     public function processCashOnDelivery(Request $request, Order $order)
@@ -264,11 +292,10 @@ class CheckoutController extends Controller
         // Clear shipping info from session
         session()->forget('shipping_info');
         
-        // Redirect to cart page with success message
-        return redirect()->route('cart.index')
+        // Redirect to success page with success message
+        return redirect()->route('checkout.success', ['order' => $order->id])
                          ->with('success', 'Your order has been confirmed! You will pay upon delivery. Thank you for shopping with us.');
     }
-
     // حساب تكلفة الشحن
     protected function calculateShippingCost($shippingMethod)
     {

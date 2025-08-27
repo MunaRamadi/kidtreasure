@@ -76,9 +76,15 @@
                                 <td>{{ $order->order_number ?? $order->id }}</td>
                                 <td>
                                     @if($order->user)
-                                        <a href="{{ route('admin.users.show', $order->user) }}">{{ $order->user->name }}</a>
+                                        <a href="{{ route('admin.users.show', $order->user) }}">
+                                            {{ $order->user->first_name }} {{ $order->user->last_name }}
+                                            <br>
+                                            <small class="text-muted">{{ $order->user->email }}</small>
+                                        </a>
                                     @else
                                         {{ $order->customer_name ?? 'زائر' }}
+                                        <br>
+                                        <small class="text-muted">{{ $order->customer_email ?? 'غير متوفر' }}</small>
                                     @endif
                                 </td>
                                 <td>{{ number_format($order->total_amount_jod, 2) }} دينار</td>

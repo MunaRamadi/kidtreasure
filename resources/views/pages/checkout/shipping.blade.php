@@ -56,6 +56,7 @@
                     @csrf
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        @guest
                         <!-- First Name -->
                         <div>
                             <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
@@ -76,9 +77,15 @@
                             <input type="email" name="email" id="email" value="{{ old('email', $shippingInfo['email'] ?? '') }}" 
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required>
                         </div>
+                        @else
+                        <!-- Hidden fields for logged-in users -->
+                        <input type="hidden" name="first_name" value="{{ auth()->user()->first_name ?? auth()->user()->name }}">
+                        <input type="hidden" name="last_name" value="{{ auth()->user()->last_name ?? '' }}">
+                        <input type="hidden" name="email" value="{{ auth()->user()->email }}">
+                        @endguest
                         
                         <!-- Phone -->
-                        <div>
+                        <div class="{{ auth()->check() ? 'md:col-span-2' : '' }}">
                             <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
                             <input type="tel" name="phone" id="phone" value="{{ old('phone', $shippingInfo['phone'] ?? '') }}" 
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required>

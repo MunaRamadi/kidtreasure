@@ -11,6 +11,13 @@ class WorkshopRegistration extends Model
     use HasFactory;
 
     /**
+     * Registration status constants
+     */
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_CONFIRMED = 'confirmed';
+    public const STATUS_CANCELED = 'canceled';
+    
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -54,5 +61,29 @@ class WorkshopRegistration extends Model
     public function event(): BelongsTo
     {
         return $this->belongsTo(WorkshopEvent::class);
+    }
+    
+    /**
+     * Get all available statuses with their Arabic translations
+     *
+     * @return array
+     */
+    public static function getStatuses(): array
+    {
+        return [
+            self::STATUS_PENDING => 'قيد الانتظار',
+            self::STATUS_CONFIRMED => 'تم',
+            self::STATUS_CANCELED => 'ملغي',
+        ];
+    }
+    
+    /**
+     * Get the Arabic translation of the status
+     *
+     * @return string
+     */
+    public function getStatusNameAttribute(): string
+    {
+        return self::getStatuses()[$this->status] ?? $this->status;
     }
 }

@@ -118,8 +118,36 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // User Orders Route
+    Route::get('/profile/orders', [UserDashboardController::class, 'orders'])->name('profile.orders');
+    
+    // User Account Route
+    Route::get('/profile/account', [UserDashboardController::class, 'account'])->name('profile.account');
+    
+    // User Profile Edit Route
+    Route::get('/profile/edit', [UserSettingsController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile/edit', [UserSettingsController::class, 'update'])->name('profile.update');
+
+    // User Password Change Route
+    Route::get('/profile/password', [UserSecurityController::class, 'showPasswordForm'])->name('profile.password');
+    Route::post('/profile/password', [UserSecurityController::class, 'updatePassword'])->name('profile.password.update');
+
+    // User Address Book Routes
+    Route::get('/profile/address', [UserSettingsController::class, 'addressBook'])->name('profile.address');
+    Route::post('/profile/address', [UserSettingsController::class, 'storeAddress'])->name('profile.address.store');
+    Route::delete('/profile/address/{address}', [UserSettingsController::class, 'deleteAddress'])->name('profile.address.delete');
+    
+    // User Activities Route
+    Route::get('/profile/activities', [UserDashboardController::class, 'activities'])->name('profile.activities');
+    Route::post('/profile/activities/{registration}/cancel', [UserDashboardController::class, 'cancelRegistration'])->name('profile.activities.cancel');
 });
 
+// Password Recovery Routes
+Route::get('/forgot-password', [UserSecurityController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgot-password', [UserSecurityController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [UserSecurityController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [UserSecurityController::class, 'resetPassword'])->name('password.update');
 
 // Admin Panel Routes (requires authentication and admin role)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {

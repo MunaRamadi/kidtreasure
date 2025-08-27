@@ -89,6 +89,46 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the addresses for the user.
+     */
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    /**
+     * Get the user's preferences.
+     */
+    public function preferences()
+    {
+        return $this->hasOne(UserPreference::class);
+    }
+
+    /**
+     * Get the user's notification preferences.
+     */
+    public function notificationPreferences()
+    {
+        return $this->hasOne(UserNotificationPreference::class);
+    }
+
+    /**
+     * Get the user's privacy preferences.
+     */
+    public function privacyPreferences()
+    {
+        return $this->hasOne(UserPrivacyPreference::class);
+    }
+
+    /**
+     * Get the user's region preferences.
+     */
+    public function regionPreferences()
+    {
+        return $this->hasOne(UserRegionPreference::class);
+    }
+
+    /**
      * Check if the user is an admin.
      *
      * @return bool
