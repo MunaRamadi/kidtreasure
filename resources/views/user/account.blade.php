@@ -33,7 +33,7 @@
             
             <div class="border-l-4 border-gray-300 pl-4 py-1 hover:border-purple-600">
                 <a href="{{ route('profile.password') }}" class="text-gray-700 hover:text-purple-600">
-                    <i class="fas fa-key mr-2"></i> {{ __('Reset your password') }}
+                    <i class="fas fa-key mr-2"></i> {{ __('Change your password') }}
                 </a>
             </div>
             
