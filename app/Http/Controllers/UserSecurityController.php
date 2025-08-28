@@ -48,7 +48,7 @@ class UserSecurityController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('user.security')->with('success', 'تم تحديث كلمة المرور بنجاح');
+        return redirect()->route('profile.account')->with('success', __('Password updated successfully'));
     }
 
     /**
@@ -161,11 +161,12 @@ class UserSecurityController extends Controller
     /**
      * Display the password change form.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\View\View
      */
     public function showPasswordForm()
     {
-        return redirect()->route('password.request');
+        $user = Auth::user();
+        return view('user.profile.password', compact('user'));
     }
 
     /**

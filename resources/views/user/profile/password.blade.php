@@ -37,8 +37,13 @@
 
             <div class="mb-4">
                 <label for="current_password" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Current Password') }}</label>
-                <input type="password" name="current_password" id="current_password" 
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('current_password') border-purple-500 @enderror">
+                <div class="relative">
+                    <input type="password" name="current_password" id="current_password" 
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('current_password') border-purple-500 @enderror">
+                    <button type="button" class="toggle-password absolute inset-y-0 right-0 px-3 flex items-center" data-target="current_password">
+                        <i class="fas fa-eye text-gray-500"></i>
+                    </button>
+                </div>
                 @error('current_password')
                     <p class="text-purple-500 text-xs italic mt-1">{{ $message }}</p>
                 @enderror
@@ -46,8 +51,13 @@
 
             <div class="mb-4">
                 <label for="password" class="block text-gray-700 text-sm font-bold mb-2">{{ __('New Password') }}</label>
-                <input type="password" name="password" id="password" 
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('password') border-purple-500 @enderror">
+                <div class="relative">
+                    <input type="password" name="password" id="password" 
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('password') border-purple-500 @enderror">
+                    <button type="button" class="toggle-password absolute inset-y-0 right-0 px-3 flex items-center" data-target="password">
+                        <i class="fas fa-eye text-gray-500"></i>
+                    </button>
+                </div>
                 @error('password')
                     <p class="text-purple-500 text-xs italic mt-1">{{ $message }}</p>
                 @enderror
@@ -55,8 +65,13 @@
 
             <div class="mb-6">
                 <label for="password_confirmation" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Confirm New Password') }}</label>
-                <input type="password" name="password_confirmation" id="password_confirmation" 
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <div class="relative">
+                    <input type="password" name="password_confirmation" id="password_confirmation" 
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <button type="button" class="toggle-password absolute inset-y-0 right-0 px-3 flex items-center" data-target="password_confirmation">
+                        <i class="fas fa-eye text-gray-500"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="flex items-center justify-between">
@@ -71,3 +86,29 @@
     </div>
 </div>
 @endsection
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all password toggle buttons
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        
+        // Add click event to each button
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Get the target input field
+                const targetId = this.getAttribute('data-target');
+                const inputField = document.getElementById(targetId);
+                
+                // Toggle between password and text type
+                if (inputField.type === 'password') {
+                    inputField.type = 'text';
+                    this.innerHTML = '<i class="fas fa-eye-slash text-gray-500"></i>';
+                } else {
+                    inputField.type = 'password';
+                    this.innerHTML = '<i class="fas fa-eye text-gray-500"></i>';
+                }
+            });
+        });
+    });
+</script>
+@endpush
