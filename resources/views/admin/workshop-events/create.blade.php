@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Create Workshop Event')
+@section('title', 'إنشاء فعالية ورشة عمل')
 
 @section('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -49,18 +49,18 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid px-4">
-        <h1 class="mt-4">Create Workshop Event</h1>
+    <div class="container-fluid px-4" style="direction: rtl;">
+        <h1 class="mt-4">إنشاء فعالية ورشة عمل</h1>
         <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('admin.workshop-events.index') }}">Workshop Events</a></li>
-            <li class="breadcrumb-item active">Create Event</li>
+            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">لوحة التحكم</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('admin.workshop-events.index') }}">فعاليات ورش العمل</a></li>
+            <li class="breadcrumb-item active">إنشاء فعالية</li>
         </ol>
 
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-calendar-plus me-1"></i>
-                Event Details
+                تفاصيل الفعالية
             </div>
             <div class="card-body">
 
@@ -80,7 +80,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="title" class="form-label">Event Title <span class="text-danger">*</span></label>
+                                        <label for="title" class="form-label">عنوان الفعالية <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('title') is-invalid @enderror" id="title"
                                             name="title" value="{{ old('title') }}" required>
                                         @error('title')
@@ -91,10 +91,10 @@
 
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="workshop_id" class="form-label">Associated Workshop Template</label>
+                                        <label for="workshop_id" class="form-label">قالب ورشة العمل المرتبط</label>
                                         <select class="form-select workshop-select @error('workshop_id') is-invalid @enderror"
                                             id="workshop_id" name="workshop_id" {{ request()->has('workshop_id') ? 'disabled' : '' }}>
-                                            <option value="">-- Select Workshop Template (Optional) --</option>
+                                            <option value="">-- اختر قالب ورشة عمل (اختياري) --</option>
                                             @foreach($workshopTemplates as $template)
                                                 <option value="{{ $template->id }}" 
                                                     {{ (old('workshop_id') == $template->id || (isset($selectedWorkshopId) && $selectedWorkshopId == $template->id)) ? 'selected' : '' }}>
@@ -105,14 +105,13 @@
                                         @error('workshop_id')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                        <small class="form-text text-muted">Linking to a workshop template is optional but
-                                            recommended for consistency.</small>
+                                        <small class="form-text text-muted">الربط بقالب ورشة عمل اختياري ولكنه مستحسن للاتساق.</small>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="description" class="form-label">Event Description <span
+                                <label for="description" class="form-label">وصف الفعالية <span
                                         class="text-danger">*</span></label>
                                 <textarea class="form-control @error('description') is-invalid @enderror" id="description"
                                     name="description" rows="5" required>{{ old('description') }}</textarea>
@@ -124,7 +123,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label for="duration_hours" class="form-label">Duration (hours) <span
+                                        <label for="duration_hours" class="form-label">المدة (بالساعات) <span
                                                 class="text-danger">*</span></label>
                                         <input type="number" class="form-control @error('duration_hours') is-invalid @enderror"
                                             id="duration_hours" name="duration_hours" value="{{ old('duration_hours', 2) }}" step="0.5"
@@ -137,7 +136,7 @@
 
                                 <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label for="max_attendees" class="form-label">Maximum Attendees <span
+                                        <label for="max_attendees" class="form-label">الحد الأقصى للحضور <span
                                                 class="text-danger">*</span></label>
                                         <input type="number" class="form-control @error('max_attendees') is-invalid @enderror"
                                             id="max_attendees" name="max_attendees" value="{{ old('max_attendees', 20) }}" min="1"
@@ -150,7 +149,7 @@
                                 
                                 <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label for="price_jod" class="form-label">Price (JOD) <span
+                                        <label for="price_jod" class="form-label">السعر (دينار) <span
                                                 class="text-danger">*</span></label>
                                         <input type="number" class="form-control @error('price_jod') is-invalid @enderror"
                                             id="price_jod" name="price_jod" value="{{ old('price_jod', 0) }}" step="0.01" min="0"
@@ -158,7 +157,7 @@
                                         @error('price_jod')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                        <small class="form-text text-muted">Use 0 for free events</small>
+                                        <small class="form-text text-muted">استخدم 0 للفعاليات المجانية</small>
                                     </div>
                                 </div>
                             </div>
@@ -166,7 +165,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="event_date" class="form-label">Event Date <span
+                                        <label for="event_date" class="form-label">تاريخ الفعالية <span
                                                 class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('event_date') is-invalid @enderror"
                                             id="event_date" name="event_date" value="{{ old('event_date') }}" required>
@@ -178,7 +177,7 @@
 
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="location" class="form-label">Location <span
+                                        <label for="location" class="form-label">الموقع <span
                                                 class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('location') is-invalid @enderror"
                                             id="location" name="location" value="{{ old('location') }}" required>
@@ -190,14 +189,14 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="age_group" class="form-label">Target Age Group <span
+                                <label for="age_group" class="form-label">الفئة العمرية المستهدفة <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('age_group') is-invalid @enderror" id="age_group"
                                     name="age_group" value="{{ old('age_group') }}" required>
                                 @error('age_group')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                                <small class="form-text text-muted">Example: "5-7 years", "8-12 years", "Adults", "All ages"</small>
+                                <small class="form-text text-muted">مثال: "5-7 سنوات"، "8-12 سنة"، "بالغين"، "جميع الأعمار"</small>
                             </div>
                         </div>
                         
@@ -205,23 +204,23 @@
                             <div class="card">
                                 <div class="card-header">
                                     <i class="fas fa-images me-1"></i>
-                                    Event Images
+                                    صور الفعالية
                                 </div>
                                 <div class="card-body">
                                     <div class="row mb-4">
                                         <div class="col-md-6">
                                         <div class="mb-3">
-                                                <label for="image_path" class="form-label">Main Image</label>
+                                                <label for="image_path" class="form-label">الصورة الرئيسية</label>
                                                 <input type="file" class="form-control @error('image_path') is-invalid @enderror" id="image_path" name="image_path" accept="image/*">
                                                 @error('image_path')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
-                                                <small class="form-text text-muted">This will be the primary image shown for the event.</small>
+                                                <small class="form-text text-muted">ستكون هذه الصورة الرئيسية المعروضة للفعالية.</small>
                                                 <div id="main-image-preview-container" class="mt-2 d-none">
-                                                    <img id="main-image-preview" src="#" alt="Main image preview" class="img-thumbnail" style="max-height: 150px;">
+                                                    <img id="main-image-preview" src="#" alt="معاينة الصورة الرئيسية" class="img-thumbnail" style="max-height: 150px;">
                                                     <div class="d-flex mt-1 gap-2">
                                                         <button type="button" class="btn btn-danger btn-sm remove-image-btn" data-type="main">
-                                                            <i class="fas fa-trash-alt"></i> Remove
+                                                            <i class="fas fa-trash-alt"></i> إزالة
                                                         </button>
                                                     </div>
                                                 </div>
@@ -230,17 +229,17 @@
 
                                     </div>
                                     <div class="mb-3">
-                                        <label for="gallery_images" class="form-label">Gallery Images</label>
+                                        <label for="gallery_images" class="form-label">صور المعرض</label>
                                         <div class="d-flex gap-2 mb-2">
                                             <input type="file" class="form-control @error('gallery_images.*') is-invalid @enderror" id="gallery_images" name="gallery_images[]" multiple accept="image/*">
                                             <button type="button" class="btn btn-success" id="add-gallery-images-btn">
-                                                 Add
+                                                 إضافة
                                             </button>
                                         </div>
                                         @error('gallery_images.*')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                        <small class="form-text text-muted">You can upload multiple images for the event gallery.</small>
+                                        <small class="form-text text-muted">يمكنك تحميل صور متعددة لمعرض الفعالية.</small>
                                         <div id="gallery-preview-container" class="mt-2 d-flex flex-wrap gap-2"></div>
                                     </div>
                                 </div>
@@ -249,19 +248,19 @@
                             <div class="card mt-3">
                                 <div class="card-header">
                                     <i class="fas fa-cog me-1"></i>
-                                    Event Settings
+                                    إعدادات الفعالية
                                 </div>
                                 <div class="card-body">
                                     <div class="form-check form-switch mb-3">
                                         <input class="form-check-input" type="checkbox" id="is_open_for_registration" name="is_open_for_registration" value="1" {{ old('is_open_for_registration', true) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_open_for_registration">Open for Registration</label>
-                                        <small class="form-text text-muted d-block">Enable to allow users to register for this event.</small>
+                                        <label class="form-check-label" for="is_open_for_registration">مفتوح للتسجيل</label>
+                                        <small class="form-text text-muted d-block">تمكين للسماح للمستخدمين بالتسجيل في هذه الفعالية.</small>
                                     </div>
                                     
                                     <div class="form-check form-switch mb-3">
                                         <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_featured">Featured Event</label>
-                                        <small class="form-text text-muted d-block">Featured events may be highlighted on the homepage or in promotional areas.</small>
+                                        <label class="form-check-label" for="is_featured">فعالية مميزة</label>
+                                        <small class="form-text text-muted d-block">قد يتم تسليط الضوء على الفعاليات المميزة في الصفحة الرئيسية أو في مناطق الترويج.</small>
                                     </div>
                                 </div>
                             </div>
@@ -269,8 +268,8 @@
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <a href="{{ route('admin.workshop-events.index') }}" class="btn btn-secondary">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Create Workshop Event</button>
+                        <a href="{{ route('admin.workshop-events.index') }}" class="btn btn-secondary">إلغاء</a>
+                        <button type="submit" class="btn btn-primary">إنشاء فعالية ورشة عمل</button>
                     </div>
                 </form>
             </div>
@@ -282,15 +281,15 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Removal</h5>
+                    <h5 class="modal-title" id="confirmationModalLabel">تأكيد الإزالة</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to remove this image?
+                    هل أنت متأكد أنك تريد إزالة هذه الصورة؟
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirm-remove-btn">Remove</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-danger" id="confirm-remove-btn">إزالة</button>
                 </div>
             </div>
         </div>
@@ -301,13 +300,13 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="resultModalLabel">Result</h5>
+                    <h5 class="modal-title" id="resultModalLabel">النتيجة</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="resultModalBody">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
                 </div>
             </div>
         </div>
@@ -318,21 +317,24 @@
 
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize date picker
+            // Initialize date picker with Arabic locale
             flatpickr("#event_date", {
                 enableTime: true,
                 dateFormat: "Y-m-d H:i",
                 time_24hr: true,
-                minDate: "today"
+                minDate: "today",
+                locale: "ar"
             });
 
             // Initialize select2
             $('.workshop-select').select2({
-                placeholder: "Select a workshop template",
-                allowClear: true
+                placeholder: "اختر قالب ورشة عمل",
+                allowClear: true,
+                dir: "rtl"
             });
 
             // Initialize Bootstrap modals
@@ -368,19 +370,21 @@
             const galleryImagesInput = document.getElementById('gallery_images');
             const galleryPreviewContainer = document.getElementById('gallery-preview-container');
 
-            if (galleryImagesInput) {
-                galleryImagesInput.addEventListener('change', function() {
-                    if (this.files) {
-                        updateGalleryPreview(this.files);
-                    }
-                });
-            }
+            let galleryFiles = []; // Store gallery files in memory
 
-            // Function to update gallery preview
-            function updateGalleryPreview(files) {
+            function updateGalleryPreview(newFiles = null) {
+                // If new files are provided, add them to our stored files
+                if (newFiles && newFiles.length > 0) {
+                    Array.from(newFiles).forEach(file => {
+                        galleryFiles.push(file);
+                    });
+                }
+                
+                // Clear the preview container
                 galleryPreviewContainer.innerHTML = '';
                 
-                Array.from(files).forEach((file, index) => {
+                // Recreate all previews from our stored files
+                galleryFiles.forEach((file, index) => {
                     const reader = new FileReader();
                     const previewItem = document.createElement('div');
                     previewItem.className = 'position-relative gallery-image-item';
@@ -390,7 +394,7 @@
                         previewItem.innerHTML = `
                             <img src="${e.target.result}" class="img-thumbnail" 
                                 style="height: 100px; width: 100px; object-fit: cover;"
-                                alt="Gallery image ${index + 1}">
+                                alt="صورة المعرض ${index + 1}">
                             <button type="button"
                                 class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 p-0 rounded-circle gallery-remove-btn"
                                 style="width: 24px; height: 24px;" data-index="${index}">
@@ -413,6 +417,27 @@
                     
                     reader.readAsDataURL(file);
                 });
+
+                // Update the actual file input with our stored files
+                updateFileInput();
+            }
+
+            // Function to update the file input with our stored files
+            function updateFileInput() {
+                const dataTransfer = new DataTransfer();
+                galleryFiles.forEach(file => {
+                    dataTransfer.items.add(file);
+                });
+                galleryImagesInput.files = dataTransfer.files;
+            }
+
+            if (galleryImagesInput) {
+                galleryImagesInput.addEventListener('change', function() {
+                    if (this.files && this.files.length > 0) {
+                        updateGalleryPreview(this.files);
+                    }
+                    // If no files (cancel was clicked), we don't update anything
+                });
             }
 
             // Add gallery images button
@@ -428,22 +453,9 @@
                     
                     newInput.addEventListener('change', function() {
                         if (this.files && this.files.length > 0) {
-                            // Create a merged FileList from existing and new files
-                            const existingFiles = galleryImagesInput.files || [];
-                            const newFiles = this.files;
-                            const dataTransfer = new DataTransfer();
-                            
-                            Array.from(existingFiles).forEach(file => {
-                                dataTransfer.items.add(file);
-                            });
-                            
-                            Array.from(newFiles).forEach(file => {
-                                dataTransfer.items.add(file);
-                            });
-                            
-                            galleryImagesInput.files = dataTransfer.files;
-                            updateGalleryPreview(dataTransfer.files);
+                            updateGalleryPreview(this.files);
                         }
+                        // If no files (cancel was clicked), we don't update anything
                         
                         // Remove the temporary input
                         document.body.removeChild(newInput);
@@ -473,8 +485,8 @@
                     mainImagePreviewContainer.classList.add('d-none');
                     
                     // Show success message
-                    document.getElementById('resultModalLabel').textContent = 'Success';
-                    document.getElementById('resultModalBody').textContent = 'Image removed successfully';
+                    document.getElementById('resultModalLabel').textContent = 'نجاح';
+                    document.getElementById('resultModalBody').textContent = 'تمت إزالة الصورة بنجاح';
                     document.getElementById('resultModalBody').className = 'modal-body text-success';
                     resultModal.show();
                 } else if (currentRemoveType === 'gallery' && currentItemToRemove) {
@@ -484,24 +496,14 @@
                     currentItemToRemove.remove();
                     
                     // Remove the file from the input
-                    const files = Array.from(galleryImagesInput.files);
-                    files.splice(currentGalleryIndex, 1);
-                    
-                    // Create a new FileList
-                    const dataTransfer = new DataTransfer();
-                    files.forEach(file => {
-                        dataTransfer.items.add(file);
-                    });
-                    
-                    // Update the input
-                    galleryImagesInput.files = dataTransfer.files;
+                    galleryFiles.splice(currentGalleryIndex, 1);
                     
                     // Update the preview to refresh indices
-                    updateGalleryPreview(dataTransfer.files);
+                    updateGalleryPreview();
                     
                     // Show success message
-                    document.getElementById('resultModalLabel').textContent = 'Success';
-                    document.getElementById('resultModalBody').textContent = 'Gallery image removed successfully';
+                    document.getElementById('resultModalLabel').textContent = 'نجاح';
+                    document.getElementById('resultModalBody').textContent = 'تمت إزالة صورة المعرض بنجاح';
                     document.getElementById('resultModalBody').className = 'modal-body text-success';
                     resultModal.show();
                 }

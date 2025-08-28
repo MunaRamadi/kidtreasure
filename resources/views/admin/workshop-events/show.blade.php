@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Workshop Event Details')
+@section('title', 'تفاصيل فعالية ورشة العمل')
 
 @section('styles')
     <style>
@@ -43,11 +43,11 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid px-4">
-        <h1 class="mt-4">Workshop Event Details</h1>
+    <div class="container-fluid px-4" style="direction: rtl;">
+        <h1 class="mt-4">تفاصيل فعالية ورشة العمل</h1>
         <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('admin.workshop-events.index') }}">Workshop Events</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">لوحة التحكم</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('admin.workshop-events.index') }}">فعاليات ورش العمل</a></li>
             <li class="breadcrumb-item active">{{ $event->title }}</li>
         </ol>
 
@@ -64,7 +64,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <div>
                             <i class="fas fa-calendar-alt me-1"></i>
-                            Event Details
+                            تفاصيل الفعالية
                         </div>
 
                     </div>
@@ -77,17 +77,17 @@
                                 @else
                                     <div
                                         class="bg-light d-flex justify-content-center align-items-center event-image w-100 mb-3">
-                                        <span class="text-muted">No image available</span>
+                                        <span class="text-muted">لا توجد صورة متاحة</span>
                                     </div>
                                 @endif
 
                                 <div class="event-stats">
-                                    <h5 class="mb-3">Event Statistics</h5>
+                                    <h5 class="mb-3">إحصائيات الفعالية</h5>
                                     <div class="row">
                                         <div class="col-6">
                                             <div class="stat-card bg-primary text-white">
                                                 <div class="stat-number">{{ $event->registrations_count }}</div>
-                                                <div>Registrations</div>
+                                                <div>التسجيلات</div>
                                             </div>
                                         </div>
                                         <div class="col-6">
@@ -95,19 +95,19 @@
                                                 <div class="stat-number">
                                                     {{ $event->max_attendees - $event->registrations_count }}
                                                 </div>
-                                                <div>Available Spots</div>
+                                                <div>المقاعد المتاحة</div>
                                             </div>
                                         </div>
                                         <div class="col-6">
                                             <div class="stat-card bg-info text-white">
                                                 <div class="stat-number">{{ $event->confirmed_count ?? 0 }}</div>
-                                                <div>Confirmed</div>
+                                                <div>مؤكد</div>
                                             </div>
                                         </div>
                                         <div class="col-6">
                                             <div class="stat-card bg-warning text-white">
                                                 <div class="stat-number">{{ $event->pending_count ?? 0 }}</div>
-                                                <div>Pending</div>
+                                                <div>قيد الانتظار</div>
                                             </div>
                                         </div>
                                     </div>
@@ -119,7 +119,7 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit" class="btn btn-danger btn-sm w-100">
-                                                    <i class="fas fa-lock"></i> Close Registration
+                                                    <i class="fas fa-lock"></i> إغلاق التسجيل
                                                 </button>
                                             </form>
                                         @else
@@ -128,7 +128,7 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit" class="btn btn-success btn-sm w-100">
-                                                    <i class="fas fa-lock-open"></i> Open Registration
+                                                    <i class="fas fa-lock-open"></i> فتح التسجيل
                                                 </button>
                                             </form>
                                         @endif
@@ -142,7 +142,7 @@
 
                                     @if($event->workshop_id)
                                         <div class="mb-3">
-                                            <span class="badge bg-secondary">Part of Workshop Series:</span>
+                                            <span class="badge bg-secondary">جزء من سلسلة ورش العمل:</span>
                                             <a href="{{ route('admin.workshops.show', $event->workshop_id) }}">
                                                 {{ $event->workshop->title }}
                                             </a>
@@ -151,39 +151,39 @@
 
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <p class="mb-1"><strong><i class="far fa-calendar"></i> Date:</strong></p>
+                                            <p class="mb-1"><strong><i class="far fa-calendar"></i> التاريخ:</strong></p>
                                             <p>{{ $event->event_date->format('Y-m-d') }}</p>
                                         </div>
                                         <div class="col-md-6">
-                                            <p class="mb-1"><strong><i class="far fa-clock"></i> Time:</strong></p>
+                                            <p class="mb-1"><strong><i class="far fa-clock"></i> الوقت:</strong></p>
                                             <p>{{ $event->event_date->format('h:i A') }}</p>
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <p class="mb-1"><strong><i class="fas fa-users"></i> Max Attendees:</strong></p>
+                                            <p class="mb-1"><strong><i class="fas fa-users"></i> الحد الأقصى للحضور:</strong></p>
                                             <p>{{ $event->max_attendees }}</p>
                                         </div>
                                         <div class="col-md-6">
-                                            <p class="mb-1"><strong><i class="fas fa-money-bill"></i> Price:</strong></p>
-                                            <p>{{ $event->price_jod }} JOD</p>
+                                            <p class="mb-1"><strong><i class="fas fa-money-bill"></i> السعر:</strong></p>
+                                            <p>{{ $event->price_jod }} دينار</p>
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <p class="mb-1"><strong><i class="fas fa-child"></i> Age Group:</strong></p>
-                                            <p>{{ $event->workshop->target_age_group ?? 'Not specified' }}</p>
+                                            <p class="mb-1"><strong><i class="fas fa-child"></i> الفئة العمرية:</strong></p>
+                                            <p>{{ $event->workshop->target_age_group ?? 'غير محدد' }}</p>
                                         </div>
                                         <div class="col-md-6">
-                                            <p class="mb-1"><strong><i class="fas fa-hourglass-half"></i> Duration:</strong></p>
-                                            <p>{{ $event->duration_hours ?? $event->workshop->duration_hours ?? '2' }} hours</p>
+                                            <p class="mb-1"><strong><i class="fas fa-hourglass-half"></i> المدة:</strong></p>
+                                            <p>{{ $event->duration_hours ?? $event->workshop->duration_hours ?? '2' }} ساعات</p>
                                         </div>
                                     </div>
 
                                     <div class="mb-4">
-                                        <p class="mb-1"><strong><i class="fas fa-align-left"></i> Description:</strong></p>
+                                        <p class="mb-1"><strong><i class="fas fa-align-left"></i> الوصف:</strong></p>
                                         <div class="p-3 bg-white rounded">
                                             {!! $event->description !!}
                                         </div>
@@ -191,9 +191,9 @@
 
                                     <div class="d-flex justify-content-between">
                                         <div>
-                                            <p class="mb-0"><small class="text-muted">Created:
+                                            <p class="mb-0"><small class="text-muted">تم الإنشاء:
                                                     {{ $event->created_at->format('Y-m-d H:i') }}</small></p>
-                                            <p class="mb-0"><small class="text-muted">Last Updated:
+                                            <p class="mb-0"><small class="text-muted">آخر تحديث:
                                                     {{ $event->updated_at->format('Y-m-d H:i') }}</small></p>
                                         </div>
 
@@ -202,11 +202,11 @@
                                         <div>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#deleteModal">
-                                                <i class="fas fa-trash"></i> Remove Event
+                                                <i class="fas fa-trash"></i> حذف الفعالية
                                             </button>
                                             <a href="{{ route('admin.workshop-events.edit', $event) }}"
                                                 class="btn btn-primary btn-sm me-2">
-                                                <i class="fas fa-edit"></i> Edit Event
+                                                <i class="fas fa-edit"></i> تعديل الفعالية
                                             </a>
                                         </div>
                                     </div>
@@ -223,10 +223,10 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-users me-1"></i>
-                    Event Registrations
+                    تسجيلات الفعالية
                 </div>
                 <div>
-                    <span class="badge bg-info">{{ $registrations->total() }} / {{ $event->max_attendees }} Registered</span>
+                    <span class="badge bg-info">{{ $registrations->total() }} / {{ $event->max_attendees }} مسجل</span>
                 </div>
             </div>
             <div class="card-body">
@@ -235,30 +235,27 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Search by name or email..." name="search" value="{{ request('search') }}">
-                                <button class="btn btn-outline-secondary" type="submit">
-                                    <i class="fas fa-search"></i>
-                                </button>
+                                <input type="text" class="form-control" placeholder="ابحث بالاسم أو البريد الإلكتروني..." name="search" value="{{ request('search') }}">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <select name="status" class="form-select">
-                                <option value="">All Status</option>
-                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                <option value="attended" {{ request('status') == 'attended' ? 'selected' : '' }}>Attended</option>
+                                <option value="">جميع الحالات</option>
+                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>قيد الانتظار</option>
+                                <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>مؤكد</option>
+                                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>ملغي</option>
+                                <option value="attended" {{ request('status') == 'attended' ? 'selected' : '' }}>حضر</option>
                             </select>
                         </div>
                         <div class="col-md-3">
                             <select name="type" class="form-select">
-                                <option value="">All Types</option>
-                                <option value="user" {{ request('type') == 'user' ? 'selected' : '' }}>Registered Users</option>
-                                <option value="guest" {{ request('type') == 'guest' ? 'selected' : '' }}>Guests</option>
+                                <option value="">جميع الأنواع</option>
+                                <option value="user" {{ request('type') == 'user' ? 'selected' : '' }}>مستخدمون مسجلون</option>
+                                <option value="guest" {{ request('type') == 'guest' ? 'selected' : '' }}>ضيوف</option>
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary w-100">Filter</button>
+                            <button type="submit" class="btn btn-primary w-100">فلتر</button>
                         </div>
                     </div>
                 </form>
@@ -268,15 +265,15 @@
                     <table class="table table-bordered table-striped table-hover">
                         <thead class="table-dark">
                             <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Attendee Name</th>
-                                <th>Parent Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Registration Date</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th>الرقم</th>
+                                <th>الاسم</th>
+                                <th>اسم الحضور</th>
+                                <th>اسم الوالد</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>الهاتف</th>
+                                <th>تاريخ التسجيل</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -286,10 +283,10 @@
                                     <td>
                                         @if($registration->user_id)
                                             <a href="{{ route('admin.users.show', $registration->user_id) }}">
-                                                {{ $registration->user->name }} <i class="fas fa-user-check text-success" title="Registered User"></i>
+                                                {{ $registration->user->name }} <i class="fas fa-user-check text-success" title="مستخدم مسجل"></i>
                                             </a>
                                         @else
-                                            {{ $registration->attendee_name }} <i class="fas fa-user text-secondary" title="Guest"></i>
+                                            {{ $registration->attendee_name }} <i class="fas fa-user text-secondary" title="ضيف"></i>
                                         @endif
                                     </td>
                                     <td>{{ $registration->attendee_name ?? 'N/A' }}</td>
@@ -320,7 +317,7 @@
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="pending">
-                                                        <button type="submit" class="dropdown-item">Pending</button>
+                                                        <button type="submit" class="dropdown-item">قيد الانتظار</button>
                                                     </form>
                                                 </li>
                                                 <li>
@@ -328,7 +325,7 @@
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="confirmed">
-                                                        <button type="submit" class="dropdown-item">Confirmed</button>
+                                                        <button type="submit" class="dropdown-item">مؤكد</button>
                                                     </form>
                                                 </li>
                                                 <li>
@@ -336,7 +333,7 @@
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="cancelled">
-                                                        <button type="submit" class="dropdown-item">Cancelled</button>
+                                                        <button type="submit" class="dropdown-item">ملغي</button>
                                                     </form>
                                                 </li>
                                                 <li>
@@ -344,7 +341,7 @@
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="attended">
-                                                        <button type="submit" class="dropdown-item">Attended</button>
+                                                        <button type="submit" class="dropdown-item">حضر</button>
                                                     </form>
                                                 </li>
                                             </ul>
@@ -352,10 +349,10 @@
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal{{ $registration->id }}">
-                                            <i class="fas fa-info-circle"></i> Details
+                                            <i class="fas fa-info-circle"></i> التفاصيل
                                         </button>
                                         <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $registration->id }}">
-                                            <i class="fas fa-trash"></i> Remove
+                                            <i class="fas fa-trash"></i> حذف التسجيل
                                         </button>
                                     </td>
                                 </tr>
@@ -365,17 +362,17 @@
                                     <div class="modal-dialog modal-lg">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="detailsModalLabel{{ $registration->id }}">Registration Details</h5>
+                                                <h5 class="modal-title" id="detailsModalLabel{{ $registration->id }}">تفاصيل التسجيل</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
                                                 <div class="registration-details">
-                                                    <h5>Attendee Information</h5>
+                                                    <h5>معلومات الحضور</h5>
                                                     <dl class="row registration-info">
-                                                        <dt class="col-sm-3">Registration ID:</dt>
+                                                        <dt class="col-sm-3">رقم التسجيل:</dt>
                                                         <dd class="col-sm-9">{{ $registration->id }}</dd>
                                                         
-                                                        <dt class="col-sm-3">Name:</dt>
+                                                        <dt class="col-sm-3">الاسم:</dt>
                                                         <dd class="col-sm-9">
                                                             @if($registration->user_id)
                                                                 {{ $registration->user->name }}
@@ -384,13 +381,13 @@
                                                             @endif
                                                         </dd>
                                                         
-                                                        <dt class="col-sm-3">Attendee Name:</dt>
+                                                        <dt class="col-sm-3">اسم الحضور:</dt>
                                                         <dd class="col-sm-9">{{ $registration->attendee_name ?? 'N/A' }}</dd>
                                                         
-                                                        <dt class="col-sm-3">Parent Name:</dt>
+                                                        <dt class="col-sm-3">اسم الوالد:</dt>
                                                         <dd class="col-sm-9">{{ $registration->parent_name ?? 'N/A' }}</dd>
                                                         
-                                                        <dt class="col-sm-3">Email:</dt>
+                                                        <dt class="col-sm-3">البريد الإلكتروني:</dt>
                                                         <dd class="col-sm-9">
                                                             @if($registration->user_id)
                                                                 {{ $registration->user->email }}
@@ -399,16 +396,16 @@
                                                             @endif
                                                         </dd>
                                                         
-                                                        <dt class="col-sm-3">Phone:</dt>
+                                                        <dt class="col-sm-3">الهاتف:</dt>
                                                         <dd class="col-sm-9">{{ $registration->parent_contact }}</dd>
                                                         
-                                                        <dt class="col-sm-3">Registration Type:</dt>
-                                                        <dd class="col-sm-9">{{ $registration->user_id ? 'Registered User' : 'Guest' }}</dd>
+                                                        <dt class="col-sm-3">نوع التسجيل:</dt>
+                                                        <dd class="col-sm-9">{{ $registration->user_id ? 'مستخدم مسجل' : 'ضيف' }}</dd>
                                                         
-                                                        <dt class="col-sm-3">Registration Date:</dt>
+                                                        <dt class="col-sm-3">تاريخ التسجيل:</dt>
                                                         <dd class="col-sm-9">{{ $registration->created_at->format('Y-m-d H:i:s') }}</dd>
                                                         
-                                                        <dt class="col-sm-3">Status:</dt>
+                                                        <dt class="col-sm-3">الحالة:</dt>
                                                         <dd class="col-sm-9">
                                                             <span class="badge 
                                                                 @if($registration->status == 'confirmed') bg-success
@@ -421,22 +418,22 @@
                                                         </dd>
                                                         
                                                         @if($registration->special_requirements)
-                                                            <dt class="col-sm-3">Special Requirements:</dt>
+                                                            <dt class="col-sm-3">متطلبات خاصة:</dt>
                                                             <dd class="col-sm-9">{{ $registration->special_requirements }}</dd>
                                                         @endif
                                                         
                                                         @if($registration->user_id)
-                                                            <dt class="col-sm-3">User Account:</dt>
+                                                            <dt class="col-sm-3">حساب المستخدم:</dt>
                                                             <dd class="col-sm-9">
                                                                 <a href="{{ route('admin.users.show', $registration->user_id) }}">
-                                                                    View User Profile <i class="fas fa-external-link-alt"></i>
+                                                                    عرض ملف المستخدم <i class="fas fa-external-link-alt"></i>
                                                                 </a>
                                                             </dd>
                                                         @endif
                                                     </dl>
                                                     
                                                     @if($registration->notes)
-                                                        <h5 class="mt-4">Notes</h5>
+                                                        <h5 class="mt-4">ملاحظات</h5>
                                                         <div class="p-3 bg-light rounded">
                                                             {{ $registration->notes }}
                                                         </div>
@@ -444,10 +441,10 @@
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
                                                 <div class="dropdown d-inline-block">
                                                     <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Update Status
+                                                        تحديث الحالة
                                                     </button>
                                                     <ul class="dropdown-menu">
                                                         <li>
@@ -455,7 +452,7 @@
                                                                 @csrf
                                                                 @method('PATCH')
                                                                 <input type="hidden" name="status" value="pending">
-                                                                <button type="submit" class="dropdown-item">Pending</button>
+                                                                <button type="submit" class="dropdown-item">قيد الانتظار</button>
                                                             </form>
                                                         </li>
                                                         <li>
@@ -463,7 +460,7 @@
                                                                 @csrf
                                                                 @method('PATCH')
                                                                 <input type="hidden" name="status" value="confirmed">
-                                                                <button type="submit" class="dropdown-item">Confirmed</button>
+                                                                <button type="submit" class="dropdown-item">مؤكد</button>
                                                             </form>
                                                         </li>
                                                         <li>
@@ -471,7 +468,7 @@
                                                                 @csrf
                                                                 @method('PATCH')
                                                                 <input type="hidden" name="status" value="cancelled">
-                                                                <button type="submit" class="dropdown-item">Cancelled</button>
+                                                                <button type="submit" class="dropdown-item">ملغي</button>
                                                             </form>
                                                         </li>
                                                         <li>
@@ -479,7 +476,7 @@
                                                                 @csrf
                                                                 @method('PATCH')
                                                                 <input type="hidden" name="status" value="attended">
-                                                                <button type="submit" class="dropdown-item">Attended</button>
+                                                                <button type="submit" class="dropdown-item">حضر</button>
                                                             </form>
                                                         </li>
                                                     </ul>
@@ -490,7 +487,7 @@
                                 </div>
                             @empty
                                 <tr>
-                                    <td colspan="10" class="text-center">No registrations found</td>
+                                    <td colspan="10" class="text-center">لا توجد تسجيلات</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -508,20 +505,19 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                        <h5 class="modal-title" id="deleteModalLabel">تأكيد الحذف</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure you want to delete this workshop event: <strong>{{ $event->title }}</strong>?</p>
-                        <p class="text-danger"><strong>Warning:</strong> This will also delete all registrations associated with
-                            this event. This action cannot be undone.</p>
+                        <p>هل أنت متأكد من حذف فعالية ورشة العمل هذه: <strong>{{ $event->title }}</strong>؟</p>
+                        <p class="text-danger"><strong>تحذير:</strong> سيتم حذف جميع التسجيلات المرتبطة بهذه الفعالية. لا يمكن التراجع عن هذا الإجراء.</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                         <form action="{{ route('admin.workshop-events.destroy', $event) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Delete Event</button>
+                            <button type="submit" class="btn btn-danger">حذف الفعالية</button>
                         </form>
                     </div>
                 </div>
@@ -534,33 +530,33 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="deleteModalLabel{{ $registration->id }}">Confirm Deletion</h5>
+                            <h5 class="modal-title" id="deleteModalLabel{{ $registration->id }}">تأكيد الحذف</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <p>Are you sure you want to remove this registration?</p>
-                            <p><strong>Name:</strong> 
+                            <p>هل أنت متأكد من حذف تسجيل هذا المستخدم؟</p>
+                            <p><strong>الاسم:</strong> 
                                 @if($registration->user_id)
                                     {{ $registration->user->name }}
                                 @else
                                     {{ $registration->attendee_name }}
                                 @endif
                             </p>
-                            <p><strong>Email:</strong> 
+                            <p><strong>البريد الإلكتروني:</strong> 
                                 @if($registration->user_id)
                                     {{ $registration->user->email }}
                                 @else
                                     {{ $registration->attendee_email ?? 'N/A' }}
                                 @endif
                             </p>
-                            <p class="text-danger">This action cannot be undone.</p>
+                            <p class="text-danger">لا يمكن التراجع عن هذا الإجراء.</p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                             <form action="{{ route('admin.workshop-events.registrations.destroy', $registration->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger">Delete Registration</button>
+                                <button type="submit" class="btn btn-danger">حذف التسجيل</button>
                             </form>
                         </div>
                     </div>

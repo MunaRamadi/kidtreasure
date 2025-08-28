@@ -11,10 +11,10 @@
         </div>
         <div class="card-body">
             <form action="{{ route('admin.users.index') }}" method="GET" class="form-inline">
-                <div class="form-group mr-2">
+                <div class="form-group my-3">
                     <input type="text" name="search" class="form-control" placeholder="Search by name or email" value="{{ request('search') }}">
                 </div>
-                <div class="form-group mr-2">
+                <div class="form-group mb-3">
                     <select name="role" class="form-control">
                         <option value="">All Roles</option>
                         <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>User</option>

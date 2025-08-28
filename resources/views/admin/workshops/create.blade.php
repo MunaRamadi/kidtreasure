@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Add New Workshop')
+@section('title', 'إضافة ورشة جديدة')
 
 @section('styles')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -43,18 +43,18 @@
 @endsection
 
 @section('content')
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Add New Workshop</h1>
+<div class="container-fluid px-4" style="direction: rtl;">
+    <h1 class="mt-4">إضافة ورشة جديدة</h1>
     <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('admin.workshops.index') }}">Workshops</a></li>
-        <li class="breadcrumb-item active">Add New</li>
+        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">لوحة التحكم</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('admin.workshops.index') }}">الورش</a></li>
+        <li class="breadcrumb-item active">إضافة جديدة</li>
     </ol>
 
     <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-plus-circle me-1"></i>
-            Workshop Information
+            معلومات الورشة
         </div>
         <div class="card-body">
             @if ($errors->any())
@@ -75,34 +75,26 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="name_en" class="form-label">English Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('name_en') is-invalid @enderror" id="name_en" name="name_en" value="{{ old('name_en') }}" required>
-                                    @error('name_en')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="name_ar" class="form-label">Arabic Name <span class="text-danger">*</span></label>
+                                    <label for="name_ar" class="form-label">الاسم بالعربية <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('name_ar') is-invalid @enderror" id="name_ar" name="name_ar" value="{{ old('name_ar') }}" dir="rtl" required>
                                     @error('name_ar')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="name_en" class="form-label">الاسم بالإنجليزية <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('name_en') is-invalid @enderror" id="name_en" name="name_en" value="{{ old('name_en') }}" required>
+                                    @error('name_en')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="form-group mb-3">
-                            <label for="description_en" class="form-label">English Description <span class="text-danger">*</span></label>
-                            <textarea class="form-control @error('description_en') is-invalid @enderror" id="description_en" name="description_en" rows="4" required>{{ old('description_en') }}</textarea>
-                            @error('description_en')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="description_ar" class="form-label">Arabic Description <span class="text-danger">*</span></label>
+                            <label for="description_ar" class="form-label">الوصف بالعربية <span class="text-danger">*</span></label>
                             <textarea class="form-control @error('description_ar') is-invalid @enderror" id="description_ar" name="description_ar" rows="4" dir="rtl" required>{{ old('description_ar') }}</textarea>
                             @error('description_ar')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -110,21 +102,20 @@
                         </div>
                         
                         <div class="form-group mb-3">
-                            <label for="target_age_group" class="form-label">Target Age Group <span class="text-danger">*</span></label>
+                            <label for="description_en" class="form-label">الوصف بالإنجليزية <span class="text-danger">*</span></label>
+                            <textarea class="form-control @error('description_en') is-invalid @enderror" id="description_en" name="description_en" rows="4" required>{{ old('description_en') }}</textarea>
+                            @error('description_en')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="target_age_group" class="form-label">الفئة العمرية المستهدفة <span class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('target_age_group') is-invalid @enderror" id="target_age_group" name="target_age_group" value="{{ old('target_age_group') }}" required>
                             @error('target_age_group')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">Example: "5-7 years", "8-12 years", "Adults", "All ages"</small>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="skills_developed" class="form-label">Skills Developed</label>
-                            <input type="text" class="form-control @error('skills_developed') is-invalid @enderror" id="skills_developed" name="skills_developed" value="{{ old('skills_developed') }}">
-                            @error('skills_developed')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <small class="form-text text-muted">Comma-separated list of skills (e.g., "Creativity, Problem-solving, Teamwork")</small>
+                            <small class="form-text text-muted">مثال: "5-7 سنوات"، "8-12 سنة"، "بالغين"، "جميع الأعمار"</small>
                         </div>
                     </div>
                     
@@ -132,25 +123,25 @@
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-images me-1"></i>
-                                Workshop Image
+                                صورة الورشة
                             </div>
                             <div class="card-body">
                                 <div class="row mb-4">
                                     <div class="col-md-12">
                                         <div class="mb-3">
-                                            <label for="image_path" class="form-label">Main Image</label>
+                                            <label for="image_path" class="form-label">الصورة الرئيسية</label>
                                             <input type="file" class="form-control @error('image_path') is-invalid @enderror" id="image_path" name="image" accept="image/*">
                                             @error('image_path')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
-                                            <small class="form-text text-muted">This will be the primary image shown for the workshop.</small>
+                                            <small class="form-text text-muted">ستكون هذه الصورة الرئيسية المعروضة للورشة.</small>
                                             <div id="main-image-preview-container" class="mt-2 d-none">
                                                 <div class="d-flex align-items-center mb-2">
                                                     <button type="button" id="remove_image_btn" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal">
-                                                        <i class="fas fa-trash me-1"></i> Remove image
+                                                        <i class="fas fa-trash me-1"></i> إزالة الصورة
                                                     </button>
                                                 </div>
-                                                <img id="main-image-preview" src="#" alt="Main image preview" class="img-thumbnail" style="max-height: 150px;">
+                                                <img id="main-image-preview" src="#" alt="معاينة الصورة الرئيسية" class="img-thumbnail" style="max-height: 150px;">
                                             </div>
                                         </div>
                                     </div>
@@ -161,19 +152,19 @@
                         <div class="card">
                             <div class="card-header">
                                 <i class="fas fa-cog me-1"></i>
-                                Workshop Settings
+                                إعدادات الورشة
                             </div>
                             <div class="card-body">
                                 <div class="form-check form-switch mb-3">
                                     <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_active">Active</label>
-                                    <small class="form-text text-muted d-block">Inactive workshops won't be visible to users.</small>
+                                    <label class="form-check-label" for="is_active">نشط</label>
+                                    <small class="form-text text-muted d-block">الورش غير النشطة لن تكون مرئية للمستخدمين.</small>
                                 </div>
                                 
                                 <div class="form-check form-switch mb-3">
                                     <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_featured">Featured Workshop</label>
-                                    <small class="form-text text-muted d-block">Featured workshops may be highlighted on the homepage.</small>
+                                    <label class="form-check-label" for="is_featured">ورشة مميزة</label>
+                                    <small class="form-text text-muted d-block">قد يتم تسليط الضوء على الورش المميزة في الصفحة الرئيسية.</small>
                                 </div>
                             </div>
                         </div>
@@ -181,8 +172,8 @@
                 </div>
                 
                 <div class="d-flex justify-content-end mt-4">
-                    <a href="{{ route('admin.workshops.index') }}" class="btn btn-secondary me-2">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Save Workshop</button>
+                    <a href="{{ route('admin.workshops.index') }}" class="btn btn-secondary me-2">إلغاء</a>
+                    <button type="submit" class="btn btn-primary mx-2">حفظ الورشة</button>
                 </div>
             </form>
         </div>
@@ -195,15 +186,15 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmModalLabel">Confirm Image Removal</h5>
+                <h5 class="modal-title" id="confirmModalLabel">تأكيد إزالة الصورة</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="confirmModalBody">
-                Are you sure you want to remove this image?
+                هل أنت متأكد من رغبتك في إزالة هذه الصورة؟
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmRemoveBtn">Remove</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-danger" id="confirmRemoveBtn">إزالة</button>
             </div>
         </div>
     </div>
@@ -214,13 +205,13 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="resultModalLabel">Result</h5>
+                <h5 class="modal-title" id="resultModalLabel">النتيجة</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="resultModalBody">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">موافق</button>
             </div>
         </div>
     </div>
@@ -282,8 +273,8 @@
             mainImagePreviewContainer.classList.add('d-none');
             
             // Show success message in result modal
-            document.getElementById('resultModalLabel').textContent = 'Success';
-            document.getElementById('resultModalBody').textContent = 'Image removed successfully';
+            document.getElementById('resultModalLabel').textContent = 'نجاح';
+            document.getElementById('resultModalBody').textContent = 'تمت إزالة الصورة بنجاح';
             document.getElementById('resultModalBody').className = 'modal-body text-success';
             resultModal.show();
         });
