@@ -1,14 +1,14 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Workshop Details')
+@section('title', 'تفاصيل الورشة')
 
 @section('content')
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Workshop Details</h1>
+<div class="container-fluid px-4" style="direction: rtl;">
+    <h1 class="mt-4">تفاصيل الورشة</h1>
     <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('admin.workshops.index') }}">Workshops</a></li>
-        <li class="breadcrumb-item active">{{ $workshop->name_en }}</li>
+        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">لوحة التحكم</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('admin.workshops.index') }}">الورش</a></li>
+        <li class="breadcrumb-item active">{{ $workshop->name_ar }}</li>
     </ol>
 
     @if(session('success'))
@@ -25,72 +25,72 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
                         <i class="fas fa-info-circle me-1"></i>
-                        Workshop Information
+                        معلومات الورشة
                     </div>
                     <div>
                         <a href="{{ route('admin.workshops.edit', $workshop) }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-edit"></i> Edit
+                            <i class="fas fa-edit"></i> تعديل
                         </a>
                         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                            <i class="fas fa-trash"></i> Delete
+                            <i class="fas fa-trash"></i> حذف
                         </button>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <h5>English Name</h5>
-                            <p>{{ $workshop->name_en }}</p>
+                            <h5>الاسم بالعربية</h5>
+                            <p dir="rtl">{{ $workshop->name_ar }}</p>
                         </div>
                         <div class="col-md-6">
-                            <h5>Arabic Name</h5>
-                            <p dir="rtl" class="text-end">{{ $workshop->name_ar }}</p>
+                            <h5>الاسم بالإنجليزية</h5>
+                            <p>{{ $workshop->name_en }}</p>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <h5>Status</h5>
+                            <h5>الحالة</h5>
                             @if($workshop->is_active)
-                                <span class="badge bg-success">Active</span>
+                                <span class="badge bg-success">نشط</span>
                             @else
-                                <span class="badge bg-danger">Inactive</span>
+                                <span class="badge bg-danger">غير نشط</span>
                             @endif
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <h5>Target Age Group</h5>
+                            <h5>الفئة العمرية المستهدفة</h5>
                             <p>{{ $workshop->target_age_group }}</p>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <h5>English Description</h5>
-                            <div class="border rounded p-3 bg-light">
-                                {{ $workshop->description_en }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-12">
-                            <h5>Arabic Description</h5>
+                            <h5>الوصف بالعربية</h5>
                             <div class="border rounded p-3 bg-light" dir="rtl">
                                 {{ $workshop->description_ar }}
                             </div>
                         </div>
                     </div>
 
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <h5>الوصف بالإنجليزية</h5>
+                            <div class="border rounded p-3 bg-light">
+                                {{ $workshop->description_en }}
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-md-6">
-                            <h5>Created At</h5>
+                            <h5>تاريخ الإنشاء</h5>
                             <p>{{ $workshop->created_at->format('Y-m-d H:i') }}</p>
                         </div>
                         <div class="col-md-6">
-                            <h5>Last Updated</h5>
+                            <h5>آخر تحديث</h5>
                             <p>{{ $workshop->updated_at->format('Y-m-d H:i') }}</p>
                         </div>
                     </div>
@@ -104,10 +104,10 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
                         <i class="fas fa-calendar me-1"></i>
-                        Workshop Events
+                        فعاليات الورشة
                     </div>
                     <a href="{{ route('admin.workshop-events.create', ['workshop_id' => $workshop->id, 'redirect_to' => 'workshop']) }}" class="btn btn-success btn-sm">
-                        <i class="fas fa-plus"></i> Add Event
+                        <i class="fas fa-plus"></i> إضافة فعالية
                     </a>
                 </div>
                 <div class="card-body">
@@ -116,13 +116,13 @@
                             <table class="table table-bordered table-striped">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th>Date</th>
-                                        <th>Time</th>
-                                        <th>Location</th>
-                                        <th>Price (JOD)</th>
-                                        <th>Attendees</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
+                                        <th>التاريخ</th>
+                                        <th>الوقت</th>
+                                        <th>المكان</th>
+                                        <th>السعر (دينار)</th>
+                                        <th>الحضور</th>
+                                        <th>الحالة</th>
+                                        <th>الإجراءات</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -145,14 +145,14 @@
                                             </td>
                                             <td>
                                                 @if($event->is_open_for_registration)
-                                                    <span class="badge bg-success">Open</span>
+                                                    <span class="badge bg-success">مفتوح</span>
                                                 @else
-                                                    <span class="badge bg-danger">Closed</span>
+                                                    <span class="badge bg-danger">مغلق</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 <a href="{{ route('admin.workshop-events.show', $event) }}" class="btn btn-sm btn-primary">
-                                                    <i class="fas fa-eye"></i> Details
+                                                    <i class="fas fa-eye"></i> تفاصيل
                                                 </a>
                                             </td>
                                         </tr>
@@ -162,7 +162,7 @@
                         </div>
                     @else
                         <div class="alert alert-info">
-                            No events have been scheduled for this workshop yet.
+                            لم يتم جدولة أي فعاليات لهذه الورشة بعد.
                         </div>
                     @endif
                 </div>
@@ -176,18 +176,18 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">تأكيد الحذف</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete the workshop "{{ $workshop->name_en }}"? This will also delete all associated events and registrations.
+                    هل أنت متأكد من رغبتك في حذف الورشة "{{ $workshop->name_ar }}"؟ سيؤدي هذا أيضًا إلى حذف جميع الفعاليات والتسجيلات المرتبطة بها.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                     <form action="{{ route('admin.workshops.destroy', $workshop) }}" method="POST">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="submit" class="btn btn-danger">حذف</button>
                     </form>
                 </div>
             </div>
@@ -200,23 +200,23 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteEventModalLabel{{ $event->id }}">Confirm Delete Event</h5>
+                    <h5 class="modal-title" id="deleteEventModalLabel{{ $event->id }}">تأكيد حذف الفعالية</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete the event scheduled for {{ $event->event_date->format('Y-m-d') }} at {{ $event->event_time->format('H:i') }}?
+                    هل أنت متأكد من رغبتك في حذف الفعالية المجدولة بتاريخ {{ $event->event_date->format('Y-m-d') }} في الساعة {{ $event->event_time->format('H:i') }}؟
                     @if($event->registrations_count > 0)
                     <div class="alert alert-warning mt-2">
-                        <strong>Warning:</strong> This event has {{ $event->registrations_count }} registrations that will also be deleted.
+                        <strong>تحذير:</strong> تحتوي هذه الفعالية على {{ $event->registrations_count }} تسجيل سيتم حذفها أيضًا.
                     </div>
                     @endif
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                     <form action="{{ route('admin.workshop-events.destroy', $event) }}" method="POST">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete Event</button>
+                        <button type="submit" class="btn btn-danger">حذف الفعالية</button>
                     </form>
                 </div>
             </div>

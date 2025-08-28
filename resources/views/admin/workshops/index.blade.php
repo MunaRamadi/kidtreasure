@@ -1,23 +1,23 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Manage Workshops')
+@section('title', 'إدارة الورش')
 
 @section('content')
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Manage Workshops</h1>
+<div class="container-fluid px-4" style="direction: rtl;">
+    <h1 class="mt-4">إدارة الورش</h1>
     <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-        <li class="breadcrumb-item active">Workshops</li>
+        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">لوحة التحكم</a></li>
+        <li class="breadcrumb-item active">الورش</li>
     </ol>
     
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <i class="fas fa-calendar-alt me-1"></i>
-                Workshops List
+                قائمة الورش
             </div>
             <a href="{{ route('admin.workshops.create') }}" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus"></i> Add New Workshop
+                <i class="fas fa-plus"></i> إضافة ورشة جديدة
             </a>
         </div>
         <div class="card-body">
@@ -26,32 +26,29 @@
                 <div class="row g-3">
                     <div class="col-md-3">
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Search workshops..." name="search" value="{{ request('search') }}">
-                            <button class="btn btn-outline-secondary" type="submit">
-                                <i class="fas fa-search"></i>
-                            </button>
+                            <input type="text" class="form-control" placeholder="البحث عن ورش..." name="search" value="{{ request('search') }}">
                         </div>
                     </div>
                     <div class="col-md-2">
-                        <input type="text" class="form-control" placeholder="Age Group" name="age_group" value="{{ request('age_group') }}">
+                        <input type="text" class="form-control" placeholder="الفئة العمرية" name="age_group" value="{{ request('age_group') }}">
                     </div>
                     <div class="col-md-2">
                         <select name="status" class="form-select">
-                            <option value="all">All Status</option>
-                            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
-                            <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            <option value="all">جميع الحالات</option>
+                            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>نشط</option>
+                            <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>غير نشط</option>
                         </select>
                     </div>
                     <div class="col-md-3">
                         <select name="sort" class="form-select">
-                            <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Latest First</option>
-                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
-                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name (A-Z)</option>
-                            <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name (Z-A)</option>
+                            <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>الأحدث أولاً</option>
+                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>الأقدم أولاً</option>
+                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>الاسم (أ-ي)</option>
+                            <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>الاسم (ي-أ)</option>
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                        <button type="submit" class="btn btn-primary w-100">تصفية</button>
                     </div>
                 </div>
             </form>
@@ -67,13 +64,13 @@
                 <table class="table table-bordered table-striped table-hover">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Target Age</th>
-                            <th>Status</th>
-                            <th>Events</th>
-                            <th>Created At</th>
-                            <th>Actions</th>
+                            <th>الرقم</th>
+                            <th>الاسم</th>
+                            <th>الفئة العمرية</th>
+                            <th>الحالة</th>
+                            <th>الفعاليات</th>
+                            <th>تاريخ الإنشاء</th>
+                            <th>الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -81,19 +78,19 @@
                             <tr>
                                 <td>{{ $workshop->id }}</td>
                                 <td>
-                                    <div>{{ $workshop->name_en }}</div>
-                                    <small class="text-muted">{{ $workshop->name_ar }}</small>
+                                    <div>{{ $workshop->name_ar }}</div>
+                                    <small class="text-muted">{{ $workshop->name_en }}</small>
                                 </td>
                                 <td>{{ $workshop->target_age_group }}</td>
                                 <td>
                                     @if($workshop->is_active)
-                                        <span class="badge bg-success">Active</span>
+                                        <span class="badge bg-success">نشط</span>
                                     @else
-                                        <span class="badge bg-danger">Inactive</span>
+                                        <span class="badge bg-danger">غير نشط</span>
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="badge bg-info">{{ $workshop->events_count ?? $workshop->events()->count() }} Events</span>
+                                    <span class="badge bg-info">{{ $workshop->events_count ?? $workshop->events()->count() }} فعالية</span>
                                 </td>
                                 <td>{{ $workshop->created_at->format('Y-m-d') }}</td>
                                 <td>
@@ -114,18 +111,18 @@
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title" id="deleteModalLabel{{ $workshop->id }}">Confirm Delete</h5>
+                                                    <h5 class="modal-title" id="deleteModalLabel{{ $workshop->id }}">تأكيد الحذف</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    Are you sure you want to delete the workshop "{{ $workshop->name_en }}"?
+                                                    هل أنت متأكد من رغبتك في حذف الورشة "{{ $workshop->name_ar }}"؟
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                                                     <form action="{{ route('admin.workshops.destroy', $workshop) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                                        <button type="submit" class="btn btn-danger">حذف</button>
                                                     </form>
                                                 </div>
                                             </div>
@@ -135,7 +132,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center">No workshops found</td>
+                                <td colspan="7" class="text-center">لم يتم العثور على ورش</td>
                             </tr>
                         @endforelse
                     </tbody>

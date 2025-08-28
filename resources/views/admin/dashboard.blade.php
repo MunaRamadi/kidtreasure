@@ -1,13 +1,13 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Admin Dashboard')
+@section('title', 'لوحة التحكم')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid" dir="rtl">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+        <h1 class="h3 mb-0 text-gray-800">لوحة التحكم</h1>
         <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-            <i class="fas fa-download fa-sm text-white-50"></i> Generate Report
+            <i class="fas fa-download fa-sm text-white-50"></i> إنشاء تقرير
         </a>
     </div>
 
@@ -18,7 +18,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Products
+                                المنتجات
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['products'] }}</div>
                         </div>
@@ -36,7 +36,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Total Orders
+                                الطلبات الكلية
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['orders'] }}</div>
                         </div>
@@ -54,7 +54,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Users
+                                المستخدمين
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['users'] }}</div>
                         </div>
@@ -72,7 +72,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Messages
+                                الرسائل
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['messages'] }}</div>
                         </div>
@@ -92,7 +92,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
-                                Stories
+                                القصص
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['stories'] }}</div>
                         </div>
@@ -110,7 +110,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Workshops
+                                الورش
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['workshops'] }}</div>
                         </div>
@@ -128,7 +128,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Blog Posts
+                                منشورات المدونة
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['blog_posts'] }}</div>
                         </div>
@@ -146,7 +146,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                Pending Items
+                                العناصر المعلقة
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 {{ $stats['pending_stories'] + $stats['pending_orders'] + $stats['unread_messages'] }}
@@ -165,18 +165,18 @@
         <div class="col-lg-8 mb-4">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Orders</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">الطلبات الأخيرة</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th>Order ID</th>
-                                    <th>Customer</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                    <th>Amount</th>
+                                    <th>رقم الطلب</th>
+                                    <th>العميل</th>
+                                    <th>الحالة</th>
+                                    <th>التاريخ</th>
+                                    <th>المبلغ</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -203,7 +203,7 @@
         <div class="col-lg-4 mb-4">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Top Selling Products</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">أفضل المنتجات مبيعاً</h6>
                 </div>
                 <div class="card-body">
                     @foreach($topProducts as $product)
@@ -216,7 +216,7 @@
                         </div>
                         <div class="flex-grow-1 ms-3">
                             <h6 class="mb-0">{{ $product->name }}</h6>
-                            <small class="text-muted">{{ $product->order_items_count }} sold</small>
+                            <small class="text-muted">{{ $product->order_items_count }} مباع</small>
                         </div>
                         <div class="flex-shrink-0">
                             <span class="badge badge-primary">${{ $product->price }}</span>
@@ -232,16 +232,16 @@
         <div class="col-lg-12">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-warning">Required Actions</h6>
+                    <h6 class="m-0 font-weight-bold text-warning">الإجراءات المطلوبة</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         @if($stats['pending_orders'] > 0)
                         <div class="col-md-4">
                             <div class="alert alert-warning" role="alert">
-                                <h6 class="alert-heading">Pending Orders</h6>
-                                <p>There are {{ $stats['pending_orders'] }} orders awaiting review.</p>
-                                <a href="{{ route('admin.orders.index') }}" class="btn btn-sm btn-warning">View Orders</a>
+                                <h6 class="alert-heading">الطلبات المعلقة</h6>
+                                <p>هناك {{ $stats['pending_orders'] }} طلبات في انتظار المراجعة.</p>
+                                <a href="{{ route('admin.orders.index') }}" class="btn btn-sm btn-warning">عرض الطلبات</a>
                             </div>
                         </div>
                         @endif
@@ -249,9 +249,9 @@
                         @if($stats['pending_stories'] > 0)
                         <div class="col-md-4">
                             <div class="alert alert-info" role="alert">
-                                <h6 class="alert-heading">Pending Stories</h6>
-                                <p>There are {{ $stats['pending_stories'] }} stories awaiting approval.</p>
-                                <a href="{{ route('admin.stories.index') }}" class="btn btn-sm btn-info">Review Stories</a>
+                                <h6 class="alert-heading">القصص المعلقة</h6>
+                                <p>هناك {{ $stats['pending_stories'] }} قصص في انتظار الموافقة.</p>
+                                <a href="{{ route('admin.stories.index') }}" class="btn btn-sm btn-info">مراجعة القصص</a>
                             </div>
                         </div>
                         @endif
@@ -259,9 +259,9 @@
                         @if($stats['unread_messages'] > 0)
                         <div class="col-md-4">
                             <div class="alert alert-danger" role="alert">
-                                <h6 class="alert-heading">Unread Messages</h6>
-                                <p>There are {{ $stats['unread_messages'] }} new messages.</p>
-                                <a href="{{ route('admin.contact-messages.index') }}" class="btn btn-sm btn-danger">Read Messages</a>
+                                <h6 class="alert-heading">الرسائل غير المقروءة</h6>
+                                <p>هناك {{ $stats['unread_messages'] }} رسائل جديدة.</p>
+                                <a href="{{ route('admin.contact-messages.index') }}" class="btn btn-sm btn-danger">قراءة الرسائل</a>
                             </div>
                         </div>
                         @endif

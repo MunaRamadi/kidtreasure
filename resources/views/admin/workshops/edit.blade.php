@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Edit Workshop')
+@section('title', 'تعديل الورشة')
 
 @section('styles')
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -43,18 +43,18 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid px-4">
-        <h1 class="mt-4">Edit Workshop</h1>
+    <div class="container-fluid px-4" style="direction: rtl;">
+        <h1 class="mt-4">تعديل الورشة</h1>
         <ol class="breadcrumb mb-4">
-            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('admin.workshops.index') }}">Workshops</a></li>
-            <li class="breadcrumb-item active">Edit: {{ $workshop->name_en }}</li>
+            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">لوحة التحكم</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('admin.workshops.index') }}">الورش</a></li>
+            <li class="breadcrumb-item active">تعديل: {{ $workshop->name_ar }}</li>
         </ol>
 
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-edit me-1"></i>
-                Workshop Information
+                معلومات الورشة
             </div>
             <div class="card-body">
                 @if ($errors->any())
@@ -76,19 +76,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="name_en" class="form-label">English Name <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" class="form-control @error('name_en') is-invalid @enderror"
-                                            id="name_en" name="name_en" value="{{ old('name_en', $workshop->name_en) }}"
-                                            required>
-                                        @error('name_en')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="name_ar" class="form-label">Arabic Name <span
+                                        <label for="name_ar" class="form-label">الاسم بالعربية <span
                                                 class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('name_ar') is-invalid @enderror"
                                             id="name_ar" name="name_ar" value="{{ old('name_ar', $workshop->name_ar) }}"
@@ -98,21 +86,22 @@
                                         @enderror
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="name_en" class="form-label">الاسم بالإنجليزية <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control @error('name_en') is-invalid @enderror"
+                                            id="name_en" name="name_en" value="{{ old('name_en', $workshop->name_en) }}"
+                                            required>
+                                        @error('name_en')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group mb-3">
-                                <label for="description_en" class="form-label">English Description <span
-                                        class="text-danger">*</span></label>
-                                <textarea class="form-control @error('description_en') is-invalid @enderror"
-                                    id="description_en" name="description_en" rows="4"
-                                    required>{{ old('description_en', $workshop->description_en) }}</textarea>
-                                @error('description_en')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group mb-4">
-                                <label for="description_ar" class="form-label">Arabic Description <span
+                                <label for="description_ar" class="form-label">الوصف بالعربية <span
                                         class="text-danger">*</span></label>
                                 <textarea class="form-control @error('description_ar') is-invalid @enderror"
                                     id="description_ar" name="description_ar" rows="4" dir="rtl"
@@ -122,16 +111,27 @@
                                 @enderror
                             </div>
 
+                            <div class="form-group mb-4">
+                                <label for="description_en" class="form-label">الوصف بالإنجليزية <span
+                                        class="text-danger">*</span></label>
+                                <textarea class="form-control @error('description_en') is-invalid @enderror"
+                                    id="description_en" name="description_en" rows="4"
+                                    required>{{ old('description_en', $workshop->description_en) }}</textarea>
+                                @error('description_en')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="target_age_group" class="form-label">Target Age Group <span
+                                        <label for="target_age_group" class="form-label">الفئة العمرية المستهدفة <span
                                                 class="text-danger">*</span></label>
                                         <input type="text"
                                             class="form-control @error('target_age_group') is-invalid @enderror"
                                             id="target_age_group" name="target_age_group"
                                             value="{{ old('target_age_group', $workshop->target_age_group) }}"
-                                            placeholder="e.g. 5-8 years" required>
+                                            placeholder="مثال: 5-8 سنوات" required>
                                         @error('target_age_group')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -139,7 +139,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="skills_developed" class="form-label">Skills Developed</label>
+                                        <label for="skills_developed" class="form-label">المهارات المكتسبة</label>
                                         <input type="text"
                                             class="form-control @error('skills_developed') is-invalid @enderror"
                                             id="skills_developed" name="skills_developed"
@@ -147,7 +147,7 @@
                                         @error('skills_developed')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                        <small class="form-text text-muted">Comma-separated list of skills</small>
+                                        <small class="form-text text-muted">قائمة مهارات مفصولة بفواصل</small>
                                     </div>
                                 </div>
                             </div>
@@ -157,42 +157,41 @@
                             <div class="card mb-4">
                                 <div class="card-header">
                                     <i class="fas fa-images me-1"></i>
-                                    Workshop Image
+                                    صورة الورشة
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <label for="image" class="form-label">Workshop Image</label>
+                                        <label for="image" class="form-label">صورة الورشة</label>
                                         <input type="file" class="form-control @error('image') is-invalid @enderror"
                                             id="image" name="image" accept="image/*">
                                         @error('image')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                        <small class="form-text text-muted">This will be the primary image shown for the
-                                            workshop.</small>
+                                        <small class="form-text text-muted">ستكون هذه الصورة الرئيسية المعروضة للورشة.</small>
 
                                         @if($workshop->image)
                                             <div class="mt-3">
                                                 <div class="d-flex align-items-center">
                                                     <button type="button" id="remove_image_btn"
-                                                        class="btn btn-danger btn-sm me-3" data-bs-toggle="modal"
+                                                        class="btn btn-danger btn-sm mx-2" data-bs-toggle="modal"
                                                         data-bs-target="#confirmModal">
-                                                        <i class="fas fa-trash me-1"></i> Remove image
+                                                        <i class="fas fa-trash me-1"></i> إزالة الصورة
                                                     </button>
                                                     <a href="{{ asset('storage/' . $workshop->image) }}" target="_blank"
                                                         class="btn btn-sm btn-outline-secondary">
-                                                        View current image
+                                                        عرض الصورة الحالية
                                                     </a>
                                                 </div>
                                                 <div id="current-main-image" class="mt-2">
                                                     <img src="{{ asset('storage/' . $workshop->image) }}"
-                                                        alt="Current main image" class="img-thumbnail"
+                                                        alt="الصورة الحالية" class="img-thumbnail"
                                                         style="max-height: 200px;">
                                                 </div>
                                             </div>
                                         @endif
 
                                         <div id="main-image-preview-container" class="mt-2 d-none">
-                                            <img id="main-image-preview" src="#" alt="Main image preview"
+                                            <img id="main-image-preview" src="#" alt="معاينة الصورة الرئيسية"
                                                 class="img-thumbnail" style="max-height: 150px;">
                                         </div>
                                     </div>
@@ -201,22 +200,22 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <i class="fas fa-cog me-1"></i>
-                                        Workshop Settings
+                                        إعدادات الورشة
                                     </div>
                                     <div class="card-body">
                                         <div class="form-check form-switch mb-3">
                                             <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
                                                 value="1" {{ old('is_active', $workshop->is_active ?? 1) == 1 ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="is_active">Active</label>
-                                            <small class="form-text text-muted d-block">Inactive workshops won't be visible
-                                                to users.</small>
+                                            <label class="form-check-label" for="is_active">نشط</label>
+                                            <small class="form-text text-muted d-block">الورش غير النشطة لن تكون مرئية
+                                                للمستخدمين.</small>
                                         </div>
                                         <div class="form-check form-switch mb-3">
                                             <input class="form-check-input" type="checkbox" id="is_featured"
                                                 name="is_featured" value="1" {{ old('is_featured', $workshop->is_featured ?? 0) == 1 ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="is_featured">Featured Workshop</label>
-                                            <small class="form-text text-muted d-block">Featured workshops may be
-                                                highlighted on the homepage.</small>
+                                            <label class="form-check-label" for="is_featured">ورشة مميزة</label>
+                                            <small class="form-text text-muted d-block">قد يتم تسليط الضوء على الورش المميزة
+                                                في الصفحة الرئيسية.</small>
                                         </div>
                                     </div>
                                 </div>
@@ -225,77 +224,10 @@
 
                         <div class="d-flex justify-content-end mt-4">
                             <a href="{{ route('admin.workshops.show', $workshop) }}"
-                                class="btn btn-secondary me-2">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Update Workshop</button>
+                                class="btn btn-secondary me-2">إلغاء</a>
+                            <button type="submit" class="btn btn-primary mx-2">تحديث الورشة</button>
                         </div>
                 </form>
-            </div>
-        </div>
-
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="fas fa-calendar me-1"></i>
-                Workshop Events
-            </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Manage Events</h5>
-                    <a href="#" class="btn btn-success btn-sm">
-                        <i class="fas fa-plus"></i> Add New Event
-                    </a>
-                </div>
-
-                @if($workshop->events->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Time</th>
-                                    <th>Location</th>
-                                    <th>Price (JOD)</th>
-                                    <th>Attendees</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($workshop->events as $event)
-                                    <tr>
-                                        <td>{{ $event->event_date->format('Y-m-d') }}</td>
-                                        <td>{{ $event->event_time->format('H:i') }}</td>
-                                        <td>{{ $event->location }}</td>
-                                        <td>{{ number_format($event->price_jod, 2) }}</td>
-                                        <td>
-                                            {{ $event->current_attendees }} / {{ $event->max_attendees }}
-                                        </td>
-                                        <td>
-                                            @if($event->is_open_for_registration)
-                                                <span class="badge bg-success">Open</span>
-                                            @else
-                                                <span class="badge bg-danger">Closed</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <a href="#" class="btn btn-sm btn-primary">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <button type="button" class="btn btn-sm btn-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="alert alert-info">
-                        No events have been scheduled for this workshop yet.
-                    </div>
-                @endif
             </div>
         </div>
     </div>
@@ -305,15 +237,15 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmModalLabel">Confirm Image Removal</h5>
+                    <h5 class="modal-title" id="confirmModalLabel">تأكيد إزالة الصورة</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="confirmModalBody">
-                    Are you sure you want to remove this image?
+                    هل أنت متأكد من رغبتك في إزالة هذه الصورة؟
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmRemoveBtn">Remove</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-danger" id="confirmRemoveBtn">إزالة</button>
                 </div>
             </div>
         </div>
@@ -324,13 +256,13 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="resultModalLabel">Result</h5>
+                    <h5 class="modal-title" id="resultModalLabel">النتيجة</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="resultModalBody">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">موافق</button>
                 </div>
             </div>
         </div>
@@ -394,7 +326,7 @@
 
                     // Show loading state
                     removeMainImageBtn.disabled = true;
-                    removeMainImageBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Removing...';
+                    removeMainImageBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> جاري الإزالة...';
 
                     // Make AJAX request to remove the image
                     fetch('{{ route('admin.workshops.remove-image', $workshop) }}', {
@@ -415,34 +347,34 @@
                                 }
 
                                 // Show success message in result modal
-                                document.getElementById('resultModalLabel').textContent = 'Success';
-                                document.getElementById('resultModalBody').textContent = 'Image removed successfully';
+                                document.getElementById('resultModalLabel').textContent = 'نجاح';
+                                document.getElementById('resultModalBody').textContent = 'تمت إزالة الصورة بنجاح';
                                 document.getElementById('resultModalBody').className = 'modal-body text-success';
                                 resultModal.show();
                             } else {
                                 // Show error message in result modal
-                                document.getElementById('resultModalLabel').textContent = 'Error';
-                                document.getElementById('resultModalBody').textContent = data.message || 'Failed to remove image';
+                                document.getElementById('resultModalLabel').textContent = 'خطأ';
+                                document.getElementById('resultModalBody').textContent = data.message || 'فشل في إزالة الصورة';
                                 document.getElementById('resultModalBody').className = 'modal-body text-danger';
                                 resultModal.show();
 
                                 // Reset button state
                                 removeMainImageBtn.disabled = false;
-                                removeMainImageBtn.innerHTML = '<i class="fas fa-trash me-1"></i> Remove image';
+                                removeMainImageBtn.innerHTML = '<i class="fas fa-trash me-1"></i> إزالة الصورة';
                             }
                         })
                         .catch(error => {
                             console.error('Error:', error);
 
                             // Show error message in result modal
-                            document.getElementById('resultModalLabel').textContent = 'Error';
-                            document.getElementById('resultModalBody').textContent = 'An error occurred while removing the image';
+                            document.getElementById('resultModalLabel').textContent = 'خطأ';
+                            document.getElementById('resultModalBody').textContent = 'حدث خطأ أثناء إزالة الصورة';
                             document.getElementById('resultModalBody').className = 'modal-body text-danger';
                             resultModal.show();
 
                             // Reset button state
                             removeMainImageBtn.disabled = false;
-                            removeMainImageBtn.innerHTML = '<i class="fas fa-trash me-1"></i> Remove image';
+                            removeMainImageBtn.innerHTML = '<i class="fas fa-trash me-1"></i> إزالة الصورة';
                         });
                 });
             }
