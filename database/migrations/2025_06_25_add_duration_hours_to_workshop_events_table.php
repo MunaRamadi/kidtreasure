@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::table('workshop_events', function (Blueprint $table) {
             $table->decimal('duration_hours', 3, 1)->default(2.0)->after('event_time');
-            // Drop the duration_minutes column
-            $table->dropColumn('duration_minutes');
+            
+            // Check if the column exists before trying to drop it
+            if (Schema::hasColumn('workshop_events', 'duration_minutes')) {
+                $table->dropColumn('duration_minutes');
+            }
         });
     }
 

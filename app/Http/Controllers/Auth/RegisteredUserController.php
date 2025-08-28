@@ -57,6 +57,6 @@ class RegisteredUserController extends Controller
             return redirect()->route('checkout.index');
         }
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->route('home')->with('success', 'Welcome! Your account has been created successfully.');
     }
 }

@@ -161,11 +161,11 @@ class UserSecurityController extends Controller
     /**
      * Display the password change form.
      *
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function showPasswordForm()
     {
-        return view('user.profile.password');
+        return redirect()->route('password.request');
     }
 
     /**
@@ -175,7 +175,7 @@ class UserSecurityController extends Controller
      */
     public function showForgotPasswordForm()
     {
-        return view('auth.forgot-password');
+        return view('auth.passwords.email');
     }
 
     /**
