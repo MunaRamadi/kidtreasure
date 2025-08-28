@@ -12,13 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('password_reset_requests', function (Blueprint $table) {
-            // أضف عمودي created_at و updated_at
-            $table->timestamp('created_at')->nullable()->after('user_id'); // يمكنك تغيير after('user_id') حسب مكان العمود الذي تفضله
-            $table->timestamp('updated_at')->nullable()->after('created_at'); // بعد created_at
-
-            // ملاحظة: لجعلها non-nullable لاحقاً، ستحتاج إلى تحديث القيم الموجودة أولاً
-            // حالياً، Laravel لا يقوم بملء created_at و updated_at للقيم القديمة تلقائياً عند إضافتها
-            // إذا كنت تريدها non-nullable، يجب أن تملأها بقيمة افتراضية (مثلاً Carbon::now()) قبل جعلها non-nullable
+            // Check if created_at column doesn't exist before adding it
+            if (!Schema::hasColumn('password_reset_requests', 'created_at')) {
+                $table->timestamp('created_at')->nullable()->after('user_id'); // يمكنك تغيير after('user_id') حسب مكان العمود الذي تفضله
+            }
+            
+            // Check if updated_at column doesn't exist before adding it
+            if (!Schema::hasColumn('password_reset_requests', 'updated_at')) {
+                $table->timestamp('updated_at')->nullable()->after('created_at'); // بعد created_at
+            }
         });
     }
 
@@ -28,8 +30,14 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('password_reset_requests', function (Blueprint $table) {
-            // عند التراجع، احذف العمودين
-            $table->dropColumn(['created_at', 'updated_at']);
+            // Only drop columns if they exist
+            if (Schema::hasColumn('password_reset_requests', 'created_at')) {
+                $table->dropColumn('created_at');
+            }
+            
+            if (Schema::hasColumn('password_reset_requests', 'updated_at')) {
+                $table->dropColumn('updated_at');
+            }
         });
     }
 };

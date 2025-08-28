@@ -32,7 +32,7 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('profile.password') }}" class="flex items-center text-gray-700 hover:text-purple-600">
+                <a href="{{ route('password.request') }}" class="flex items-center text-gray-700 hover:text-purple-600">
                     <span class="mr-2">›</span>
                     <span>{{ __('Change your password') }}</span>
                 </a>

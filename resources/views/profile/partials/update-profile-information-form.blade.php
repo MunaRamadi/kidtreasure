@@ -13,8 +13,9 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.updateUser') }}" class="mt-6 space-y-6">
         @csrf
+        @method('post')
 
         <div class="mb-4">
             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Name') }}</label>

@@ -26,9 +26,9 @@
 
     <!-- Profile Edit Form -->
     <div class="bg-white rounded-lg shadow-lg p-6">
-        <form action="{{ route('profile.update') }}" method="POST">
+        <form action="{{ route('profile.updateUser') }}" method="POST">
             @csrf
-            @method('PUT')
+            @method('post')
 
             <div class="mb-4">
                 <label for="name" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Name') }}</label>

@@ -90,5 +90,21 @@
         });
     </script>
     @endif
+
+    <!-- Snackbar for success message -->
+    @if(session('success'))
+    <div id="successSnackbar" class="snackbar">
+        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var snackbar = document.getElementById("successSnackbar");
+            snackbar.className = "snackbar show";
+            setTimeout(function(){ 
+                snackbar.className = snackbar.className.replace("show", ""); 
+            }, 3000);
+        });
+    </script>
+    @endif
 </body>
 </html>

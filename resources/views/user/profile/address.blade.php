@@ -50,18 +50,16 @@
                         @if($address->address_line2)
                             <p class="text-gray-600">{{ $address->address_line2 }}</p>
                         @endif
-                        <p class="text-gray-600">{{ $address->city }}, {{ $address->state }} {{ $address->postal_code }}</p>
+                        <p class="text-gray-600">{{ $address->city }}, {{ $address->postal_code }}</p>
                         <p class="text-gray-600">{{ $address->country }}</p>
                         <p class="text-gray-600">{{ $address->phone }}</p>
                         
                         <div class="mt-4 flex space-x-2">
-                            <form action="{{ route('profile.address.delete', $address) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-purple-600 hover:text-purple-800" onclick="return confirm('{{ __('Are you sure you want to delete this address?') }}')">
-                                    {{ __('Delete') }}
-                                </button>
-                            </form>
+                            <button type="button" class="text-purple-600 hover:text-purple-800 delete-address-btn" 
+                                data-address-id="{{ $address->id }}" 
+                                data-address-name="{{ $address->name }}">
+                                {{ __('Delete') }}
+                            </button>
                             
                             @if(!$address->is_default)
                                 <form action="{{ route('profile.address.default', $address) }}" method="POST" class="inline">
@@ -123,17 +121,6 @@
                 </div>
                 
                 <div>
-                    <label for="state" class="block text-gray-700 text-sm font-bold mb-2">{{ __('State/Province') }}</label>
-                    <input type="text" name="state" id="state" value="{{ old('state') }}" required
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('state') border-purple-500 @enderror">
-                    @error('state')
-                        <p class="text-purple-500 text-xs italic mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
                     <label for="postal_code" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Postal Code') }}</label>
                     <input type="text" name="postal_code" id="postal_code" value="{{ old('postal_code') }}" required
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('postal_code') border-purple-500 @enderror">
@@ -141,15 +128,15 @@
                         <p class="text-purple-500 text-xs italic mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                
-                <div>
-                    <label for="country" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Country') }}</label>
-                    <input type="text" name="country" id="country" value="{{ old('country') }}" required
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('country') border-purple-500 @enderror">
-                    @error('country')
-                        <p class="text-purple-500 text-xs italic mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="country" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Country') }}</label>
+                <input type="text" name="country" id="country" value="{{ old('country') }}" required
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('country') border-purple-500 @enderror">
+                @error('country')
+                    <p class="text-purple-500 text-xs italic mt-1">{{ $message }}</p>
+                @enderror
             </div>
             
             <div class="mb-4">
@@ -178,6 +165,36 @@
             </div>
         </form>
     </div>
+
+    <!-- Delete Address Confirmation Modal -->
+    <div id="deleteAddressModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">{{ __('Confirm Deletion') }}</h3>
+                <button type="button" id="closeModal" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <p class="text-gray-600 mb-6">{{ __('Are you sure you want to delete this address?') }} <span id="addressToDelete" class="font-semibold"></span></p>
+            
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancelDelete" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded">
+                    {{ __('Cancel') }}
+                </button>
+                
+                <form id="deleteAddressForm" action="" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded">
+                        {{ __('Delete') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -186,6 +203,11 @@
         const addAddressBtn = document.getElementById('addAddressBtn');
         const addAddressForm = document.getElementById('addAddressForm');
         const cancelAddAddress = document.getElementById('cancelAddAddress');
+        const deleteAddressModal = document.getElementById('deleteAddressModal');
+        const deleteAddressForm = document.getElementById('deleteAddressForm');
+        const addressToDelete = document.getElementById('addressToDelete');
+        const cancelDelete = document.getElementById('cancelDelete');
+        const closeModal = document.getElementById('closeModal');
         
         addAddressBtn.addEventListener('click', function() {
             addAddressForm.classList.remove('hidden');
@@ -193,6 +215,26 @@
         
         cancelAddAddress.addEventListener('click', function() {
             addAddressForm.classList.add('hidden');
+        });
+        
+        document.querySelectorAll('.delete-address-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const addressId = button.getAttribute('data-address-id');
+                const addressName = button.getAttribute('data-address-name');
+                
+                deleteAddressForm.action = `/profile/address/${addressId}`;
+                addressToDelete.textContent = addressName;
+                
+                deleteAddressModal.classList.remove('hidden');
+            });
+        });
+        
+        cancelDelete.addEventListener('click', function() {
+            deleteAddressModal.classList.add('hidden');
+        });
+        
+        closeModal.addEventListener('click', function() {
+            deleteAddressModal.classList.add('hidden');
         });
     });
 </script>

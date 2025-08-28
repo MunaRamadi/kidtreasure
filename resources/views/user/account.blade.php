@@ -14,20 +14,26 @@
     <!-- Page Title -->
     <h1 class="text-2xl font-bold mb-6" style="color: rgb(147 51 234 / var(--tw-text-opacity, 1));">{{ __('My Account') }}</h1>
 
+    @if (session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <!-- Account Section -->
     <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
         <h2 class="text-xl font-bold mb-6 text-gray-800">{{ __('My Account') }}</h2>
 
         <div class="space-y-4">
             <div class="border-l-4 border-gray-300 pl-4 py-1 hover:border-purple-600">
-                <a href="{{ route('profile.edit') }}" class="text-gray-700 hover:text-purple-600">
+                <a href="{{ route('profile.editUser') }}" class="text-gray-700 hover:text-purple-600">
                     <i class="fas fa-user-edit mr-2"></i> {{ __('Edit your account information') }}
                 </a>
             </div>
             
             <div class="border-l-4 border-gray-300 pl-4 py-1 hover:border-purple-600">
                 <a href="{{ route('profile.password') }}" class="text-gray-700 hover:text-purple-600">
-                    <i class="fas fa-key mr-2"></i> {{ __('Change your password') }}
+                    <i class="fas fa-key mr-2"></i> {{ __('Reset your password') }}
                 </a>
             </div>
             
