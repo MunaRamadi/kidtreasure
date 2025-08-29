@@ -33,7 +33,7 @@
         <nav class="flex mb-6" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="javascript:history.back()" class="flex items-center text-purple-600 hover:text-purple-800">
+                    <a href="{{ route('workshops.show', $event->workshop->id) }}" class="flex items-center text-purple-600 hover:text-purple-800">
                         <i class="fas fa-arrow-left mr-2"></i>
                         <span>Go Back</span>
                     </a>
@@ -71,7 +71,7 @@
                                 d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                                 clip-rule="evenodd"></path>
                         </svg>
-                        <a href="{{ route('workshops.show', $event->workshop) }}"
+                        <a href="{{ route('workshops.show', $event->workshop->id) }}"
                             class="ml-1 text-gray-700 hover:text-purple-600 md:ml-2">{{ $event->workshop->name_en }}</a>
                     </div>
                 </li>
@@ -181,8 +181,7 @@
                                             d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
                                         </path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                                        </path>
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0zM7 10a2 2 0 11-4 0 2 2 0 014 0zM7 10H1"></path>
                                     </svg>
                                 </div>
                                 <div>
@@ -300,7 +299,7 @@
                 <div class="bg-white rounded-lg shadow-lg p-6 border border-gray-200 sticky top-8">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">Registration</h2>
 
-                    @if(isset($userRegistered) && $userRegistered)
+                    @if(isset($userRegistered) && $userRegistered && $registration && $registration->status != 'cancelled')
                         <div class="flex items-center mb-4">
                             <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                             <span class="text-green-600 font-medium">You are registered for this event</span>
@@ -310,16 +309,25 @@
                             <div class="mt-2 mb-4 p-3 bg-blue-50 rounded-lg">
                                 <p class="text-blue-800">
                                     <strong>Registration Status:</strong>
-                                    <span class="capitalize">{{ $registration->status }}</span>
+                                    @if($registration->status == 'pending')
+                                        <span class="capitalize text-yellow-600">Pending</span>
+                                    @else
+                                        <span class="capitalize">{{ $registration->status }}</span>
+                                    @endif
                                 </p>
-                                @if($registration->payment_status && $registration->payment_status != 'not_applicable')
-                                    <p class="text-blue-800 mt-2">
-                                        <strong>Payment Status:</strong>
-                                        <span class="capitalize">{{ $registration->payment_status }}</span>
-                                    </p>
-                                @endif
                             </div>
                         @endif
+                        @elseif($event->registrations()->active()->count() >= $event->max_attendees)
+                        <div class="flex items-center mb-4">
+                            <div class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
+                            <span class="text-yellow-600 font-medium">Event is Full</span>
+                        </div>
+                        
+                        <div class="mt-2 mb-4 p-3 bg-yellow-50 rounded-lg">
+                            <p class="text-yellow-800">
+                                This event has reached its maximum capacity of {{ $event->max_attendees }} attendees.
+                            </p>
+                        </div>
                     @elseif($event->is_open_for_registration)
                         <div class="flex items-center mb-4">
                             <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
@@ -344,10 +352,10 @@
 
 <!-- Registration Modal -->
 <div id="registrationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-    <div class="bg-gray-100 rounded-3xl shadow-2xl max-w-4xl w-full mx-4 md:mx-auto max-h-[90vh] overflow-y-auto">
-        <div class="p-6 md:p-10">
+    <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full mx-4 md:mx-auto max-h-[90vh] overflow-y-auto">
+        <div class="p-6 md:p-8">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-3xl font-bold text-gray-800" id="modalWorkshopTitle">{{ __('workshops.register_interest') }}</h3>
+                <h3 class="text-2xl font-bold text-gray-800" id="modalWorkshopTitle">{{ __('workshops.register_for') }}</h3>
                 <button type="button" onclick="closeRegistrationModal()" class="text-gray-500 hover:text-gray-700">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -357,43 +365,7 @@
                 </button>
             </div>
 
-            <form id="registrationForm" action="{{ route('workshops.register', ['event' => 0]) }}" method="POST"
-                class="space-y-6">
-                @csrf
-                <input type="hidden" name="event_id" id="modalWorkshopId">
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="form-input-group">
-                        <input type="text" name="parent_name"
-                            class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
-                            placeholder="{{ __('workshops.parent_name') }}" required>
-                    </div>
-
-                    <div class="form-input-group">
-                        <input type="tel" name="parent_contact"
-                            class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-gray-800"
-                            placeholder="{{ __('workshops.parent_phone') }}" required>
-                    </div>
-
-                    <div class="form-input-group">
-                        <input type="text" name="attendee_name"
-                            class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-gray-800"
-                            placeholder="{{ __('workshops.child_name') }}" required>
-                    </div>
-                </div>
-
-                <div class="form-input-group">
-                    <textarea name="special_requirements"
-                        class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-gray-800"
-                        placeholder="{{ __('workshops.special_requirements') }}" rows="4"></textarea>
-                </div>
-
-                <div class="mt-8">
-                    <button type="submit" class="register-btn btn-professional w-full">
-                        {{ __('workshops.register') }}
-                    </button>
-                </div>
-            </form>
+            <x-workshop-registration-form :event="$event" :isModal="true" />
         </div>
     </div>
 </div>
@@ -524,7 +496,7 @@
 
     function closeRegistrationModal() {
         document.getElementById('registrationModal').classList.add('hidden');
-        document.body.style.overflow = ''; // Re-enable scrolling
+        document.body.style.overflow = 'auto'; // Re-enable scrolling when modal is closed
     }
 
     // Close modal when clicking outside of it
@@ -534,6 +506,45 @@
 
         if (event.target === modal) {
             closeRegistrationModal();
+        }
+    });
+    
+    // Listen for registration cancellation events
+    document.addEventListener('registration-cancelled', function(e) {
+        const eventId = e.detail.eventId;
+        const currentAttendees = e.detail.currentAttendees;
+        const maxAttendees = e.detail.maxAttendees;
+        
+        // Update attendee count display
+        const attendeeCountElement = document.querySelector('.attendee-count');
+        if (attendeeCountElement) {
+            attendeeCountElement.textContent = currentAttendees + '/' + maxAttendees;
+        }
+        
+        // If this is the event page for the cancelled event
+        if (window.location.href.includes('/event/' + eventId)) {
+            // If the event was full but now has space, update the UI
+            if (currentAttendees < maxAttendees) {
+                // Check if there's a "Full" status message
+                const fullStatusElement = document.querySelector('.text-yellow-600.font-medium');
+                if (fullStatusElement && fullStatusElement.textContent.includes('Full')) {
+                    // Replace with "Open for Registration" message
+                    fullStatusElement.innerHTML = '<span class="text-green-600 font-medium">Open for Registration</span>';
+                    
+                    // Replace the full message with registration button
+                    const fullMessageElement = document.querySelector('.mt-2.mb-4.p-3.bg-yellow-50.rounded-lg');
+                    if (fullMessageElement) {
+                        // Create registration button
+                        const registerBtn = document.createElement('button');
+                        registerBtn.setAttribute('onclick', `openRegistrationModal('${eventId}', '${e.detail.eventTitle}')`);
+                        registerBtn.className = 'block w-full text-center px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors';
+                        registerBtn.textContent = 'Register Now';
+                        
+                        // Replace the full message with the button
+                        fullMessageElement.parentNode.replaceChild(registerBtn, fullMessageElement);
+                    }
+                }
+            }
         }
     });
 </script>

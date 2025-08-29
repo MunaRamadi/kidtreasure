@@ -152,7 +152,7 @@ class UserDashboardController extends Controller
      * Cancel a workshop registration
      * 
      * @param int $registration
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\Response
      */
     public function cancelRegistration($registration)
     {
@@ -161,12 +161,38 @@ class UserDashboardController extends Controller
         
         // Only allow cancellation if the registration is not already canceled
         // and the event date is in the future
-        if ($registration->status !== WorkshopRegistration::STATUS_CANCELED && $registration->event->event_date->isFuture()) {
-            $registration->status = WorkshopRegistration::STATUS_CANCELED;
+        if ($registration->status !== WorkshopRegistration::STATUS_CANCELLED && $registration->event->event_date->isFuture()) {
+            $registration->status = WorkshopRegistration::STATUS_CANCELLED;
             $registration->save();
+            
+            // Update the event's current_attendees count
+            $event = $registration->event;
+            $activeRegistrationsCount = $event->registrations()->active()->count();
+            $event->current_attendees = $activeRegistrationsCount;
+            $event->save();
+            
+            // Return JSON response for AJAX requests
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => __('Your registration has been successfully canceled.'),
+                    'event_id' => $registration->event_id,
+                    'event_title' => $registration->event->title ?? '',
+                    'current_attendees' => $activeRegistrationsCount,
+                    'max_attendees' => $event->max_attendees,
+                ]);
+            }
             
             return redirect()->route('profile.activities')
                 ->with('success', __('Your registration has been successfully canceled.'));
+        }
+        
+        // Return JSON error response for AJAX requests
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Unable to cancel this registration. It may be already canceled or the event has already taken place.'),
+            ], 400);
         }
         
         return redirect()->route('profile.activities')

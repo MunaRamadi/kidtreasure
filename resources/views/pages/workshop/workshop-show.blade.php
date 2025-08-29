@@ -7,12 +7,26 @@
     : 'تعرف على ورشة ' . $workshop->name_ar . ' - ' . Str::limit(strip_tags($workshop->description_ar), 150))
 
 @section('content')
+<style>
+      <style>
+      /* Register Button Styles */
+      .register-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.75rem;
+      }
+
+        .register-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+</style>
     <div class="container mx-auto px-4 py-8">
         <!-- Breadcrumbs -->
         <nav class="flex mb-6" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="javascript:history.back()" class="flex items-center text-purple-600 hover:text-purple-800">
+                    <a href="{{ route('workshops.index') }}" class="flex items-center text-purple-600 hover:text-purple-800">
                         <i class="fas fa-arrow-left mr-2"></i>
                         <span>Go Back</span>
                     </a>
@@ -111,6 +125,8 @@
                                         <img src="{{ asset('storage/' . $event->image_path) }}" alt="{{ $event->title }}" class="w-full h-48 object-cover">
                                     @elseif($workshop->image_path)
                                         <img src="{{ asset('storage/' . $workshop->image_path) }}" alt="{{ $event->title }}" class="w-full h-48 object-cover opacity-80">
+                                    @else
+                                        <img src="{{ asset('images/default-workshop.jpg') }}" alt="{{ $event->title }}" class="w-full h-48 object-cover">
                                     @endif
                                     
                                     <div class="p-4">
@@ -145,10 +161,40 @@
                                             <span>{{ $event->price_jod }} JOD</span>
                                         </div>
                                         
+                                        
                                         @if($event->is_open_for_registration)
-                                            <a href="{{ route('workshops.register.form', $event) }}" class="block w-full text-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
-                                                {{ __('workshops.register') }}
-                                            </a>
+                                            @if(in_array($event->id, $registeredEventIds ?? []))
+                                                <div class="block w-full text-center px-4 py-2 mb-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest event-registration-status-{{ $event->id }}">
+                                                    {{ __('Registered') }}
+                                                </div>
+                                                <a href="{{ $event->getGoogleCalendarUrl() }}" 
+                                                    class="block w-full text-center items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700" 
+                                                    target="_blank">
+                                                    + Add to Calendar
+                                                </a>
+                                                <a href="{{ route('workshops.event.show', $event) }}"
+                                                    class="block w-full text-center px-4 py-2 my-2 bg-white border border-transparent rounded-md font-semibold text-xs text-indigo-600 uppercase tracking-widest disabled:opacity-25 transition ease-in-out duration-150 event-registration-status-{{ $event->id }}" data-event-id="{{ $event->id }}">
+                                                    Details
+                                                </a>
+                                            @elseif($event->registrations()->active()->count() >= $event->max_attendees)
+                                                <div class="block w-full text-center px-4 py-2 mb-2 bg-yellow-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest">
+                                                    {{ __('FULL') }}
+                                                </div>
+                                                <a href="{{ route('workshops.event.show', $event->id) }}" type="button" 
+                                                    class="block w-full text-center px-4 py-2 my-2 bg-white border border-transparent rounded-md font-semibold text-xs text-indigo-600 uppercase tracking-widest disabled:opacity-25 transition ease-in-out duration-150 event-registration-status-{{ $event->id }}" data-event-id="{{ $event->id }}">
+                                                   {{ __('Details') }}
+                                                </a>
+                                            @else 
+                                                <a href="{{ route('workshops.event.show', $event->id) }}" type="button" 
+                                                    class="block w-full text-center px-4 py-2 my-2 bg-white border border-transparent rounded-md font-semibold text-xs text-indigo-600 uppercase tracking-widest  disabled:opacity-25 transition ease-in-out duration-150 event-registration-status-{{ $event->id }}" data-event-id="{{ $event->id }}">
+                                               {{ __('Details') }}
+                                                </a>
+                                                <button type="button" 
+                                                    onclick="openRegistrationModal('{{ $event->id }}', '{{ $event->title }}')" 
+                                                    class="block w-full text-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150 event-registration-status-{{ $event->id }}" data-event-id="{{ $event->id }}">
+                                                    {{ __('workshops.register') }}
+                                                </button>
+                                            @endif
                                         @else
                                             <div class="text-center text-sm text-red-600 py-2">
                                                 {{ __('workshops.registration_closed') }}
@@ -195,4 +241,83 @@
             </div>
         </div>
     </div>
+
+    <!-- Registration Modal -->
+    <div id="registrationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full mx-4 md:mx-auto max-h-[90vh] overflow-y-auto">
+            <div class="p-6 md:p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800" id="modalWorkshopTitle">{{ __('workshops.register_for') }}</h3>
+                    <button type="button" onclick="closeRegistrationModal()" class="text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <x-workshop-registration-form :event="$workshop->events->first()" :isModal="true" />
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+        // Function to open registration modal
+        function openRegistrationModal(eventId, eventTitle) {
+            document.getElementById('modalWorkshopTitle').textContent = '{{ __("workshops.register_for") }} ' + eventTitle;
+            document.getElementById('registrationModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+        }
+        
+        // Function to close registration modal
+        function closeRegistrationModal() {
+            document.getElementById('registrationModal').classList.add('hidden');
+            document.body.style.overflow = 'auto'; // Re-enable scrolling when modal is closed
+        }
+        
+        // Listen for registration cancellation events
+        document.addEventListener('registration-cancelled', function(e) {
+            const eventId = e.detail.eventId;
+            const currentAttendees = e.detail.currentAttendees;
+            const maxAttendees = e.detail.maxAttendees;
+            
+            // Update attendee count display for this event if it exists on the page
+            const attendeeCountElements = document.querySelectorAll('.attendee-count-' + eventId);
+            attendeeCountElements.forEach(function(element) {
+                element.textContent = currentAttendees + '/' + maxAttendees;
+            });
+            
+            // If the event was full but now has space, update the UI
+            if (currentAttendees < maxAttendees) {
+                // Find the event card
+                const eventCard = document.querySelector('[data-event-id="' + eventId + '"]').closest('.event-card');
+                if (eventCard) {
+                    // Remove "FULL" status if it exists
+                    const fullStatus = eventCard.querySelector('.bg-yellow-600');
+                    if (fullStatus) {
+                        fullStatus.remove();
+                    }
+                    
+                    // Re-enable registration button
+                    const registerBtn = eventCard.querySelector('button[onclick^="openRegistrationModal"]');
+                    if (!registerBtn) {
+                        // If button doesn't exist, create it
+                        const detailsBtn = eventCard.querySelector('a[href*="workshops.event.show"]');
+                        if (detailsBtn && detailsBtn.parentNode) {
+                            const newBtn = document.createElement('button');
+                            newBtn.setAttribute('type', 'button');
+                            newBtn.setAttribute('onclick', 'openRegistrationModal("' + eventId + '", "' + e.detail.eventTitle + '")');
+                            newBtn.className = 'block w-full text-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150 event-registration-status-' + eventId;
+                            newBtn.setAttribute('data-event-id', eventId);
+                            newBtn.textContent = '{{ __("workshops.register") }}';
+                            detailsBtn.parentNode.appendChild(newBtn);
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    @endpush
 @endsection

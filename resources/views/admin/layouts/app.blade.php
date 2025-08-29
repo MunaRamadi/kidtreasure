@@ -400,13 +400,6 @@
                 </ul>
             </nav>
             <div class="container-fluid p-4">
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
                 @if(session('error'))
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         {{ session('error') }}
@@ -448,6 +441,22 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var snackbar = document.getElementById("welcomeSnackbar");
+        snackbar.className = "snackbar show";
+        setTimeout(function(){ 
+            snackbar.className = snackbar.className.replace("show", ""); 
+        }, 3000);
+    });
+</script>
+@endif
+
+<!-- Snackbar for success messages -->
+@if(session('snackbar'))
+<div id="successSnackbar" class="snackbar">
+    <i class="fas fa-check-circle me-2"></i> {{ session('snackbar') }}
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var snackbar = document.getElementById("successSnackbar");
         snackbar.className = "snackbar show";
         setTimeout(function(){ 
             snackbar.className = snackbar.className.replace("show", ""); 

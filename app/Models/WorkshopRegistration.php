@@ -15,7 +15,7 @@ class WorkshopRegistration extends Model
      */
     public const STATUS_PENDING = 'pending';
     public const STATUS_CONFIRMED = 'confirmed';
-    public const STATUS_CANCELED = 'canceled';
+    public const STATUS_CANCELLED = 'cancelled';
     
     /**
      * The attributes that are mass assignable.
@@ -73,7 +73,7 @@ class WorkshopRegistration extends Model
         return [
             self::STATUS_PENDING => 'قيد الانتظار',
             self::STATUS_CONFIRMED => 'تم',
-            self::STATUS_CANCELED => 'ملغي',
+            self::STATUS_CANCELLED => 'ملغي',
         ];
     }
     
@@ -85,5 +85,16 @@ class WorkshopRegistration extends Model
     public function getStatusNameAttribute(): string
     {
         return self::getStatuses()[$this->status] ?? $this->status;
+    }
+    
+    /**
+     * Scope a query to only include active registrations (not cancelled)
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', '!=', self::STATUS_CANCELLED);
     }
 }
