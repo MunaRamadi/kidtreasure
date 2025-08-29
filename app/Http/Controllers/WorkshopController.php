@@ -8,7 +8,8 @@ use App\Models\WorkshopRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\DB; 
-use Illuminate\Validation\ValidationException; 
+use Illuminate\Support\Facades\Session; 
+use Illuminate\Support\Facades\ValidationException; 
 
 class WorkshopController extends Controller
 {
@@ -24,6 +25,16 @@ class WorkshopController extends Controller
             ->where('is_open_for_registration', true)
             ->orderBy('event_date')
             ->get();
+
+        // Get the total count of featured workshops
+        $featuredWorkshopsCount = Workshop::where('is_active', true)
+            ->where(function($query) {
+                $query->where('is_featured', true)
+                      ->orWhereHas('events', function($q) {
+                          $q->where('event_date', '>=', now());
+                      });
+            })
+            ->count();
 
         // Get featured workshops (selecting those marked as featured or with most events/registrations)
         $featuredWorkshops = Workshop::where('is_active', true)
@@ -44,13 +55,13 @@ class WorkshopController extends Controller
                       ->orderBy('event_date')
                       ->with('registrations');
             }])
-            ->limit(5) // Limit to 5 featured workshops for the carousel
+            ->limit(3) // Limit to 3 featured workshops for display
             ->get();
 
         // Get a single featured workshop (for backward compatibility)
         $featuredWorkshop = $featuredWorkshops->first();
 
-        return view('pages.workshop.workshop', compact('workshops', 'upcomingEvents', 'featuredWorkshop', 'featuredWorkshops'));
+        return view('pages.workshop.workshop', compact('workshops', 'upcomingEvents', 'featuredWorkshop', 'featuredWorkshops', 'featuredWorkshopsCount'));
     }
 
     /**
@@ -69,8 +80,9 @@ class WorkshopController extends Controller
         $userRegistrations = [];
         
         if (auth()->check()) {
-            // Get all registrations for the current user
-            $userRegistrations = WorkshopRegistration::where('user_id', auth()->id())
+            // Get all active registrations for the current user
+            $userRegistrations = WorkshopRegistration::active()
+                ->where('user_id', auth()->id())
                 ->with('event')
                 ->get()
                 ->keyBy('event_id');
@@ -82,18 +94,29 @@ class WorkshopController extends Controller
     /**
      * Display the specified workshop with its upcoming events
      * 
-     * @param \App\Models\Workshop $workshop
+     * @param int $id
      * @return \Illuminate\View\View
      */
-    public function show(Workshop $workshop)
+    public function show($id)
     {
-        // Load upcoming events for this workshop
-        $workshop->load(['events' => function($query) {
-            $query->where('event_date', '>=', now())
-                  ->orderBy('event_date');
-        }]);
+        $workshop = Workshop::findOrFail($id)
+            ->load(['events' => function ($query) {
+                $query->where('event_date', '>=', now())
+                      ->where('is_open_for_registration', true)
+                      ->orderBy('event_date', 'asc');
+            }]);
         
-        return view('pages.workshop.workshop-show', compact('workshop'));
+        $registeredEventIds = [];
+        if (auth()->check()) {
+            $registeredEventIds = WorkshopRegistration::active()
+                ->where('user_id', auth()->id())
+                ->pluck('event_id')
+                ->toArray();
+        } else {
+            $registeredEventIds = session('registered_events', []);
+        }
+        
+        return view('pages.workshop.workshop-show', compact('workshop', 'registeredEventIds'));
     }
 
  
@@ -151,15 +174,21 @@ class WorkshopController extends Controller
     {
         // Validate form data
         $request->validate([
-            'attendee_name' => 'required|string|max:255',
-            'parent_name' => 'required|string|max:255', 
-            'parent_contact' => 'required|string|max:255',
-            'special_requirements' => 'nullable|string',
+            'attendee_name' => 'required|string|max:255|regex:/^[A-Za-z\s\-\.\']+$/',
+            'parent_name' => 'required|string|max:255|regex:/^[A-Za-z\s\-\.\']+$/', 
+            'parent_contact' => 'required|string|max:255|regex:/^[0-9\+\-\s]+$/',
+            'special_requirements' => 'nullable|string|max:500',
         ]);
 
         // Check if the event is still open for registration
         if (!$event->is_open_for_registration || $event->event_date < now()) {
              return back()->withInput()->with('error', 'تعذر التسجيل. الورشة غير متاحة.');
+        }
+        
+        // Check if the event has reached maximum capacity
+        $activeRegistrationsCount = $event->registrations()->active()->count();
+        if ($activeRegistrationsCount >= $event->max_attendees) {
+            return back()->withInput()->with('error', 'عذراً، الورشة ممتلئة بالكامل.');
         }
 
         // Save registration data to database
@@ -175,11 +204,20 @@ class WorkshopController extends Controller
             'payment_status' => ($event->price_jod > 0) ? 'pending' : 'not_applicable', 
         ]);
         
-        // Increment the attendee count for the event
-        $event->increment('current_attendees');
+        // Update the event's current_attendees count
+        $activeRegistrationsCount = $event->registrations()->active()->count();
+        $event->current_attendees = $activeRegistrationsCount;
+        $event->save();
 
-        // Redirect back to workshops list with success message
-        return redirect()->route('workshops.list')->with('success', 'Registration successful! Thank you for registering for ' . $event->title . '.');
+        // Store registration in session for guest users
+        if (!Auth::check()) {
+            $registeredEvents = session('registered_events', []);
+            $registeredEvents[] = $event->id;
+            session(['registered_events' => $registeredEvents]);
+        }
+
+        // Redirect back to workshop details page with success message
+        return redirect()->route('workshops.show', $event->workshop_id)->with('success', 'Registration successful! Thank you for registering for ' . $event->title . '.');
     }
 
     /**
@@ -202,6 +240,12 @@ class WorkshopController extends Controller
         // Get the event
         $event = WorkshopEvent::findOrFail($validated['event_id']);
         
+        // Check if the event has reached maximum capacity
+        $activeRegistrationsCount = $event->registrations()->active()->count();
+        if ($activeRegistrationsCount >= $event->max_attendees) {
+            return back()->withInput()->with('error', 'عذراً، الورشة ممتلئة بالكامل.');
+        }
+        
         // Store registration in database
         $registration = WorkshopRegistration::create([
             'user_id' => Auth::id() ?? null, // Use authenticated user ID if available
@@ -214,8 +258,10 @@ class WorkshopController extends Controller
             'payment_status' => ($event->price_jod > 0) ? 'pending' : 'not_applicable',
         ]);
         
-        // Increment the attendee count for the event
-        $event->increment('current_attendees');
+        // Update the event's current_attendees count
+        $activeRegistrationsCount = $event->registrations()->active()->count();
+        $event->current_attendees = $activeRegistrationsCount;
+        $event->save();
         
         // Redirect with success message
         return redirect()->route('workshops.index')->with('success', 'Thank you for registering! Your registration has been received.');

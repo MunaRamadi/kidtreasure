@@ -223,7 +223,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end mt-4">
-                            <a href="{{ route('admin.workshops.show', $workshop) }}"
+                            <a href="{{ route('admin.workshops.index') }}"
                                 class="btn btn-secondary me-2">إلغاء</a>
                             <button type="submit" class="btn btn-primary mx-2">تحديث الورشة</button>
                         </div>

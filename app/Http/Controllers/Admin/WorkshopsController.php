@@ -127,7 +127,7 @@ class WorkshopsController extends Controller
         $workshop->save();
 
         return redirect()->route('admin.workshops.index')
-            ->with('success', 'Workshop template created successfully.');
+            ->with('snackbar', 'تم إنشاء ورشة جديدة بنجاح');
     }
 
     /**
@@ -216,8 +216,8 @@ class WorkshopsController extends Controller
 
         $workshop->save();
 
-        return redirect()->route('admin.workshops.show', $workshop)
-            ->with('success', 'Workshop template updated successfully.');
+        return redirect()->route('admin.workshops.index')
+            ->with('snackbar', 'تم تحديث الورشة بنجاح');
     }
 
     /**
@@ -248,7 +248,7 @@ class WorkshopsController extends Controller
         $workshop->delete();
 
         return redirect()->route('admin.workshops.index')
-            ->with('success', 'Workshop template deleted successfully.');
+            ->with('snackbar', 'تم حذف الورشة بنجاح');
     }
 
     /**
@@ -311,9 +311,9 @@ class WorkshopsController extends Controller
         }
 
         if ($success) {
-            return response()->json(['success' => true, 'message' => 'Image removed successfully']);
+            return response()->json(['success' => true, 'message' => 'تم حذف الصورة بنجاح']);
         }
 
-        return response()->json(['success' => false, 'message' => 'Failed to remove image'], 400);
+        return response()->json(['success' => false, 'message' => 'فشل حذف الصورة'], 400);
     }
 }

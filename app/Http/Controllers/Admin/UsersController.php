@@ -80,7 +80,7 @@ class UsersController extends Controller
         $user->update($userData); // تحديث المستخدم بالبيانات الجديدة
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'تم تحديث المستخدم بنجاح');
+            ->with('snackbar', 'تم تحديث المستخدم بنجاح');
     }
 
     public function destroy(User $user)
@@ -93,15 +93,17 @@ class UsersController extends Controller
         $user->delete();
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'تم حذف المستخدم بنجاح');
+            ->with('snackbar', 'تم حذف المستخدم بنجاح');
     }
 
     public function toggleStatus(User $user)
     {
         $user->update(['is_active' => !$user->is_active]);
-
+        
+        $message = $user->is_active ? 'تم تفعيل المستخدم بنجاح' : 'تم تعطيل المستخدم بنجاح';
+        
         return redirect()->route('admin.users.index')
-            ->with('success', $user->is_active ? 'تم تفعيل المستخدم بنجاح' : 'تم إلغاء تفعيل المستخدم بنجاح');
+            ->with('snackbar', $message);
     }
 
     /**
@@ -142,16 +144,16 @@ class UsersController extends Controller
         // Handle is_admin field (convert checkbox to boolean)
         $userData['is_admin'] = $request->has('is_admin');
         
-        User::create($userData);
+        $user = User::create($userData);
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'User created successfully');
+            ->with('snackbar', 'تم إنشاء المستخدم ' . $user->name . ' بنجاح');
     }
 
     // دالة جديدة لمعالجة طلب إعادة تعيين كلمة المرور (وضع علامة كـ "معالج")
     public function resolvePasswordResetRequest(PasswordResetRequest $request)
     {
         $request->update(['is_resolved' => true]);
-        return back()->with('success', 'تم وضع علامة على الطلب كتمت معالجته بنجاح.');
+        return back()->with('snackbar', 'تم وضع علامة على الطلب كتمت معالجته بنجاح.');
     }
 }

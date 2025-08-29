@@ -48,7 +48,7 @@ Route::post('/workshops/register-interest', [WorkshopController::class, 'registe
 // Workshop routes
 Route::prefix('workshops')->name('workshops.')->group(function () {
     Route::get('/', [WorkshopController::class, 'index'])->name('index');
-    Route::get('/workshop/{workshop}', [WorkshopController::class, 'show'])->name('show');
+    Route::get('/workshop/{id}', [WorkshopController::class, 'show'])->name('show')->where('id', '[0-9]+');
     Route::get('/event/{event}', [WorkshopController::class, 'showEvent'])->name('event.show');
     Route::get('/event/{event}/register', [WorkshopController::class, 'registerForm'])->name('register.form');
     Route::post('/event/{event}/register', [WorkshopController::class, 'register'])->name('register');

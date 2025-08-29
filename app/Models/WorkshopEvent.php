@@ -93,7 +93,7 @@ class WorkshopEvent extends Model
      */
     public function getCurrentAttendeesAttribute(): int
     {
-        return $this->registrations()->count();
+        return $this->registrations()->active()->count();
     }
     
     /**

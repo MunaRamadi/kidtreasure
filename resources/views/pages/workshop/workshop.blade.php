@@ -21,14 +21,22 @@
             --glass-border: rgba(255, 255, 255, 0.2);
         }
 
-        /* Form Styles with Improved Placeholder Visibility */
-        .form-input {
-            @apply w-full px-4 py-3 bg-white bg-opacity-90 rounded-xl border border-indigo-200 shadow-inner focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 transition duration-300 outline-none text-gray-900 font-medium;
+        /* Register Button Styles */
+        .register-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        /* Placeholder styling for better visibility */
-        .form-input::placeholder {
-            @apply text-gray-500 opacity-100;
+        .register-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
 
         /* Animated Background Effect */
@@ -43,12 +51,13 @@
             width: 100%;
             padding-bottom: 40px;
         }
-        
+
         .swiper-pagination {
             bottom: 0 !important;
         }
-        
-        .swiper-button-next, .swiper-button-prev {
+
+        .swiper-button-next,
+        .swiper-button-prev {
             color: white !important;
             background: rgba(118, 75, 162, 0.7);
             width: 40px !important;
@@ -56,20 +65,22 @@
             border-radius: 50%;
             transition: all 0.3s ease;
         }
-        
-        .swiper-button-next:hover, .swiper-button-prev:hover {
+
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
             background: rgba(118, 75, 162, 1);
         }
-        
-        .swiper-button-next:after, .swiper-button-prev:after {
+
+        .swiper-button-next:after,
+        .swiper-button-prev:after {
             font-size: 18px !important;
         }
-        
+
         .swiper-pagination-bullet {
             background: white !important;
             opacity: 0.7;
         }
-        
+
         .swiper-pagination-bullet-active {
             opacity: 1;
             background: #f093fb !important;
@@ -163,8 +174,6 @@
         .btn-professional {
             position: relative;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d;
         }
 
         .btn-professional::before {
@@ -174,16 +183,10 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.6s;
-        }
-
-        .btn-professional:hover::before {
-            left: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)
         }
 
         .btn-professional:hover {
-            transform: translateY(-5px) rotateX(10deg);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
         }
 
@@ -219,6 +222,17 @@
         .card-hover-effect:hover {
             transform: rotateY(10deg) rotateX(10deg) translateZ(20px);
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Disable hover effects for upcoming events cards */
+        .workshop-card.glass-card {
+            transition: none !important;
+            transform-style: flat !important;
+        }
+
+        .workshop-card.glass-card:hover {
+            transform: none !important;
+            box-shadow: none !important;
         }
 
         /* Section Background Patterns */
@@ -281,11 +295,6 @@
         .workshop-card {
             overflow: hidden;
             border-radius: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .workshop-card:hover .workshop-image img {
-            transform: scale(1.1);
         }
 
         .workshop-image {
@@ -297,46 +306,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .form-input-group {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            background-color: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
-            outline: none;
-        }
-
-        .register-btn {
-            width: 100%;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            background: var(--primary-gradient);
-            color: white;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .register-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
     </style>
 
@@ -374,7 +343,7 @@
             <div class="floating-element"></div>
             <div class="floating-element"></div>
         </div>
-        
+
         <div class="container mx-auto px-6 relative z-10">
             <div class="text-center mb-16 fade-in-up">
                 <h2 class="text-5xl md:text-7xl font-black mb-8">
@@ -385,203 +354,93 @@
                     Discover our most popular and engaging workshop experiences
                 </p>
             </div>
-            
+
             @if(isset($featuredWorkshops) && $featuredWorkshops->count() > 0)
-                <div id="featuredWorkshopsCarousel" class="carousel slide" data-bs-ride="carousel">
-                    <!-- Carousel Indicators -->
-                    <div class="carousel-indicators">
-                        @foreach($featuredWorkshops as $index => $workshop)
-                            <button type="button" data-bs-target="#featuredWorkshopsCarousel" data-bs-slide-to="{{ $index }}" 
-                                class="{{ $index == 0 ? 'active' : '' }}" aria-current="{{ $index == 0 ? 'true' : 'false' }}" 
-                                aria-label="Slide {{ $index + 1 }}"></button>
-                        @endforeach
-                    </div>
-                    
-                                 <!-- Carousel Items -->
-                                 <div class="carousel-inner">
-                        @foreach($featuredWorkshops as $index => $workshop)
-                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                                <div class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-xl overflow-hidden shadow-2xl">
-                                    <div class="md:flex">
-                                        <div class="md:w-1/2 carousel-image-container">
-                                            @if($workshop->image)
-                                                <img src="{{ asset('storage/' . $workshop->image) }}" 
-                                                    alt="{{ app()->getLocale() == 'en' ? $workshop->name_en : $workshop->name_ar }}" 
-                                                    class="workshop-carousel-image">
-                                            @else
-                                                <img src="{{ asset('images/placeholder-workshop.jpg') }}" 
-                                                    alt="{{ app()->getLocale() == 'en' ? $workshop->name_en : $workshop->name_ar }}" 
-                                                    class="workshop-carousel-image">
-                                            @endif
+                <div class="container mx-auto px-4 py-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @foreach($featuredWorkshops as $workshop)
+                                <div
+                                    class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-xl overflow-hidden shadow-2xl">
+                                    <div class="relative h-48 overflow-hidden">
+                                        @if($workshop->image)
+                                            <img src="{{ asset('storage/' . $workshop->image) }}"
+                                                alt="{{ app()->getLocale() == 'en' ? $workshop->name_en : $workshop->name_ar }}"
+                                                class="w-full h-full object-cover">
+                                        @else
+                                            <img src="{{ asset('images/default-workshop.jpg') }}"
+                                                alt="{{ app()->getLocale() == 'en' ? $workshop->name_en : $workshop->name_ar }}"
+                                                class="w-full h-full object-cover">
+                                        @endif
+                                        <div class="absolute top-0 right-0 mt-4 mr-4">
+                                            <span
+                                                class="inline-block bg-purple-500 bg-opacity-80 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                                {{ $workshop->target_age_group }}
+                                            </span>
                                         </div>
-                                        <div class="md:w-1/2 p-8 workshop-content">
-                                            <div class="mb-4">
-                                                <span class="inline-block bg-purple-500 bg-opacity-30 text-white px-3 py-1 rounded-full text-sm font-medium mb-4">
-                                                    {{ $workshop->target_age_group }}
-                                                </span>
-                                                <h3 class="text-3xl font-bold mb-4">
-                                                    {{ app()->getLocale() == 'en' ? $workshop->name_en : $workshop->name_ar }}
-                                                </h3>
+                                    </div>
+                                    <div class="p-6">
+                                        <h3 class="text-xl font-bold mb-3 text-white">
+                                            {{ app()->getLocale() == 'en' ? $workshop->name_en : $workshop->name_ar }}
+                                        </h3>
+
+                                        <p class="text-white text-opacity-80 mb-4 h-20 overflow-hidden">
+                                            {{ \Illuminate\Support\Str::limit(app()->getLocale() == 'en' ? $workshop->description_en : $workshop->description_ar, 120) }}
+                                        </p>
+
+                                        <div class="flex flex-wrap gap-4 mb-4">
+                                            <div class="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-300 mr-2" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span class="text-sm text-white text-opacity-80">{{ $workshop->events->count() }}
+                                                    Events</span>
                                             </div>
-                                            
-                                            <p class="text-white text-opacity-80 mb-6">
-                                                {{ \Illuminate\Support\Str::limit(app()->getLocale() == 'en' ? $workshop->description_en : $workshop->description_ar, 250) }}
-                                            </p>
-                                            
-                                            <div class="mt-8">
-                                                <div class="flex flex-wrap gap-4 mb-6">
-                                                    <div class="flex items-center">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        <span>{{ $workshop->events->count() }} Events</span>
-                                                    </div>
-                                                    
-                                                    <div class="flex items-center">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                                        </svg>
-                                                        <span>{{ $workshop->events->sum(function($event) { return $event->registrations->count(); }) ?? 0 }} Participants</span>
-                                                    </div>
-                                                </div>
-                                                
-                                                @if($workshop->events->where('event_date', '>=', now())->count() > 0)
-                                                    <div class="mb-6">
-                                                        <h4 class="text-xl font-semibold mb-3">Next Event</h4>
-                                                        @php
-                                                            $nextEvent = $workshop->events->where('event_date', '>=', now())->sortBy('event_date')->first();
-                                                        @endphp
-                                                        
-                                                        @if($nextEvent)
-                                                            <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                                                                <div class="flex justify-between items-center mb-2">
-                                                                    <span class="font-medium">{{ $nextEvent->title }}</span>
-                                                                    <span>{{ \Carbon\Carbon::parse($nextEvent->event_date)->format('M d, Y') }}</span>
-                                                                </div>
-                                                                <div class="flex justify-between items-center">
-                                                                    <span>{{ \Carbon\Carbon::parse($nextEvent->event_time)->format('g:i A') }}</span>
-                                                                    <span>{{ $nextEvent->location }}</span>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                @endif
-                                                
-                                                <div class="mt-8">
-                                                    <a href="{{ route('workshops.show', $workshop) }}" class="inline-block bg-white text-purple-800 h-12 px-6 py-3 rounded-full font-bold text-sm hover:bg-opacity-90 transition-colors">
-                                                        {{ __('workshops.learn_more') }}
-                                                    </a>
-                                                </div>
+
+                                            <div class="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-300 mr-2" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                </svg>
+                                                <span
+                                                    class="text-sm text-white text-opacity-80">{{ $workshop->events->sum(function ($event) {
+                            return $event->registrations->count(); }) ?? 0 }}
+                                                    Participants</span>
                                             </div>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <a href="{{ route('workshops.show', $workshop->id) }}"
+                                                class="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-purple-800 bg-white rounded-full hover:bg-opacity-90 transition-colors">
+                                                {{ __('Events') }}
+                                                <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
+                                                </svg>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                         @endforeach
                     </div>
-                    
-                    <!-- Carousel Controls -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#featuredWorkshopsCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#featuredWorkshopsCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
-                </div>
-                
-                @push('styles')
-                <style>
-                    /* Custom carousel styles */
-                    #featuredWorkshopsCarousel {
-                        margin: 0 auto;
-                        max-width: 1200px;
-                    }
-                    
-                    #featuredWorkshopsCarousel .carousel-item {
-                        transition: transform 0.6s ease-in-out;
-                        height: 550px; /* Increased height for carousel items */
-                    }
-                    
-                    #featuredWorkshopsCarousel .carousel-inner {
-                        height: 550px; /* Increased height for carousel container */
-                    }
 
-                    #featuredWorkshopsCarousel .md\:flex {
-                        height: 100%; /* Make flex container take full height */
-                    }
-                    
-                    /* Image container styles */
-                    #featuredWorkshopsCarousel .carousel-image-container {
-                        height: 550px; /* Increased height to match */
-                        overflow: hidden;
-                    }
-                    
-                    /* Workshop image styles */
-                    #featuredWorkshopsCarousel .workshop-carousel-image {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: cover; /* This ensures the image covers the area without distortion */
-                    }
-                    
-                    /* Content area styles */
-                    #featuredWorkshopsCarousel .workshop-content {
-                        height: 550px; /* Increased height to match */
-                        overflow-y: visible; /* Changed from auto to visible to remove scroll */
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: space-between;
-                    }
-                    
-                    /* Button styling to be more compact */
-                    #featuredWorkshopsCarousel .workshop-content .mt-8 a {
-                        padding: 0.5rem 1.5rem; /* Reduced padding */
-                        display: inline-block;
-                    }
-                    
-                    #featuredWorkshopsCarousel .carousel-control-prev,
-                    #featuredWorkshopsCarousel .carousel-control-next {
-                        width: 5%;
-                        background: rgba(0, 0, 0, 0.2);
-                        border-radius: 50%;
-                        height: 50px;
-                        width: 50px;
-                        top: 50%;
-                        transform: translateY(-50%);
-                    }
-                    
-                    #featuredWorkshopsCarousel .carousel-indicators {
-                        bottom: -50px;
-                    }
-                    
-                    #featuredWorkshopsCarousel .carousel-indicators button {
-                        width: 12px;
-                        height: 12px;
-                        border-radius: 50%;
-                        background-color: rgba(255, 255, 255, 0.5);
-                        margin: 0 5px;
-                    }
-                    
-                    #featuredWorkshopsCarousel .carousel-indicators button.active {
-                        background-color: white;
-                    }
-                </style>
-                @endpush
-                
-                @push('scripts')
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        // Initialize the carousel with custom settings
-                        const carousel = new bootstrap.Carousel(document.getElementById('featuredWorkshopsCarousel'), {
-                            interval: 5000,  // Change slides every 5 seconds
-                            wrap: true,      // Continuous loop
-                            keyboard: true,  // Allow keyboard navigation
-                            pause: 'hover'   // Pause on mouse hover
-                        });
-                    });
-                </script>
-                @endpush
+                    @if(isset($featuredWorkshopsCount) && $featuredWorkshopsCount > 3)
+                        <div class="flex justify-end mt-6">
+                            <a href="{{ route('workshops.list') }}"
+                                class="inline-flex items-center px-6 py-3 text-sm font-medium text-center text-white bg-purple-600 rounded-full hover:bg-purple-700 transition-colors shadow-lg">
+                                {{ app()->getLocale() == 'en' ? 'View All Workshops' : 'عرض جميع الورش' }}
+                                <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    fill="none" viewBox="0 0 14 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M1 5h12m0 0L9 1m4 4L9 9" />
+                                </svg>
+                            </a>
+                        </div>
+                    @endif
+                </div>
             @else
                 <div class="text-center py-12">
                     <p class="text-white text-opacity-80">Stay tuned for our featured workshops coming soon!</p>
@@ -698,12 +557,12 @@
             <!-- Simple Grid Layout for All Workshops -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 @foreach($upcomingEvents as $event)
-                    <div class="workshop-card glass-card card-hover-effect p-0 fade-in-up h-full">
+                    <div class="workshop-card glass-card p-0 h-full">
                         <div class="workshop-image">
-                        @if($event->image)
+                            @if($event->image)
                                 <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}">
                             @else
-                                <img src="{{ asset('images/placeholder-workshop.jpg') }}" alt="{{ $event->title }}">
+                                <img src="{{ asset('images/default-workshop.jpg') }}" alt="{{ $event->title }}">
                             @endif
                         </div>
                         <div class="p-6">
@@ -743,18 +602,19 @@
 
                             <div class="flex justify-between items-center">
                                 <span class="text-white font-bold text-xl">{{ $event->price_jod }} JOD</span>
-                                
+
                                 <div class="flex space-x-2">
                                     <a href="{{ route('workshops.event.show', $event) }}"
                                         class="btn-professional bg-white text-indigo-600 px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
                                         Details
                                     </a>
-                                    
+
                                     @php
                                         $userRegistered = false;
                                         if (auth()->check()) {
                                             $userRegistered = $event->registrations()
                                                 ->where('user_id', auth()->id())
+                                                ->where('status', '!=', \App\Models\WorkshopRegistration::STATUS_CANCELLED)
                                                 ->exists();
                                         }
                                     @endphp
@@ -763,11 +623,6 @@
                                         <span class="bg-green-500 text-white px-4 py-2 rounded-full font-bold text-sm">
                                             Registered
                                         </span>
-                                        <a href="{{ $event->getGoogleCalendarUrl() }}" 
-                                           class="bg-purple-600 text-white px-2 py-2 rounded-full text-sm hover:bg-purple-700 transition-colors flex items-center"
-                                           target="_blank">
-                                            Add to Calendar
-                                        </a>
                                     @elseif($event->is_open_for_registration)
                                         <button type="button"
                                             class="btn-professional bg-white text-purple-700 px-4 py-2 rounded-full font-bold text-sm hover:bg-opacity-90"
@@ -783,7 +638,7 @@
                     </div>
                 @endforeach
             </div>
-            
+
             <!-- If no upcoming events -->
             @if(count($upcomingEvents) == 0)
                 <div class="text-center py-12">
@@ -792,7 +647,7 @@
             @endif
 
             <!-- Call to Action Button for Workshops Page -->
-            <div class="text-center mt-12 fade-in-up">
+            <div class="text-center mt-12">
                 <a href="{{ route('workshops.list') }}"
                     class="btn-professional bg-white text-purple-700 px-8 py-3 rounded-full font-bold text-lg hover:bg-opacity-90 inline-flex items-center transition-all duration-300 transform hover:scale-105">
                     <span>Explore Workshops</span>
@@ -807,12 +662,14 @@
         </div>
     </section>
 
+
     <!-- Registration Modal -->
     <div id="registrationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-        <div class="bg-gray-100 rounded-3xl shadow-2xl max-w-4xl w-full mx-4 md:mx-auto max-h-[90vh] overflow-y-auto">
-            <div class="p-6 md:p-10">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 md:mx-auto max-h-[90vh] overflow-y-auto">
+            <div class="p-6 md:p-8">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-3xl font-bold text-gray-800" id="modalWorkshopTitle">Register Interest</h3>
+                    <h3 class="text-2xl font-bold text-gray-800" id="modalWorkshopTitle">{{ __('workshops.register_for') }}
+                    </h3>
                     <button type="button" onclick="closeRegistrationModal()" class="text-gray-500 hover:text-gray-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -822,37 +679,7 @@
                     </button>
                 </div>
 
-                <form id="registrationForm" action="{{ route('workshops.register', ['event' => 0]) }}" method="POST" class="space-y-6">
-                    @csrf
-                    <input type="hidden" name="event_id" id="modalWorkshopId">
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="form-input-group">
-                            <input type="text" name="parent_name" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white " placeholder="Parent's Name *" required>
-                        </div>
-
-                        <div class="form-input-group">
-                            <input type="tel" name="parent_contact" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-gray-800" placeholder="Parent's Phone *"
-                                required>
-                        </div>
-
-                        <div class="form-input-group">
-                            <input type="text" name="attendee_name" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-gray-800" placeholder="Child's Name *" required>
-                        </div>
-                    </div>
-
-                    <div class="form-input-group">
-                        <textarea name="special_requirements" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-gray-800"
-                            placeholder="Any special requirements or interests?" rows="4"></textarea>
-                    </div>
-
-
-                    <div class="mt-8">
-                        <button type="submit" class="register-btn btn-professional w-full">
-                            Register
-                        </button>
-                    </div>
-                </form>
+                <x-workshop-registration-form :event="null" :isModal="true" />
             </div>
         </div>
     </div>
@@ -862,7 +689,8 @@
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
                 <h2 class="text-5xl md:text-6xl font-black mb-8">
-                    <span class="text-gradient-advanced">{{ __('workshops.frequently_asked') }}</span> {{ __('workshops.questions') }}
+                    <span class="text-gradient-advanced">{{ __('workshops.frequently_asked') }}</span>
+                    {{ __('workshops.questions') }}
                 </h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                     {{ __('workshops.faq_description') }}
@@ -892,7 +720,8 @@
                     </div>
 
                     <div class="glass-card p-6 rounded-xl card-hover-effect bg-gradient-to-r from-blue-50 to-purple-50">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ __('workshops.faq_special_needs_question') }}</h3>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ __('workshops.faq_special_needs_question') }}
+                        </h3>
                         <p class="text-gray-600">{{ __('workshops.faq_special_needs_answer') }}</p>
                     </div>
                 </div>
@@ -930,20 +759,62 @@
             });
         });
 
-        function openRegistrationModal(workshopId, workshopTitle) {
-            document.getElementById('modalWorkshopId').value = workshopId;
+        // Workshop Registration Management
+        function openRegistrationModal(eventId, workshopTitle) {
+            // Set the workshop title in the modal
             document.getElementById('modalWorkshopTitle').textContent = 'Register for: ' + workshopTitle;
-            
+
+            // Set the workshop ID in the hidden inputs
+            const modalWorkshopIdInput = document.getElementById('modalWorkshopId');
+            const eventIdInput = document.getElementById('event_id');
+            const registrationType = document.getElementById('registration_type');
+
+            if (modalWorkshopIdInput) {
+                modalWorkshopIdInput.value = eventId;
+            }
+
+            if (eventIdInput) {
+                eventIdInput.value = eventId;
+            }
+
+            // Set registration type to event
+            if (registrationType) {
+                registrationType.value = 'event';
+            }
+
+            // Update UI elements
+            const registrationBadge = document.getElementById('registration_badge');
+            const registerButtonText = document.getElementById('register_button_text');
+            const preferredDayGroup = document.getElementById('preferred_day_group');
+
+            if (registrationBadge) {
+                registrationBadge.textContent = 'Event Registration';
+                registrationBadge.classList.remove('bg-blue-500');
+                registrationBadge.classList.add('bg-green-500');
+            }
+
+            if (registerButtonText) {
+                registerButtonText.textContent = 'Register for Event';
+            }
+
+            if (preferredDayGroup) {
+                preferredDayGroup.style.display = 'none';
+            }
+
             // Update the form action URL with the correct event ID
             const form = document.getElementById('registrationForm');
-            const action = form.getAttribute('action');
-            form.setAttribute('action', action.replace('/0/register', '/' + workshopId + '/register'));
-            
+            if (form) {
+                const action = form.getAttribute('action');
+                form.setAttribute('action', action.replace('/0/register', '/' + eventId + '/register'));
+            }
+
+            // Show the modal
             document.getElementById('registrationModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
         }
 
         function closeRegistrationModal() {
+            // Hide the modal
             document.getElementById('registrationModal').classList.add('hidden');
             document.body.style.overflow = ''; // Re-enable scrolling
         }
@@ -951,10 +822,41 @@
         // Close modal when clicking outside of it
         document.addEventListener('click', function (event) {
             const modal = document.getElementById('registrationModal');
-            const modalContent = modal.querySelector('div');
+            if (modal && !modal.classList.contains('hidden')) {
+                const modalContent = modal.querySelector('.bg-white');
+                if (event.target === modal) {
+                    closeRegistrationModal();
+                }
+            }
+        });
+    </script>
 
-            if (event.target === modal) {
-                closeRegistrationModal();
+    <!-- Swiper JS -->
+    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+    <script>
+        // Initialize Swiper
+        var swiper = new Swiper('.swiper-container', {
+            slidesPerView: 1,
+            spaceBetween: 30,
+            loop: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 1,
+                },
+                768: {
+                    slidesPerView: 2,
+                },
+                1024: {
+                    slidesPerView: 3,
+                },
             }
         });
     </script>
@@ -962,54 +864,5 @@
 @endsection
 
 @section('scripts')
-    <!-- Swiper JS -->
-    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
-    <script>
-        
-        function openRegistrationModal(eventId = null, workshopTitle = 'Workshop Interest') {
-            // Set the workshop title in the modal
-            document.getElementById('modalWorkshopTitle').innerText = workshopTitle;
-            
-            // Set the workshop ID in the hidden input if provided
-            if (eventId) {
-                document.getElementById('modalWorkshopId').value = eventId;
-                document.getElementById('registration_type').value = 'event';
-                document.getElementById('event_id').value = eventId;
-                
-                // Update UI for event registration
-                document.getElementById('register_button_text').innerText = 'Register for Event';
-                document.getElementById('registration_badge').innerText = 'Event Registration';
-                document.getElementById('registration_badge').classList.remove('bg-blue-500');
-                document.getElementById('registration_badge').classList.add('bg-green-500');
-                
-                // Hide preferred day field for event registration
-                if (document.getElementById('preferred_day_group')) {
-                    document.getElementById('preferred_day_group').classList.add('hidden');
-                }
-            } else {
-                document.getElementById('modalWorkshopId').value = '';
-                document.getElementById('registration_type').value = 'interest';
-                document.getElementById('event_id').value = '';
-                
-                // Update UI for interest registration
-                document.getElementById('register_button_text').innerText = 'Register Interest';
-                document.getElementById('registration_badge').innerText = 'Interest Registration';
-                document.getElementById('registration_badge').classList.remove('bg-green-500');
-                document.getElementById('registration_badge').classList.add('bg-blue-500');
-                
-                // Show preferred day field for interest registration
-                if (document.getElementById('preferred_day_group')) {
-                    document.getElementById('preferred_day_group').classList.remove('hidden');
-                }
-            }
-            
-            // Show the modal
-            document.getElementById('registrationModal').classList.remove('hidden');
-        }
-        
-        function closeRegistrationModal() {
-            // Hide the modal
-            document.getElementById('registrationModal').classList.add('hidden');
-        }
-    </script>
+
 @endsection

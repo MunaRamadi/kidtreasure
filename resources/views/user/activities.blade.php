@@ -112,7 +112,7 @@
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                                     @if($registration->status === \App\Models\WorkshopRegistration::STATUS_CONFIRMED) bg-green-100 text-green-800 
                                                     @elseif($registration->status === \App\Models\WorkshopRegistration::STATUS_PENDING) bg-yellow-100 text-yellow-800 
-                                                    @elseif($registration->status === \App\Models\WorkshopRegistration::STATUS_CANCELED) bg-red-100 text-red-800 
+                                                    @elseif($registration->status === \App\Models\WorkshopRegistration::STATUS_CANCELLED) bg-red-100 text-red-800 
                                                     @endif">
                                                     @if(app()->getLocale() == 'ar')
                                                         {{ $registration->status_name }}
@@ -121,7 +121,7 @@
                                                             {{ __('Pending') }}
                                                         @elseif($registration->status === \App\Models\WorkshopRegistration::STATUS_CONFIRMED)
                                                             {{ __('Done') }}
-                                                        @elseif($registration->status === \App\Models\WorkshopRegistration::STATUS_CANCELED)
+                                                        @elseif($registration->status === \App\Models\WorkshopRegistration::STATUS_CANCELLED)
                                                             {{ __('Canceled') }}
                                                         @else
                                                             {{ $registration->status }}
@@ -130,17 +130,14 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button type="button" class="text-[#9232E9] hover:text-[#7E22CE] font-medium toggle-details mr-3" data-registration-id="{{ $registration->id }}">
+                                                <button type="button" class="text-[#9232E9] hover:text-[#7E22CE] font-medium toggle-details mr-3" data-registration-id="{{ $registration->id }}" onclick="toggleDetails({{ $registration->id }})">
                                                     {{ __('Details') }}
                                                 </button>
                                                 
-                                                @if($registration->status !== \App\Models\WorkshopRegistration::STATUS_CANCELED && $registration->event->event_date->isFuture())
-                                                    <form action="{{ route('profile.activities.cancel', $registration->id) }}" method="POST" class="inline-block">
-                                                        @csrf
-                                                        <button type="submit" class="text-red-600 hover:text-red-900 font-medium" onclick="return confirm('{{ __('Are you sure you want to cancel this registration?') }}')">
-                                                            {{ __('Cancel') }}
-                                                        </button>
-                                                    </form>
+                                                @if($registration->status !== \App\Models\WorkshopRegistration::STATUS_CANCELLED && $registration->event->event_date->isFuture())
+                                                    <button type="button" onclick="openCancelModal({{ $registration->id }})" class="text-red-600 hover:text-red-900 font-medium">
+                                                        {{ __('Cancel') }}
+                                                    </button>
                                                 @endif
                                             </td>
                                         </tr>
@@ -155,7 +152,7 @@
                                                                 <img src="{{ asset('storage/' . $registration->event->workshop->image_path) }}" alt="{{ $registration->event->title }}" class="w-full h-auto rounded-lg">
                                                             @else
                                                                 <div class="bg-gray-200 rounded-lg w-full h-48 flex items-center justify-center">
-                                                                    <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                    <svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2"></path>
                                                                     </svg>
                                                                 </div>
@@ -198,7 +195,7 @@
                                                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                                                             @if($registration->status === \App\Models\WorkshopRegistration::STATUS_CONFIRMED) bg-green-100 text-green-800 
                                                                             @elseif($registration->status === \App\Models\WorkshopRegistration::STATUS_PENDING) bg-yellow-100 text-yellow-800 
-                                                                            @elseif($registration->status === \App\Models\WorkshopRegistration::STATUS_CANCELED) bg-red-100 text-red-800 
+                                                                            @elseif($registration->status === \App\Models\WorkshopRegistration::STATUS_CANCELLED) bg-red-100 text-red-800 
                                                                             @endif">
                                                                             @if(app()->getLocale() == 'ar')
                                                                                 {{ $registration->status_name }}
@@ -207,7 +204,7 @@
                                                                                     {{ __('Pending') }}
                                                                                 @elseif($registration->status === \App\Models\WorkshopRegistration::STATUS_CONFIRMED)
                                                                                     {{ __('Done') }}
-                                                                                @elseif($registration->status === \App\Models\WorkshopRegistration::STATUS_CANCELED)
+                                                                                @elseif($registration->status === \App\Models\WorkshopRegistration::STATUS_CANCELLED)
                                                                                     {{ __('Canceled') }}
                                                                                 @else
                                                                                     {{ $registration->status }}
@@ -219,25 +216,13 @@
                                                             </div>
                                                             
                                                             <div class="flex flex-wrap gap-2 mt-4">
-                                                                @if($registration->event->getGoogleCalendarUrl() && $registration->status !== \App\Models\WorkshopRegistration::STATUS_CONFIRMED)
+                                                                @if($registration->event->getGoogleCalendarUrl() && $registration->status !== \App\Models\WorkshopRegistration::STATUS_CANCELLED)
                                                                     <a href="{{ $registration->event->getGoogleCalendarUrl() }}" target="_blank" class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-[#9232E9] hover:bg-[#7E22CE] focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                                                                         <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
                                                                         </svg>
                                                                         {{ __('Add to Google Calendar') }}
                                                                     </a>
-                                                                @endif
-                                                                
-                                                                @if($registration->status !== \App\Models\WorkshopRegistration::STATUS_CANCELED && $registration->event->event_date->isFuture())
-                                                                    <form action="{{ route('profile.activities.cancel', $registration->id) }}" method="POST">
-                                                                        @csrf
-                                                                        <button type="submit" class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red active:bg-red-700 transition ease-in-out duration-150" onclick="return confirm('{{ __('Are you sure you want to cancel this registration?') }}')">
-                                                                            <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                                                                            </svg>
-                                                                            {{ __('Cancel Registration') }}
-                                                                        </button>
-                                                                    </form>
                                                                 @endif
                                                             </div>
                                                         </div>
@@ -269,26 +254,241 @@
     </div>
 </div>
 
+<!-- Cancellation Modal -->
+<div id="cancelRegistrationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 md:mx-auto">
+        <div class="p-6 relative">
+            <button type="button" onclick="closeCancelModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ __('Cancel Registration') }}</h3>
+            <p class="text-gray-600 mb-6">{{ __('Are you sure you want to cancel this registration? This action cannot be undone.') }}</p>
+
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="closeCancelModal()" class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#9232E9]">
+                    {{ __('No, Keep Registration') }}
+                </button>
+                <button type="button" onclick="submitCancelForm(document.getElementById('cancelRegistrationForm'))" class="px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    {{ __('Yes, Cancel Registration') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form for cancellation submission -->
+<form id="cancelRegistrationForm" action="" method="POST" class="hidden" onsubmit="return submitCancelForm(this);">
+    @csrf
+    <input type="hidden" name="registration_id" value="">
+</form>
+
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Toggle event details visibility
-        const viewEventButtons = document.querySelectorAll('.toggle-details');
-        viewEventButtons.forEach(button => {
+    <script>
+    // Function to open the cancel modal
+    function openCancelModal(registrationId) {
+        WorkshopRegistration.modal.open(registrationId);
+    }
+    
+    // Function to close the cancel modal
+    function closeCancelModal() {
+        WorkshopRegistration.modal.close();
+    }
+    
+    // Function to submit the cancel form
+    function submitCancelForm(form) {
+        return WorkshopRegistration.submitCancelForm(form);
+    }
+    
+    // Function to toggle details visibility
+    function toggleDetails(registrationId) {
+        const detailsRow = document.getElementById(`details-${registrationId}`);
+        if (detailsRow) {
+            detailsRow.classList.toggle('hidden');
+        }
+    }
+    
+    // Workshop Registration Management
+const WorkshopRegistration = {
+    // DOM Elements
+    elements: {
+        cancelModal: document.getElementById('cancelRegistrationModal'),
+        cancelForm: document.getElementById('cancelRegistrationForm')
+    },
+    
+    // Initialize the module
+    init: function() {
+        // Set up event listeners
+        document.addEventListener('DOMContentLoaded', this.setupEventListeners.bind(this));
+    },
+    
+    // Set up all event listeners
+    setupEventListeners: function() {
+        // Listen for registration cancellation events from other pages
+        document.addEventListener('registration-cancelled', this.handleExternalCancellation.bind(this));
+        
+        // Set up toggle details buttons
+        const detailsButtons = document.querySelectorAll('.toggle-details');
+        detailsButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const registrationId = this.getAttribute('data-registration-id');
-                const detailsRow = document.querySelector(`#details-${registrationId}`);
-                
-                if (detailsRow.classList.contains('hidden')) {
-                    detailsRow.classList.remove('hidden');
-                    this.textContent = '{{ __("Hide Details") }}';
-                } else {
-                    detailsRow.classList.add('hidden');
-                    this.textContent = '{{ __("Details") }}';
+                const detailsRow = document.getElementById(`details-${registrationId}`);
+                if (detailsRow) {
+                    detailsRow.classList.toggle('hidden');
                 }
             });
         });
-    });
-</script>
+    },
+    
+    // Modal Management
+    modal: {
+        open: function(registrationId) {
+            const form = WorkshopRegistration.elements.cancelForm;
+            form.action = '/profile/activities/' + registrationId + '/cancel';
+            form.querySelector('input[name="registration_id"]').value = registrationId;
+            WorkshopRegistration.elements.cancelModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+        },
+        
+        close: function() {
+            WorkshopRegistration.elements.cancelModal.classList.add('hidden');
+            document.body.style.overflow = 'auto'; // Re-enable scrolling when modal is closed
+        }
+    },
+    
+    // Form Submission
+    submitCancelForm: function(form) {
+        const formAction = form.action;
+        const eventId = formAction.split('/').slice(-2)[0]; // Extract event ID from URL
+        
+        // Submit the form using fetch to handle it via AJAX
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new URLSearchParams(new FormData(form))
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Close the modal
+            this.modal.close();
+            
+            // Update the UI to reflect the cancellation
+            this.updateUIAfterCancel(eventId);
+            
+            // Show success message using the global toast function
+            if (typeof showToast === 'function') {
+                showToast('Success', data.message || '{{ __("Registration successfully cancelled") }}', 'success');
+            }
+            
+            // Dispatch custom event for other pages to listen to
+            this.dispatchCancellationEvent(eventId, data.event_title || '', data.current_attendees, data.max_attendees);
+            
+            // Show snackbar notification
+            if (typeof showSnackbar === 'function') {
+                showSnackbar(data.message || '{{ __("Registration successfully cancelled") }}');
+            }
+            
+            // Reload the page after a short delay to show updated status
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            // Close the modal
+            this.modal.close();
+            
+            // Show error message using the global toast function
+            if (typeof showToast === 'function') {
+                showToast('Error', '{{ __("An error occurred while cancelling your registration") }}', 'error');
+            }
+        });
+        
+        return false; // Prevent form submission
+    },
+    
+    // UI Updates
+    updateUIAfterCancel: function(registrationId) {
+        try {
+            // Find the row for this registration - more compatible selector
+            const buttons = document.querySelectorAll('button[data-registration-id]');
+            let row = null;
+            
+            // Find the button with matching registration ID and get its parent row
+            for (const button of buttons) {
+                if (button.getAttribute('data-registration-id') === registrationId) {
+                    row = button.closest('tr');
+                    break;
+                }
+            }
+            
+            if (row) {
+                // Update status badge to show cancelled
+                const statusBadge = row.querySelector('.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full');
+                if (statusBadge) {
+                    statusBadge.textContent = '{{ __("Canceled") }}';
+                    statusBadge.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800';
+                }
+                
+                // Hide cancel button
+                const cancelButton = row.querySelector('button[onclick^="openCancelModal"]');
+                if (cancelButton) {
+                    cancelButton.style.display = 'none';
+                }
+            }
+            
+            // Also update the details section if it's open
+            const detailsRow = document.getElementById(`details-${registrationId}`);
+            if (detailsRow) {
+                const detailsStatusBadge = detailsRow.querySelector('.px-2.inline-flex.text-xs.leading-5.font-semibold.rounded-full');
+                if (detailsStatusBadge) {
+                    detailsStatusBadge.textContent = '{{ __("Canceled") }}';
+                    detailsStatusBadge.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800';
+                }
+                
+                // Hide Google Calendar button if it exists
+                const calendarButton = detailsRow.querySelector('a[href*="google.com/calendar"]');
+                if (calendarButton) {
+                    calendarButton.style.display = 'none';
+                }
+            }
+        } catch (error) {
+            console.error('Error updating UI after cancel:', error);
+        }
+    },
+    
+    // Event Dispatching
+    dispatchCancellationEvent: function(eventId, eventTitle, currentAttendees, maxAttendees) {
+        document.dispatchEvent(new CustomEvent('registration-cancelled', {
+            detail: {
+                eventId: eventId,
+                eventTitle: eventTitle,
+                currentAttendees: currentAttendees,
+                maxAttendees: maxAttendees
+            },
+            bubbles: true
+        }));
+    },
+    
+    // Handle cancellation events from other pages
+    handleExternalCancellation: function(e) {
+        const eventId = e.detail.eventId;
+        console.log('External cancellation received for event ID:', eventId);
+        this.updateUIAfterCancel(eventId);
+    }
+};
+    </script>
 @endpush
 @endsection
