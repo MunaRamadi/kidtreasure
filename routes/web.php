@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\BlogController as AdminBlogController; // For adm
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\UserSettingsController;
 use App\Http\Controllers\UserSecurityController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // Language Switching Route
@@ -142,6 +143,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // User Activities Route
     Route::get('/profile/activities', [UserDashboardController::class, 'activities'])->name('profile.activities');
     Route::post('/profile/activities/{registration}/cancel', [UserDashboardController::class, 'cancelRegistration'])->name('profile.activities.cancel');
+});
+
+// Notification Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::get('/notifications/unread', [NotificationController::class, 'getUnreadNotifications'])->name('notifications.unread');
+    
+    // Test route - remove in production
+    Route::get('/test-notification', [NotificationController::class, 'testNotification'])->name('notifications.test');
 });
 
 // Admin Panel Routes (requires authentication and admin role)
