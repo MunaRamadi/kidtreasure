@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\OrderCreated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -38,6 +39,15 @@ class Order extends Model
         'paid_at' => 'datetime',
         'order_status' => 'string',
         'payment_status' => 'string',
+    ];
+
+    /**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+        'created' => OrderCreated::class,
     ];
 
     // Status constants

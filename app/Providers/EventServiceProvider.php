@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Event;
 // استيراد الحدث والمستمع الذي قمنا بتطويره مسبقاً
 use Illuminate\Auth\Events\PasswordResetLinkSent; // هذا هو الحدث الذي نحتاجه
 use App\Listeners\LogPasswordResetRequest; // هذا هو المستمع الذي قمنا بإنشائه
+// Import our new event and listener
+use App\Events\OrderCreated;
+use App\Listeners\SendOrderCreatedNotification;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -21,6 +24,9 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
+        ],
+        OrderCreated::class => [
+            SendOrderCreatedNotification::class,
         ],
         // هذا هو الجزء الأهم الذي قمنا بإضافته لربط طلبات إعادة تعيين كلمة المرور
         PasswordResetLinkSent::class => [
