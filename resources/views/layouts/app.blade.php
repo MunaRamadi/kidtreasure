@@ -57,9 +57,6 @@
     
     @include('partials.footer')
 
-    <!-- Toast Notification Component -->
-    @include('components.toast')
-
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/notifications.js') }}"></script>
@@ -80,34 +77,34 @@
     
     @stack('scripts') 
     
-    <!-- Snackbar for welcome message -->
-    @if(session('welcome'))
-    <div id="welcomeSnackbar" class="snackbar">
-        <i class="fas fa-user-check me-2"></i> مرحباً {{ session('welcome') }}! تم تسجيل الدخول بنجاح.
-    </div>
+    @if(session('error'))
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var snackbar = document.getElementById("welcomeSnackbar");
-            snackbar.className = "snackbar show";
-            setTimeout(function(){ 
-                snackbar.className = snackbar.className.replace("show", ""); 
-            }, 3000);
+            showToast('Error', '{{ session('error') }}', 'error');
         });
     </script>
     @endif
 
-    <!-- Snackbar for success message -->
     @if(session('success'))
-    <div id="successSnackbar" class="snackbar">
-        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-    </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var snackbar = document.getElementById("successSnackbar");
-            snackbar.className = "snackbar show";
-            setTimeout(function(){ 
-                snackbar.className = snackbar.className.replace("show", ""); 
-            }, 3000);
+            showToast('Success', '{{ session('success') }}', 'success');
+        });
+    </script>
+    @endif
+
+    @if(session('info'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showToast('Information', '{{ session('info') }}', 'info');
+        });
+    </script>
+    @endif
+
+    @if(session('welcome'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showToast('Welcome', 'مرحباً {{ session('welcome') }}! تم تسجيل الدخول بنجاح.', 'success');
         });
     </script>
     @endif
