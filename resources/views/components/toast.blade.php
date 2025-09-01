@@ -1,17 +1,20 @@
 <div 
-    x-data="{ show: false, message: '', type: 'success' }"
+    x-data="{ show: false, title: '', message: '', type: 'success' }"
     x-show="show"
     x-init="
-        window.showToast = (type, message) => {
-            $data.type = type;
+        $el.style.display = 'none';
+        window.showToast = (title, message, type = 'success') => {
+            $data.type = type.toLowerCase();
+            $data.title = title;
             $data.message = message;
             $data.show = true;
             setTimeout(() => { $data.show = false }, 3000);
         }
     "
     @toast.window="
-        showToast($event.detail.type, $event.detail.message);
+        showToast($event.detail.title, $event.detail.message, $event.detail.type);
     "
+    style="display: none;"
     x-transition:enter="transition ease-out duration-300"
     x-transition:enter-start="opacity-0 transform translate-y-2"
     x-transition:enter-end="opacity-100 transform translate-y-0"
@@ -48,7 +51,10 @@
             </svg>
         </template>
     </div>
-    <div x-text="message"></div>
+    <div>
+        <div x-text="title" class="font-bold"></div>
+        <div x-text="message"></div>
+    </div>
     <button @click="show = false" class="ml-4 text-white hover:text-gray-200">
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

@@ -230,7 +230,8 @@ class CheckoutController extends Controller
             abort(403);
         }
         
-        return view('pages.checkout.success', compact('order'));
+        // Redirect to orders page with success message
+        return redirect()->route('profile.orders')->with('success', 'Your order has been confirmed successfully! Thank you for shopping with us.');
     }
 
     // صفحة فشل الطلب
@@ -292,8 +293,8 @@ class CheckoutController extends Controller
         // Clear shipping info from session
         session()->forget('shipping_info');
         
-        // Redirect to success page with success message
-        return redirect()->route('checkout.success', ['order' => $order->id])
+        // Redirect to orders page with success message
+        return redirect()->route('profile.orders')
                          ->with('success', 'Your order has been confirmed! You will pay upon delivery. Thank you for shopping with us.');
     }
     // حساب تكلفة الشحن

@@ -179,22 +179,57 @@
             visibility: hidden;
             min-width: 250px;
             margin-left: -125px;
-            background-color: #4e73df;
+            background-color: #333;
             color: #fff;
             text-align: center;
-            border-radius: 6px;
+            border-radius: 4px;
             padding: 16px;
             position: fixed;
-            z-index: 1100;
+            z-index: 9999;
             left: 50%;
             bottom: 30px;
             font-size: 16px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-
+        
         .snackbar.show {
             visibility: visible;
             animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+        
+        .snackbar.success {
+            background-color: #28a745;
+        }
+        
+        .snackbar.error {
+            background-color: #dc3545;
+        }
+        
+        .snackbar.info {
+            background-color: #17a2b8;
+        }
+        
+        .snackbar-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .snackbar-message {
+            flex-grow: 1;
+            text-align: left;
+        }
+        
+        .snackbar-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 0 0 16px;
         }
 
         @keyframes fadein {
@@ -213,6 +248,16 @@
 
 <body>
     <div id="wrapper">
+        <!-- Snackbar element -->
+        <div id="snackbar" class="snackbar">
+            <div class="snackbar-content">
+                <div class="snackbar-message">
+                    <strong id="snackbar-title">Message</strong>
+                    <div id="snackbar-text"></div>
+                </div>
+                <button class="snackbar-close" onclick="hideSnackbar()">&times;</button>
+            </div>
+        </div>
         <nav class="sidebar" id="sidebar">
             <a class="sidebar-brand d-flex align-items-center justify-content-center"
                 href="{{ route('admin.dashboard') }}">
@@ -401,10 +446,43 @@
             </nav>
             <div class="container-fluid p-4">
                 @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showSnackbar('Error', '{{ session('error') }}', 'error');
+                    });
+                </script>
+                @endif
+
+                @if(session('success'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showSnackbar('Success', '{{ session('success') }}', 'success');
+                    });
+                </script>
+                @endif
+
+                @if(session('info'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showSnackbar('Information', '{{ session('info') }}', 'info');
+                    });
+                </script>
+                @endif
+
+                @if(session('snackbar'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showSnackbar('Success', '{{ session('snackbar') }}', 'success');
+                    });
+                </script>
+                @endif
+
+                @if(session('welcome'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showSnackbar('Welcome', 'مرحباً {{ session('welcome') }}! تم تسجيل الدخول بنجاح.', 'success');
+                    });
+                </script>
                 @endif
 
                 @yield('content')
@@ -428,41 +506,25 @@
                 }
             }
         });
+
+        function showSnackbar(title, message, type) {
+            var snackbar = document.getElementById("snackbar");
+            snackbar.className = "snackbar " + type;
+            document.getElementById("snackbar-title").innerHTML = title;
+            document.getElementById("snackbar-text").innerHTML = message;
+            snackbar.className = "snackbar " + type + " show";
+            setTimeout(function(){ 
+                snackbar.className = snackbar.className.replace("show", ""); 
+            }, 3000);
+        }
+
+        function hideSnackbar() {
+            var snackbar = document.getElementById("snackbar");
+            snackbar.className = snackbar.className.replace("show", "");
+        }
     </script>
 
     @yield('scripts')
 </body>
-
-<!-- Snackbar for welcome message -->
-@if(session('welcome'))
-<div id="welcomeSnackbar" class="snackbar">
-    <i class="fas fa-user-check me-2"></i> مرحباً {{ session('welcome') }}! تم تسجيل الدخول بنجاح.
-</div>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var snackbar = document.getElementById("welcomeSnackbar");
-        snackbar.className = "snackbar show";
-        setTimeout(function(){ 
-            snackbar.className = snackbar.className.replace("show", ""); 
-        }, 3000);
-    });
-</script>
-@endif
-
-<!-- Snackbar for success messages -->
-@if(session('snackbar'))
-<div id="successSnackbar" class="snackbar">
-    <i class="fas fa-check-circle me-2"></i> {{ session('snackbar') }}
-</div>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var snackbar = document.getElementById("successSnackbar");
-        snackbar.className = "snackbar show";
-        setTimeout(function(){ 
-            snackbar.className = snackbar.className.replace("show", ""); 
-        }, 3000);
-    });
-</script>
-@endif
 
 </html>
