@@ -3,7 +3,7 @@
 @section('title', 'عرض القصة')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid" dir="rtl">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>

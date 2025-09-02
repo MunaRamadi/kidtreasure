@@ -72,7 +72,7 @@
                     </thead>
                     <tbody>
                         @forelse($orders as $order)
-                            <tr>
+                            <tr class="{{ isset($highlightId) && $order->id == $highlightId ? 'table-danger' : '' }}">
                                 <td>{{ $order->order_number ?? $order->id }}</td>
                                 <td>
                                     @if($order->user)

@@ -5,6 +5,9 @@ namespace App\Models;
 use App\Events\OrderCreated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Order extends Model
 {
@@ -46,9 +49,10 @@ class Order extends Model
      *
      * @var array
      */
-    protected $dispatchesEvents = [
-        'created' => OrderCreated::class,
-    ];
+    // Removed event dispatching
+    // protected $dispatchesEvents = [
+    //     'created' => OrderCreated::class,
+    // ];
 
     // Status constants
     const STATUS_PENDING = 'pending';
@@ -138,6 +142,55 @@ class Order extends Model
                 'product_image' => $cartItem->product_image,
                 'options' => $cartItem->options,
             ]);
+        }
+        
+        // Direct notification creation instead of using events
+        try {
+            Log::info('Creating order notifications for admin users');
+            
+            // Get all admin users
+            $adminUsers = User::where('is_admin', true)->get();
+            
+            if ($adminUsers->isEmpty()) {
+                Log::warning('No admin users found, trying with role=admin');
+                $adminUsers = User::where('role', 'admin')->get();
+            }
+            
+            Log::info('Found ' . $adminUsers->count() . ' admin users');
+            
+            foreach ($adminUsers as $admin) {
+                Log::info('Creating notification for admin: ' . $admin->id . ' - ' . $admin->name);
+                
+                // Create notification data
+                $notificationData = [
+                    'id' => $order->id,
+                    'type' => 'order',
+                    'order_number' => $order->order_number,
+                    'customer_name' => $order->user->name ?? 'Guest',
+                    'total_amount' => $order->total_amount_jod,
+                    'currency' => 'JOD',
+                    'created_at' => $order->created_at->toIso8601String(),
+                    'message' => 'New order #' . $order->order_number . ' has been placed',
+                    'url' => route('admin.orders.index', ['highlight' => $order->id]),
+                    'item_id' => $order->id
+                ];
+                
+                // Direct database insertion
+                DB::table('notifications')->insert([
+                    'id' => Str::uuid()->toString(),
+                    'type' => 'App\\Notifications\\NewOrderNotification',
+                    'notifiable_type' => 'App\\Models\\User',
+                    'notifiable_id' => $admin->id,
+                    'data' => json_encode($notificationData),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                
+                Log::info('Successfully created notification for admin: ' . $admin->id);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error creating order notifications: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
         }
         
         // تفريغ السلة بعد إنشاء الطلب

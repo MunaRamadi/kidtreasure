@@ -11,7 +11,12 @@ use Illuminate\Auth\Events\PasswordResetLinkSent; // هذا هو الحدث ال
 use App\Listeners\LogPasswordResetRequest; // هذا هو المستمع الذي قمنا بإنشائه
 // Import our new event and listener
 use App\Events\OrderCreated;
-use App\Listeners\SendOrderCreatedNotification;
+// Import admin notification events and listeners
+use App\Events\ContactMessageCreated;
+use App\Events\StoryRequestCreated;
+use App\Listeners\SendNewOrderNotification;
+use App\Listeners\SendNewContactMessageNotification;
+use App\Listeners\SendNewStoryRequestNotification;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -26,11 +31,18 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         OrderCreated::class => [
-            SendOrderCreatedNotification::class,
+            SendNewOrderNotification::class,
         ],
         // هذا هو الجزء الأهم الذي قمنا بإضافته لربط طلبات إعادة تعيين كلمة المرور
         PasswordResetLinkSent::class => [
             LogPasswordResetRequest::class,
+        ],
+        // Admin notification events
+        ContactMessageCreated::class => [
+            SendNewContactMessageNotification::class,
+        ],
+        StoryRequestCreated::class => [
+            SendNewStoryRequestNotification::class,
         ],
         // إذا كان لديك أي أحداث أو مستمعين آخرين معرفين في مشروعك، أضفهم هنا
     ];

@@ -47,9 +47,21 @@ class OrdersController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $orders = $query->latest()->paginate(20)->withQueryString();
+        $orders = $query->latest()->paginate(perPage: 6)->withQueryString();
+        
+        // Check if we need to highlight a specific order
+        $highlightId = $request->query('highlight');
+        
+        // If we have a highlight ID from a notification, mark related notifications as read
+        if ($highlightId) {
+            // Mark notifications related to this order as read
+            auth()->user()->notifications()
+                ->whereJsonContains('data->item_id', (int)$highlightId)
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
+        }
 
-        return view('admin.orders.index', compact('orders'));
+        return view('admin.orders.index', compact('orders', 'highlightId'));
     }
 
     public function show(Order $order)
@@ -103,7 +115,7 @@ class OrdersController extends Controller
 
         // إرسال إشعار للعميل (يمكن إضافة هذه الوظيفة لاحقاً)
 
-        return back()->with('success', 'تم تحديث معلومات الطلب بنجاح');
+        return redirect()->route('admin.orders.index')->with('success', 'تم تحديث معلومات الطلب بنجاح');
     }
 
     public function updatePaymentStatus(Request $request, Order $order)
@@ -114,6 +126,6 @@ class OrdersController extends Controller
 
         $order->update(['payment_status' => $request->payment_status]);
 
-        return back()->with('success', 'تم تحديث حالة الدفع بنجاح');
+        return redirect()->route('admin.orders.index')->with('success', 'تم تحديث حالة الدفع بنجاح');
     }
 }

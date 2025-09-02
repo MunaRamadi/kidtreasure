@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\ContactMessageCreated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -62,6 +63,15 @@ class ContactMessage extends Model
         'submission_date',
         'created_at',
         'updated_at',
+    ];
+
+    /**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+        'created' => ContactMessageCreated::class,
     ];
 
     /**

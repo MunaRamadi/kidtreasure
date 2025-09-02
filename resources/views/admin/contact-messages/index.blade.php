@@ -129,8 +129,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="d-flex justify-content-center">
-                {{ $messages->links() }} {{-- Pagination links --}}
+            <div class="mt-4">
+                {{ $messages->links() }}
             </div>
             @else
                 <div class="alert alert-info">

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use App\Models\Order;
 use App\Observers\OrderObserver;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +26,8 @@ class AppServiceProvider extends ServiceProvider
         
         // Register observers
         Order::observe(OrderObserver::class);
+        
+        // Use Bootstrap for pagination styling
+        Paginator::useBootstrap();
     }
 }
