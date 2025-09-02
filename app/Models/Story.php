@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\StoryRequestCreated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Category;
@@ -32,6 +33,15 @@ class Story extends Model
         'admin_notes',
         'is_featured',
         'display_order'
+    ];
+
+    /**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $dispatchesEvents = [
+        'created' => StoryRequestCreated::class,
     ];
 
     protected $casts = [

@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\WorkshopsController; // For admin workshop templa
 use App\Http\Controllers\Admin\WorkshopEventsController; // For admin workshop events management
 use App\Http\Controllers\Admin\ContactMessagesController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController; // For admin blog
+use App\Http\Controllers\Admin\AdminNotificationController; // For admin notifications
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\UserSettingsController;
 use App\Http\Controllers\UserSecurityController;
@@ -162,6 +163,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Main Dashboard
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+
+    // Admin Notifications
+    Route::prefix('notifications')->name('notifications.')->controller(AdminNotificationController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/{id}/mark-read', 'markAsRead')->name('mark-read');
+        Route::post('/mark-all-read', 'markAllAsRead')->name('mark-all-read');
+        Route::post('/mark-type-read', 'markTypeAsRead')->name('mark-type-read');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+        Route::get('/unread', 'getUnreadNotifications')->name('unread');
+    });
 
     // Product Management
     Route::prefix('products')->name('products.')->controller(ProductsController::class)->group(function () {

@@ -183,7 +183,7 @@
                         </thead>
                         <tbody>
                             @foreach($stories as $story)
-                                <tr>
+                                <tr class="{{ isset($highlightId) && $story->story_id == $highlightId ? 'table-danger' : '' }}">
                                     <td>{{ $story->id }}</td>
                                     <td>
                                         @if($story->image_full_url)

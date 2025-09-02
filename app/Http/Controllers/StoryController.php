@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class StoryController extends Controller
 {
@@ -96,6 +98,54 @@ class StoryController extends Controller
             'status' => 'pending',
             'is_featured' => false,
         ]);
+
+        // Direct notification creation instead of using events
+        try {
+            Log::info('Creating story request notifications for admin users');
+            
+            // Get all admin users
+            $adminUsers = User::where('is_admin', true)->get();
+            
+            if ($adminUsers->isEmpty()) {
+                Log::warning('No admin users found, trying with role=admin');
+                $adminUsers = User::where('role', 'admin')->get();
+            }
+            
+            Log::info('Found ' . $adminUsers->count() . ' admin users');
+            
+            foreach ($adminUsers as $admin) {
+                Log::info('Creating notification for admin: ' . $admin->id . ' - ' . $admin->name);
+                
+                // Create notification data
+                $notificationData = [
+                    'id' => $story->story_id,
+                    'type' => 'story_request',
+                    'title' => $story->title_en ?? $story->title_ar,
+                    'child_name' => $story->child_name,
+                    'parent_name' => $story->parent_name,
+                    'created_at' => $story->created_at->toIso8601String(),
+                    'message' => 'New story request from ' . $story->parent_name,
+                    'url' => route('admin.stories.index', ['highlight' => $story->story_id]),
+                    'item_id' => $story->story_id
+                ];
+                
+                // Direct database insertion
+                DB::table('notifications')->insert([
+                    'id' => Str::uuid()->toString(),
+                    'type' => 'App\\Notifications\\NewStoryRequestNotification',
+                    'notifiable_type' => 'App\\Models\\User',
+                    'notifiable_id' => $admin->id,
+                    'data' => json_encode($notificationData),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                
+                Log::info('Successfully created notification for admin: ' . $admin->id);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error creating story request notifications: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
+        }
 
         return redirect()->route('stories.index')
             ->with('success', 'تم إرسال قصتك بنجاح! سيتم مراجعتها قبل النشر.');

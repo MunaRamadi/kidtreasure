@@ -56,8 +56,23 @@ class StoriesController extends Controller
             'rejected' => Story::rejected()->count(),
             'featured' => Story::featured()->count(),
         ];
+        
+        // Check if we need to highlight a specific story
+        $highlightId = $request->query('highlight');
+        
+        // If we have a highlight ID from a notification, mark related notifications as read
+        if ($highlightId) {
+            // Mark notifications related to this story as read
+            auth()->user()->notifications()
+                ->where(function($query) use ($highlightId) {
+                    $query->whereJsonContains('data->item_id', $highlightId)
+                          ->orWhereJsonContains('data->id', $highlightId);
+                })
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
+        }
 
-        return view('admin.stories.index', compact('stories', 'stats'));
+        return view('admin.stories.index', compact('stories', 'stats', 'highlightId'));
     }
 
     /**
@@ -142,6 +157,14 @@ class StoriesController extends Controller
     public function show(Story $story)
     {
         $story->load(['user', 'reviewer']);
+        
+        // Mark notifications related to this story as read
+        auth()->user()->notifications()
+            ->whereJsonContains('data->type', 'story_request')
+            ->whereJsonContains('data->id', $story->story_id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+            
         return view('admin.stories.show', compact('story'));
     }
 

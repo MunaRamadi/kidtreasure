@@ -5,9 +5,10 @@ namespace App\Notifications;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OrderCreatedNotification extends Notification implements ShouldQueue
+class NewOrderNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -52,11 +53,11 @@ class OrderCreatedNotification extends Notification implements ShouldQueue
             'id' => $this->order->id,
             'type' => 'order',
             'order_number' => $this->order->order_number,
-            'customer_name' => $this->order->customer_name ?? ($this->order->user ? $this->order->user->name : 'Guest'),
-            'amount' => $this->order->total_amount_jod,
-            'status' => $this->order->order_status,
+            'customer_name' => $this->order->user->name ?? 'Guest',
+            'total_amount' => $this->order->total_amount_jod,
+            'currency' => 'JOD',
             'created_at' => $this->order->created_at->toIso8601String(),
-            'message' => 'New order #' . $this->order->order_number . ' has been created',
+            'message' => 'New order #' . $this->order->order_number . ' has been placed',
             'url' => route('admin.orders.show', $this->order->id)
         ];
     }
